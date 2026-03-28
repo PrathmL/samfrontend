@@ -4,13 +4,13 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import LoginPage from './components/auth/LoginPage';
 import AdminLayout from './components/dashboard/AdminLayout';
 import AdminDashboardHome from './components/dashboard/AdminDashboardHome';
-import AdminDashboard from './components/dashboard/AdminDashboardHome';
 import UserManagement from './components/dashboard/UserManagement';
 import TalukaManagement from './components/dashboard/TalukaManagement';
 import SchoolManagement from './components/dashboard/SchoolManagement';
 import AdminWorkRequests from './components/dashboard/AdminWorkRequests';
 import AdminWorkMonitoring from './components/dashboard/AdminWorkMonitoring';
 import BlockerManagement from './components/dashboard/BlockerManagement';
+import BlockerAnalytics from './components/dashboard/BlockerAnalytics';
 import WorkCreationForm from './components/dashboard/WorkCreationForm';
 import HeadmasterDashboard from './components/dashboard/HeadmasterDashboard';
 import ClerkDashboard from './components/dashboard/ClerkDashboard';
@@ -53,8 +53,9 @@ function App() {
                     <Route path="work-monitoring" element={<AdminWorkMonitoring />} />
                     <Route path="work-requests" element={<AdminWorkRequests />} />
                     <Route path="blockers" element={<BlockerManagement />} />
+                    <Route path="analytics" element={<BlockerAnalytics />} />
                     <Route path="create-work/:requestId" element={<WorkCreationForm />} />
-                    <Route path="*" element={<Navigate to="dashboard" />} />
+                    <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />
                   </Routes>
                 </AdminLayout>
               </ProtectedRoute>

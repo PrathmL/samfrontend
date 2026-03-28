@@ -12,6 +12,7 @@ import {
 
 import { useNavigate } from 'react-router-dom';
 import BlockerManagement from './BlockerManagement';
+import BlockerAnalytics from './BlockerAnalytics';
 
 const SachivDashboard = () => {
   const { user, logout } = useAuth();
@@ -81,7 +82,7 @@ const SachivDashboard = () => {
   });
 
   useEffect(() => {
-    if (user && user.talukaId) {
+    if (user?.talukaId) {
       fetchDashboardData();
       fetchWorks();
       fetchBlockers();
@@ -89,7 +90,7 @@ const SachivDashboard = () => {
       fetchPendingVerification();
       fetchSachivUsers();
     }
-  }, [user]);
+  }, [user?.talukaId, user?.id]);
 
   // Filter functions
   const filteredWorks = works.filter(work => {
@@ -345,6 +346,36 @@ const SachivDashboard = () => {
     }
   };
 
+  const renderSegmentedProgressBar = (work) => {
+    if (!work.stages || work.stages.length === 0) {
+      return (
+        <div className="progress-bar-small">
+          <div className="progress-fill" style={{ width: `${work.progressPercentage}%` }}></div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="segmented-progress-container-table">
+        <div className="segmented-progress-bar-table">
+          {work.stages.map((stage, idx) => (
+            <div 
+              key={idx} 
+              className="progress-segment-table" 
+              style={{ width: `${stage.weightage}%` }}
+              title={`${stage.name}: ${stage.progressPercentage}%`}
+            >
+              <div 
+                className={`segment-fill-table ${stage.status?.toLowerCase()}`} 
+                style={{ width: `${stage.progressPercentage}%` }}
+              ></div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
   // Render Dashboard
   const renderDashboard = () => (
     <div className="sachiv-dashboard">
@@ -481,10 +512,8 @@ const SachivDashboard = () => {
                   </td>
                   <td>{work.schoolName || `School ID: ${work.schoolId}`}</td>
                   <td>
-                    <div className="progress-cell">
-                      <div className="progress-bar-small">
-                        <div className="progress-fill" style={{ width: `${work.progressPercentage}%` }}></div>
-                      </div>
+                    <div className="progress-cell-table">
+                      {renderSegmentedProgressBar(work)}
                       <span>{work.progressPercentage}%</span>
                     </div>
                   </td>
@@ -1116,6 +1145,9 @@ const SachivDashboard = () => {
           <button className={`nav-item ${activeModule === 'blockers' ? 'active' : ''}`} onClick={() => setActiveModule('blockers')}>
             <AlertCircle size={20} /> {!sidebarCollapsed && <span>Blockers</span>}
           </button>
+          <button className={`nav-item ${activeModule === 'analytics' ? 'active' : ''}`} onClick={() => setActiveModule('analytics')}>
+            <BarChart3 size={20} /> {!sidebarCollapsed && <span>Analytics</span>}
+          </button>
           <button className={`nav-item ${activeModule === 'verification' ? 'active' : ''}`} onClick={() => setActiveModule('verification')}>
             <CheckCircle2 size={20} /> {!sidebarCollapsed && <span>Verification</span>}
           </button>
@@ -1171,6 +1203,7 @@ const SachivDashboard = () => {
         {activeModule === 'dashboard' && renderDashboard()}
         {activeModule === 'works' && renderWorks()}
         {activeModule === 'blockers' && <BlockerManagement />}
+        {activeModule === 'analytics' && <BlockerAnalytics talukaId={user.talukaId} />}
         {activeModule === 'verification' && renderVerification()}
         {activeModule === 'profile' && (
           <div className="profile-card">
@@ -1243,6 +1276,15 @@ const SachivDashboard = () => {
         .progress-cell { display: flex; align-items: center; gap: 0.5rem; }
         .progress-bar-small { flex: 1; background-color: #e2e8f0; border-radius: 9999px; height: 6px; overflow: hidden; }
         .progress-fill { background-color: #0ea5e9; height: 100%; border-radius: 9999px; }
+        
+        .segmented-progress-container-table { width: 100%; min-width: 100px; }
+        .segmented-progress-bar-table { height: 8px; background: #e2e8f0; border-radius: 4px; display: flex; overflow: hidden; gap: 1px; }
+        .progress-segment-table { height: 100%; background: #f1f5f9; position: relative; }
+        .segment-fill-table { height: 100%; transition: width 0.5s ease-out; }
+        .segment-fill-table.completed { background: #10b981; }
+        .segment-fill-table.in_progress { background: #3b82f6; }
+        .segment-fill-table.pending { background: #cbd5e1; }
+
         .status-badge { display: inline-flex; align-items: center; gap: 0.25rem; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
         .view-btn { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background-color: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 0.5rem; cursor: pointer; font-size: 0.875rem; }
         .view-btn:hover { background-color: #0ea5e9; color: white; }

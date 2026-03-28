@@ -52,31 +52,61 @@ const AdminWorkMonitoring = () => {
     }
   }, []);
 
-  const fetchTalukas = async () => {
+  const fetchTalukas = useCallback(async () => {
     try {
       const res = await axios.get('http://localhost:8080/api/talukas');
       setTalukas(res.data || []);
     } catch (err) {
       console.error('Error fetching talukas:', err);
     }
-  };
+  }, []);
 
-  const fetchSchools = async () => {
+  const fetchSchools = useCallback(async () => {
     try {
       const res = await axios.get('http://localhost:8080/api/schools');
       setSchools(res.data || []);
     } catch (err) {
       console.error('Error fetching schools:', err);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchWorks();
     fetchTalukas();
     fetchSchools();
-  }, [fetchWorks]);
+  }, [fetchWorks, fetchTalukas, fetchSchools]);
 
   // Apply filters
+  const renderSegmentedProgressBar = (work) => {
+    if (!work.stages || work.stages.length === 0) {
+      return (
+        <div className="bar-bg">
+          <div className="bar-fill" style={{ width: `${work.progressPercentage}%` }}></div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="segmented-progress-container-table">
+        <div className="segmented-progress-bar-table">
+          {work.stages.map((stage, idx) => (
+            <div 
+              key={idx} 
+              className="progress-segment-table" 
+              style={{ width: `${stage.weightage}%` }}
+              title={`${stage.name}: ${stage.progressPercentage}%`}
+            >
+              <div 
+                className={`segment-fill-table ${stage.status?.toLowerCase()}`} 
+                style={{ width: `${stage.progressPercentage}%` }}
+              ></div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
   const applyFilters = useCallback(() => {
     let filtered = [...works];
 
@@ -276,10 +306,8 @@ const AdminWorkMonitoring = () => {
                     </span>
                   </td>
                   <td>
-                    <div className="progress-mini">
-                      <div className="bar-bg">
-                        <div className="bar-fill" style={{ width: `${work.progressPercentage}%` }}></div>
-                      </div>
+                    <div className="progress-mini-table">
+                      {renderSegmentedProgressBar(work)}
                       <span>{work.progressPercentage}%</span>
                     </div>
                   </td>
@@ -576,6 +604,15 @@ const AdminWorkMonitoring = () => {
         .bar-fill { height: 100%; background: #0ea5e9; border-radius: 10px; transition: width 0.3s ease; }
         .progress-mini span { font-size: 0.8rem; font-weight: 600; color: #475569; min-width: 35px; }
         
+        .progress-mini-table { display: flex; align-items: center; gap: 0.75rem; width: 150px; }
+        .segmented-progress-container-table { flex: 1; }
+        .segmented-progress-bar-table { height: 8px; background: #e2e8f0; border-radius: 4px; display: flex; overflow: hidden; gap: 1px; }
+        .progress-segment-table { height: 100%; background: #f1f5f9; position: relative; }
+        .segment-fill-table { height: 100%; transition: width 0.5s ease-out; }
+        .segment-fill-table.completed { background: #10b981; }
+        .segment-fill-table.in_progress { background: #3b82f6; }
+        .segment-fill-table.pending { background: #cbd5e1; }
+
         .date-cell { display: flex; align-items: center; gap: 0.4rem; font-size: 0.85rem; color: #64748b; }
         
         .action-btns { display: flex; gap: 0.5rem; }

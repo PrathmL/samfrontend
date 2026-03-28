@@ -82,6 +82,7 @@ const HeadmasterDashboard = () => {
 
   // Completed Works for Closure
   const [worksPendingClosure, setWorksPendingClosure] = useState([]);
+  const [lowStockAlerts, setLowStockAlerts] = useState([]);
   const [selectedWorkForClosure, setSelectedWorkForClosure] = useState(null);
   const [isClosureModalOpen, setIsClosureModalOpen] = useState(false);
   const [closureFormData, setClosureFormData] = useState({
@@ -92,14 +93,24 @@ const HeadmasterDashboard = () => {
   });
 
   useEffect(() => {
-    if (user && user.schoolId) {
+    if (user?.schoolId) {
       fetchDashboardData();
       fetchWorkRequests();
       fetchActiveWorks();
       fetchBlockers();
       fetchWorksPendingClosure();
+      fetchLowStockAlerts();
     }
-  }, [user]);
+  }, [user?.schoolId, user?.id]);
+
+  const fetchLowStockAlerts = async () => {
+    try {
+      const res = await axios.get(`http://localhost:8080/api/inventory/alerts/low-stock/${user.schoolId}`);
+      setLowStockAlerts(res.data || []);
+    } catch (err) {
+      console.error('Error fetching low stock alerts:', err);
+    }
+  };
 
   // Filter active works based on search and status
   const filteredActiveWorks = activeWorks.filter(work => {
@@ -462,6 +473,43 @@ const HeadmasterDashboard = () => {
     }
   };
 
+  const renderSegmentedProgressBar = (work) => {
+    if (!work.stages || work.stages.length === 0) {
+      return (
+        <div className="progress-bar">
+          <div className="progress-fill" style={{ width: `${work.progressPercentage}%` }}></div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="segmented-progress-container">
+        <div className="segmented-progress-bar">
+          {work.stages.map((stage, idx) => (
+            <div 
+              key={idx} 
+              className="progress-segment" 
+              style={{ width: `${stage.weightage}%` }}
+              title={`${stage.name}: ${stage.progressPercentage}%`}
+            >
+              <div 
+                className={`segment-fill ${stage.status?.toLowerCase()}`} 
+                style={{ width: `${stage.progressPercentage}%` }}
+              ></div>
+            </div>
+          ))}
+        </div>
+        <div className="progress-labels-mini">
+          {work.stages.map((stage, idx) => (
+            <div key={idx} className="stage-dot-container" title={stage.name}>
+              <div className={`stage-dot ${stage.status?.toLowerCase()}`}></div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
   // Dashboard View
   const renderDashboard = () => (
     <div className="hm-dashboard">
@@ -540,19 +588,46 @@ const HeadmasterDashboard = () => {
         </div>
       </div>
 
-      <div className="recent-activity-hm">
-        <h3>Recent Activity</h3>
-        <div className="activity-list">
-          {workRequests.slice(0, 5).map(request => (
-            <div key={request.id} className="activity-item">
-              <div className="activity-icon"><FileText size={16} /></div>
-              <div className="activity-content">
-                <p><strong>{request.title}</strong> - {request.status?.replace('_', ' ')}</p>
-                <small>{new Date(request.createdAt).toLocaleDateString()}</small>
+      <div className="dashboard-grid-two-cols">
+        <div className="recent-activity-hm">
+          <h3>Recent Activity</h3>
+          <div className="activity-list">
+            {workRequests.slice(0, 5).map(request => (
+              <div key={request.id} className="activity-item">
+                <div className="activity-icon"><FileText size={16} /></div>
+                <div className="activity-content">
+                  <p><strong>{request.title}</strong> - {request.status?.replace('_', ' ')}</p>
+                  <small>{new Date(request.createdAt).toLocaleDateString()}</small>
+                </div>
               </div>
-            </div>
-          ))}
-          {workRequests.length === 0 && <p className="no-activity">No recent activity</p>}
+            ))}
+            {workRequests.length === 0 && <p className="no-activity">No recent activity</p>}
+          </div>
+        </div>
+
+        <div className="low-stock-alerts-hm">
+          <h3>Low Stock Alerts (from Clerk)</h3>
+          <div className="alerts-list-hm">
+            {lowStockAlerts.map(alert => (
+              <div key={alert.id} className="alert-item-hm">
+                <AlertTriangle size={16} color="#f59e0b" />
+                <div className="alert-info-hm">
+                  <p><strong>{alert.name}</strong> is running low</p>
+                  <small>Current Stock: {alert.currentStock} {alert.unitOfMeasurement}</small>
+                </div>
+                <button className="report-btn-sm" onClick={() => {
+                  setBlockerFormData({
+                    ...blockerFormData,
+                    title: `Material Shortage: ${alert.name}`,
+                    type: 'Material Shortage',
+                    description: `Low stock alert received for ${alert.name}. Current quantity is ${alert.currentStock} ${alert.unitOfMeasurement}.`
+                  });
+                  setIsBlockerModalOpen(true);
+                }}>Report Blocker</button>
+              </div>
+            ))}
+            {lowStockAlerts.length === 0 && <p className="no-alerts">No low stock alerts</p>}
+          </div>
         </div>
       </div>
     </div>
@@ -648,12 +723,10 @@ const HeadmasterDashboard = () => {
               
               <div className="work-progress">
                 <div className="progress-label">
-                  <span>Progress</span>
+                  <span>Overall Progress</span>
                   <span className="progress-value">{work.progressPercentage}%</span>
                 </div>
-                <div className="progress-bar">
-                  <div className="progress-fill" style={{ width: `${work.progressPercentage}%` }}></div>
-                </div>
+                {renderSegmentedProgressBar(work)}
               </div>
               
               <div className="work-details">
@@ -877,15 +950,24 @@ const HeadmasterDashboard = () => {
 
             {selectedWork && selectedWork.stages && (
               <div className="form-group">
-                <label>Select Stage (Optional)</label>
+                <label>Select Stage to Update *</label>
                 <select
                   value={progressFormData.stageId}
-                  onChange={(e) => setProgressFormData({...progressFormData, stageId: e.target.value})}
+                  onChange={(e) => {
+                    const sId = e.target.value;
+                    const stage = selectedWork.stages.find(s => s.id === parseInt(sId));
+                    setProgressFormData({
+                      ...progressFormData, 
+                      stageId: sId,
+                      progressPercentage: stage ? stage.progressPercentage : 0
+                    });
+                  }}
+                  required
                 >
-                  <option value="">Update Overall Progress</option>
+                  <option value="">-- Choose Stage --</option>
                   {selectedWork.stages.map(stage => (
                     <option key={stage.id} value={stage.id}>
-                      {stage.name} - Current: {stage.progressPercentage}% (Weight: {stage.weightage}%)
+                      {stage.name} (Current: {stage.progressPercentage}%)
                     </option>
                   ))}
                 </select>
@@ -893,7 +975,7 @@ const HeadmasterDashboard = () => {
             )}
 
             <div className="form-group">
-              <label>Progress Percentage *</label>
+              <label>Stage Progress Percentage (0-100) *</label>
               <input
                 type="number"
                 min="0"
@@ -902,7 +984,7 @@ const HeadmasterDashboard = () => {
                 onChange={(e) => setProgressFormData({...progressFormData, progressPercentage: e.target.value})}
                 required
               />
-              <small>Enter overall work progress percentage (0-100)</small>
+              <small>Updating this will automatically recalculate the overall work progress based on stage weights.</small>
             </div>
 
             <div className="form-group">
@@ -1286,6 +1368,18 @@ const HeadmasterDashboard = () => {
         .activity-content p { margin: 0; font-size: 0.875rem; }
         .activity-content small { color: #94a3b8; font-size: 0.7rem; }
         .no-activity { text-align: center; color: #94a3b8; padding: 2rem; }
+        
+        .dashboard-grid-two-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 2rem; }
+        .low-stock-alerts-hm { background: white; padding: 1.5rem; border-radius: 0.75rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .low-stock-alerts-hm h3 { margin: 0 0 1rem 0; color: #1e293b; }
+        .alerts-list-hm { display: flex; flex-direction: column; gap: 0.75rem; }
+        .alert-item-hm { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem; background: #fffbeb; border: 1px solid #fde68a; border-radius: 0.5rem; }
+        .alert-info-hm { flex: 1; }
+        .alert-info-hm p { margin: 0; font-size: 0.875rem; color: #92400e; }
+        .alert-info-hm small { color: #b45309; font-size: 0.75rem; }
+        .report-btn-sm { padding: 0.4rem 0.8rem; background: #f59e0b; color: white; border: none; border-radius: 0.4rem; font-size: 0.75rem; font-weight: 600; cursor: pointer; }
+        .no-alerts { text-align: center; color: #94a3b8; padding: 2rem; }
+
         .hm-module { background: white; border-radius: 0.75rem; padding: 1.5rem; }
         .module-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem; }
         .module-header h2 { margin: 0; font-size: 1.25rem; }
@@ -1306,6 +1400,20 @@ const HeadmasterDashboard = () => {
         .progress-value { font-weight: 600; color: #0ea5e9; }
         .progress-bar { background-color: #e2e8f0; border-radius: 9999px; height: 8px; overflow: hidden; }
         .progress-fill { background-color: #0ea5e9; height: 100%; border-radius: 9999px; transition: width 0.3s; }
+        
+        .segmented-progress-container { margin-top: 0.5rem; }
+        .segmented-progress-bar { height: 10px; background: #e2e8f0; border-radius: 5px; display: flex; overflow: hidden; gap: 2px; }
+        .progress-segment { height: 100%; background: #f1f5f9; position: relative; }
+        .segment-fill { height: 100%; transition: width 0.5s ease-out; }
+        .segment-fill.completed { background: #10b981; }
+        .segment-fill.in_progress { background: #3b82f6; }
+        .segment-fill.pending { background: #cbd5e1; }
+        
+        .progress-labels-mini { display: flex; gap: 4px; margin-top: 6px; }
+        .stage-dot { width: 6px; height: 6px; border-radius: 50%; background: #cbd5e1; }
+        .stage-dot.completed { background: #10b981; }
+        .stage-dot.in_progress { background: #3b82f6; }
+
         .work-details { margin: 0.75rem 0; padding: 0.5rem 0; border-top: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; }
         .detail-row { display: flex; align-items: center; gap: 0.5rem; font-size: 0.75rem; color: #475569; margin-bottom: 0.25rem; }
         .stages-preview { margin: 0.5rem 0; }

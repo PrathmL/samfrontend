@@ -28,6 +28,7 @@ const BlockerManagement = () => {
   const [isResolveModalOpen, setIsResolveModalOpen] = useState(false);
   const [isEscalateModalOpen, setIsEscalateModalOpen] = useState(false);
   const [isDuplicateModalOpen, setIsDuplicateModalOpen] = useState(false);
+  const [isRequestInfoModalOpen, setIsRequestInfoModalOpen] = useState(false);
 
   // Form States
   const [reportFormData, setReportFormData] = useState({
@@ -66,9 +67,9 @@ const BlockerManagement = () => {
     try {
       setLoading(true);
       let params = {};
-      if (user.role === 'HEADMASTER' || user.role === 'CLERK') {
+      if (user?.role === 'HEADMASTER' || user?.role === 'CLERK') {
         params.schoolId = user.schoolId;
-      } else if (user.role === 'SACHIV') {
+      } else if (user?.role === 'SACHIV') {
         params.talukaId = user.talukaId;
       }
       
@@ -80,11 +81,11 @@ const BlockerManagement = () => {
     } finally {
       setLoading(false);
     }
-  }, [user]);
+  }, [user?.role, user?.schoolId, user?.talukaId]);
 
   const fetchActiveWorks = async () => {
     try {
-      const res = await axios.get(`http://localhost:8080/api/works/school/${user.schoolId}`);
+      const res = await axios.get(`http://localhost:8080/api/works/school/${user?.schoolId}`);
       setActiveWorks(res.data?.filter(w => w.status !== 'COMPLETED') || []);
     } catch (err) {
       console.error('Error fetching works:', err);
@@ -101,10 +102,12 @@ const BlockerManagement = () => {
   };
 
   useEffect(() => {
-    fetchBlockers();
-    if (user.role === 'HEADMASTER') fetchActiveWorks();
-    if (user.role === 'ADMIN' || user.role === 'SACHIV') fetchSachivUsers();
-  }, [fetchBlockers, user.role, user.schoolId]);
+    if (user) {
+      fetchBlockers();
+      if (user.role === 'HEADMASTER') fetchActiveWorks();
+      if (user.role === 'ADMIN' || user.role === 'SACHIV') fetchSachivUsers();
+    }
+  }, [fetchBlockers, user?.role, user?.schoolId]);
 
   const handleReportBlocker = async (e) => {
     e.preventDefault();
@@ -188,6 +191,27 @@ const BlockerManagement = () => {
       setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
       setError('Failed to escalate blocker');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRequestInfo = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      await axios.put(`http://localhost:8080/api/blockers/${selectedBlocker.id}/request-info`, {
+        notes: resolveFormData.resolutionNotes, // Reuse resolutionNotes for info request text
+        requestedById: user.id,
+        requestedByRole: user.role
+      });
+      setSuccess('Information requested');
+      setIsRequestInfoModalOpen(false);
+      setResolveFormData({ resolutionNotes: '' });
+      fetchBlockers();
+      setTimeout(() => setSuccess(''), 3000);
+    } catch (err) {
+      setError('Failed to request info');
     } finally {
       setLoading(false);
     }
@@ -277,6 +301,7 @@ const BlockerManagement = () => {
       case 'IN_PROGRESS': return { bg: '#e0f2fe', color: '#0284c7' };
       case 'RESOLVED': return { bg: '#dcfce7', color: '#166534' };
       case 'ESCALATED': return { bg: '#fee2e2', color: '#dc2626' };
+      case 'INFO_REQUESTED': return { bg: '#fff7ed', color: '#c2410c' };
       case 'DUPLICATE': return { bg: '#f1f5f9', color: '#475569' };
       default: return { bg: '#f1f5f9', color: '#475569' };
     }
@@ -511,9 +536,14 @@ const BlockerManagement = () => {
                         <CheckCircle2 size={16} /> Mark Resolved
                       </button>
                     )}
-                    {user.role === 'SACHIV' && selectedBlocker.status !== 'RESOLVED' && selectedBlocker.status !== 'ESCALATED' && (
+                    {user.role === 'SACHIV' && selectedBlocker.status !== 'RESOLVED' && (
                       <button className="escalate-action" onClick={() => setIsEscalateModalOpen(true)}>
                         <AlertTriangle size={16} /> Escalate to Admin
+                      </button>
+                    )}
+                    {(user.role === 'ADMIN' || user.role === 'SACHIV') && selectedBlocker.status === 'NEW' && (
+                      <button className="duplicate-action" style={{ background: '#fff7ed', color: '#c2410c' }} onClick={() => setIsRequestInfoModalOpen(true)}>
+                        <MessageSquare size={16} /> Request More Info
                       </button>
                     )}
                     {(user.role === 'ADMIN' || user.role === 'SACHIV') && selectedBlocker.status !== 'RESOLVED' && (
@@ -785,6 +815,37 @@ const BlockerManagement = () => {
               <div className="modal-footer">
                 <button type="button" className="cancel-btn" onClick={() => setIsDuplicateModalOpen(false)}>Cancel</button>
                 <button type="submit" className="save-btn" disabled={loading}>Confirm Duplicate</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Request Info Modal */}
+      {isRequestInfoModalOpen && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <div className="modal-header">
+              <h2>Request Additional Information</h2>
+              <button className="close-btn" onClick={() => setIsRequestInfoModalOpen(false)}><X size={24} /></button>
+            </div>
+            <form onSubmit={handleRequestInfo}>
+              <div className="modal-content">
+                <p className="info-text">Ask the reporter for more details to help resolve this blocker.</p>
+                <div className="form-group">
+                  <label>Specific Information Needed *</label>
+                  <textarea 
+                    value={resolveFormData.resolutionNotes}
+                    onChange={(e) => setResolveFormData({...resolveFormData, resolutionNotes: e.target.value})}
+                    rows="4"
+                    placeholder="e.g., Please provide current stock counts for cement..."
+                    required
+                  />
+                </div>
+              </div>
+              <div className="modal-footer">
+                <button type="button" className="cancel-btn" onClick={() => setIsRequestInfoModalOpen(false)}>Cancel</button>
+                <button type="submit" className="save-btn" style={{ background: '#f59e0b' }} disabled={loading}>Send Request</button>
               </div>
             </form>
           </div>
