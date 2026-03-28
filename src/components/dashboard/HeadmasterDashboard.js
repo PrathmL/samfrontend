@@ -11,6 +11,9 @@ import {
   DollarSign, Building2, BarChart3, Award, Minus, Bell
 } from 'lucide-react';
 
+import { useNavigate } from 'react-router-dom';
+import BlockerManagement from './BlockerManagement';
+
 const HeadmasterDashboard = () => {
   const { user, logout } = useAuth();
   const [activeModule, setActiveModule] = useState('dashboard');
@@ -1174,40 +1177,7 @@ const HeadmasterDashboard = () => {
         {activeModule === 'dashboard' && renderDashboard()}
         {activeModule === 'requests' && renderWorkRequests()}
         {activeModule === 'active-works' && renderActiveWorks()}
-        {activeModule === 'blockers' && (
-          <div className="hm-module">
-            <div className="module-header">
-              <h2>Blockers</h2>
-              <button className="create-btn" onClick={() => setIsBlockerModalOpen(true)}>
-                <AlertTriangle size={18} /> Report Blocker
-              </button>
-            </div>
-            <div className="blockers-list">
-              {blockers.map(blocker => (
-                <div key={blocker.id} className={`blocker-card priority-${blocker.priority?.toLowerCase()}`}>
-                  <div className="blocker-header">
-                    <h3>{blocker.title}</h3>
-                    <span className={`priority-tag ${blocker.priority?.toLowerCase()}`}>
-                      {blocker.priority}
-                    </span>
-                  </div>
-                  <p className="blocker-desc">{blocker.description}</p>
-                  <div className="blocker-meta">
-                    <span>Type: {blocker.type}</span>
-                    <span>Status: {blocker.status}</span>
-                    <span>Reported: {new Date(blocker.createdAt).toLocaleDateString()}</span>
-                  </div>
-                </div>
-              ))}
-              {blockers.length === 0 && (
-                <div className="empty-state-hm">
-                  <AlertCircle size={48} />
-                  <p>No blockers reported. All works are progressing smoothly!</p>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
+        {activeModule === 'blockers' && <BlockerManagement />}
         {activeModule === 'profile' && renderProfile()}
       </div>
 

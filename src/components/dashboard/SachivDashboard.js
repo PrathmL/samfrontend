@@ -10,6 +10,9 @@ import {
   Bell, FileText, Settings, Award, BarChart3, Minus
 } from 'lucide-react';
 
+import { useNavigate } from 'react-router-dom';
+import BlockerManagement from './BlockerManagement';
+
 const SachivDashboard = () => {
   const { user, logout } = useAuth();
   const [activeModule, setActiveModule] = useState('dashboard');
@@ -164,7 +167,9 @@ const SachivDashboard = () => {
 
   const fetchSchools = async () => {
     try {
-      const res = await axios.get(`http://localhost:8080/api/schools/taluka/${user.talukaId}`);
+      const res = await axios.get(`http://localhost:8080/api/schools`, {
+        params: { talukaId: user.talukaId }
+      });
       setSchools(res.data || []);
     } catch (err) {
       console.error('Error fetching schools:', err);
@@ -1165,7 +1170,7 @@ const SachivDashboard = () => {
 
         {activeModule === 'dashboard' && renderDashboard()}
         {activeModule === 'works' && renderWorks()}
-        {activeModule === 'blockers' && renderBlockers()}
+        {activeModule === 'blockers' && <BlockerManagement />}
         {activeModule === 'verification' && renderVerification()}
         {activeModule === 'profile' && (
           <div className="profile-card">

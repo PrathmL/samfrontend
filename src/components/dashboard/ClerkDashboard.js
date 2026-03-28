@@ -11,6 +11,9 @@ import {
   Minus, Bell  // Add Minus and Bell here
 } from 'lucide-react';
 
+import { useNavigate } from 'react-router-dom';
+import BlockerManagement from './BlockerManagement';
+
 const ClerkDashboard = () => {
   const { user, logout } = useAuth();
   const [activeModule, setActiveModule] = useState('dashboard');
@@ -293,6 +296,7 @@ const ClerkDashboard = () => {
     { id: 'dashboard', label: 'Dashboard', icon: Home },
     { id: 'inventory', label: 'Inventory', icon: Package },
     { id: 'quotations', label: 'Quotations', icon: FileText },
+    { id: 'blockers', label: 'Work Blockers', icon: AlertCircle },
     { id: 'stock-movements', label: 'Stock Movements', icon: TrendingUp },
     { id: 'alerts', label: 'Low Stock Alerts', icon: AlertTriangle },
     { id: 'profile', label: 'Profile', icon: User }
@@ -1005,6 +1009,7 @@ const ClerkDashboard = () => {
         {activeModule === 'dashboard' && renderDashboard()}
         {activeModule === 'inventory' && renderInventory()}
         {activeModule === 'quotations' && renderQuotations()}
+        {activeModule === 'blockers' && <BlockerManagement />}
         {activeModule === 'stock-movements' && renderStockMovements()}
         {activeModule === 'alerts' && renderAlerts()}
         {activeModule === 'profile' && renderProfile()}

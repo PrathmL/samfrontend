@@ -9,6 +9,7 @@ import {
   ArrowUp, ArrowDown, Download, Filter, Search
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import BlockerManagement from './BlockerManagement';
 
 const AdminDashboard = () => {
   const { user, logout } = useAuth();
@@ -676,7 +677,7 @@ const AdminDashboard = () => {
         )}
 
         {activeModule === 'dashboard' && renderDashboard()}
-        {activeModule === 'blockers' && renderBlockers()}
+        {activeModule === 'blockers' && <BlockerManagement />}
       </div>
 
       {/* Modals */}

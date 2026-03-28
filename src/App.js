@@ -9,6 +9,7 @@ import UserManagement from './components/dashboard/UserManagement';
 import TalukaManagement from './components/dashboard/TalukaManagement';
 import SchoolManagement from './components/dashboard/SchoolManagement';
 import AdminWorkRequests from './components/dashboard/AdminWorkRequests';
+import BlockerManagement from './components/dashboard/BlockerManagement';
 import WorkCreationForm from './components/dashboard/WorkCreationForm';
 import HeadmasterDashboard from './components/dashboard/HeadmasterDashboard';
 import ClerkDashboard from './components/dashboard/ClerkDashboard';
@@ -49,6 +50,7 @@ function App() {
                     <Route path="talukas" element={<TalukaManagement />} />
                     <Route path="schools" element={<SchoolManagement />} />
                     <Route path="work-requests" element={<AdminWorkRequests />} />
+                    <Route path="blockers" element={<BlockerManagement />} />
                     <Route path="create-work/:requestId" element={<WorkCreationForm />} />
                     <Route path="*" element={<Navigate to="dashboard" />} />
                   </Routes>
