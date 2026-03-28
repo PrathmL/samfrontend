@@ -4,7 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import { 
   Briefcase, Clock, CheckCircle2, IndianRupee, Building2, 
   Users, AlertTriangle, ClipboardList, BarChart3, TrendingUp,
-  ArrowRight
+  ArrowRight, FileText
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -205,6 +205,9 @@ const AdminDashboardHome = () => {
           </button>
           <button className="action-btn-home" onClick={() => navigate('/admin/analytics')}>
             <BarChart3 size={20} /> View Analytics
+          </button>
+          <button className="action-btn-home" onClick={() => navigate('/admin/reports')}>
+            <FileText size={20} /> Generate Reports
           </button>
         </div>
       </div>

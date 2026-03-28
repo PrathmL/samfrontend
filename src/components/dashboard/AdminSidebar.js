@@ -12,7 +12,8 @@ import {
   LogOut,
   Eye,
   FileText,
-  Bell
+  Bell,
+  MessageSquare
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
@@ -30,6 +31,8 @@ const AdminSidebar = () => {
     { name: 'Blocker Analytics', path: '/admin/analytics', icon: BarChart3 },
     { name: 'Alerts & Notifications', path: '/admin/alerts', icon: Bell },
     { name: 'Reports', path: '/admin/reports', icon: FileText },
+    { name: 'Communication', path: '/admin/communication', icon: MessageSquare },
+    { name: 'Audit Logs', path: '/admin/audit-logs', icon: ClipboardList },
     { name: 'Settings', path: '/admin/settings', icon: Settings },
   ];
 
@@ -85,6 +88,20 @@ const AdminSidebar = () => {
           display: flex;
           flex-direction: column;
           gap: 0.25rem;
+          overflow-y: auto;
+        }
+        .sidebar-nav::-webkit-scrollbar {
+          width: 4px;
+        }
+        .sidebar-nav::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .sidebar-nav::-webkit-scrollbar-thumb {
+          background: #334155;
+          border-radius: 10px;
+        }
+        .sidebar-nav::-webkit-scrollbar-thumb:hover {
+          background: #475569;
         }
         .nav-item {
           display: flex;
