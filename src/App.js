@@ -11,6 +11,7 @@ import AdminWorkRequests from './components/dashboard/AdminWorkRequests';
 import AdminWorkMonitoring from './components/dashboard/AdminWorkMonitoring';
 import BlockerManagement from './components/dashboard/BlockerManagement';
 import BlockerAnalytics from './components/dashboard/BlockerAnalytics';
+import Alerts from './components/dashboard/Alerts';
 import WorkCreationForm from './components/dashboard/WorkCreationForm';
 import HeadmasterDashboard from './components/dashboard/HeadmasterDashboard';
 import ClerkDashboard from './components/dashboard/ClerkDashboard';
@@ -54,6 +55,7 @@ function App() {
                     <Route path="work-requests" element={<AdminWorkRequests />} />
                     <Route path="blockers" element={<BlockerManagement />} />
                     <Route path="analytics" element={<BlockerAnalytics />} />
+                    <Route path="alerts" element={<Alerts />} />
                     <Route path="create-work/:requestId" element={<WorkCreationForm />} />
                     <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />
                   </Routes>

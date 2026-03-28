@@ -13,6 +13,7 @@ import {
 
 import { useNavigate } from 'react-router-dom';
 import BlockerManagement from './BlockerManagement';
+import Alerts from './Alerts';
 
 const HeadmasterDashboard = () => {
   const { user, logout } = useAuth();
@@ -1207,6 +1208,9 @@ const HeadmasterDashboard = () => {
           <button className={`nav-item ${activeModule === 'blockers' ? 'active' : ''}`} onClick={() => setActiveModule('blockers')}>
             <AlertCircle size={20} /> {!sidebarCollapsed && <span>Blockers</span>}
           </button>
+          <button className={`nav-item ${activeModule === 'alerts' ? 'active' : ''}`} onClick={() => setActiveModule('alerts')}>
+            <Bell size={20} /> {!sidebarCollapsed && <span>Alerts</span>}
+          </button>
           <button className={`nav-item ${activeModule === 'profile' ? 'active' : ''}`} onClick={() => setActiveModule('profile')}>
             <User size={20} /> {!sidebarCollapsed && <span>Profile</span>}
           </button>
@@ -1260,6 +1264,7 @@ const HeadmasterDashboard = () => {
         {activeModule === 'requests' && renderWorkRequests()}
         {activeModule === 'active-works' && renderActiveWorks()}
         {activeModule === 'blockers' && <BlockerManagement />}
+        {activeModule === 'alerts' && <Alerts />}
         {activeModule === 'profile' && renderProfile()}
       </div>
 

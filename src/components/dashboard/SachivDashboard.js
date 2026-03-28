@@ -1148,6 +1148,9 @@ const SachivDashboard = () => {
           <button className={`nav-item ${activeModule === 'analytics' ? 'active' : ''}`} onClick={() => setActiveModule('analytics')}>
             <BarChart3 size={20} /> {!sidebarCollapsed && <span>Analytics</span>}
           </button>
+          <button className={`nav-item ${activeModule === 'alerts' ? 'active' : ''}`} onClick={() => setActiveModule('alerts')}>
+            <Bell size={20} /> {!sidebarCollapsed && <span>Alerts</span>}
+          </button>
           <button className={`nav-item ${activeModule === 'verification' ? 'active' : ''}`} onClick={() => setActiveModule('verification')}>
             <CheckCircle2 size={20} /> {!sidebarCollapsed && <span>Verification</span>}
           </button>

@@ -13,6 +13,7 @@ import {
 
 import { useNavigate } from 'react-router-dom';
 import BlockerManagement from './BlockerManagement';
+import Alerts from './Alerts';
 
 const ClerkDashboard = () => {
   const { user, logout } = useAuth();
@@ -297,8 +298,9 @@ const ClerkDashboard = () => {
     { id: 'inventory', label: 'Inventory', icon: Package },
     { id: 'quotations', label: 'Quotations', icon: FileText },
     { id: 'blockers', label: 'Work Blockers', icon: AlertCircle },
+    { id: 'alerts', label: 'Alerts', icon: Bell },
     { id: 'stock-movements', label: 'Stock Movements', icon: TrendingUp },
-    { id: 'alerts', label: 'Low Stock Alerts', icon: AlertTriangle },
+    { id: 'low-stock-alerts', label: 'Low Stock Alerts', icon: AlertTriangle },
     { id: 'profile', label: 'Profile', icon: User }
   ];
 
@@ -1010,8 +1012,8 @@ const ClerkDashboard = () => {
         {activeModule === 'inventory' && renderInventory()}
         {activeModule === 'quotations' && renderQuotations()}
         {activeModule === 'blockers' && <BlockerManagement />}
+        {activeModule === 'alerts' && <Alerts />}
         {activeModule === 'stock-movements' && renderStockMovements()}
-        {activeModule === 'alerts' && renderAlerts()}
         {activeModule === 'profile' && renderProfile()}
       </div>
 

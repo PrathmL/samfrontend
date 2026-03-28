@@ -11,7 +11,8 @@ import {
   Settings,
   LogOut,
   Eye,
-  FileText
+  FileText,
+  Bell
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
@@ -27,6 +28,7 @@ const AdminSidebar = () => {
     { name: 'Work Requests', path: '/admin/work-requests', icon: ClipboardList },
     { name: 'Blocker Management', path: '/admin/blockers', icon: AlertCircle },
     { name: 'Blocker Analytics', path: '/admin/analytics', icon: BarChart3 },
+    { name: 'Alerts & Notifications', path: '/admin/alerts', icon: Bell },
     { name: 'Reports', path: '/admin/reports', icon: FileText },
     { name: 'Settings', path: '/admin/settings', icon: Settings },
   ];

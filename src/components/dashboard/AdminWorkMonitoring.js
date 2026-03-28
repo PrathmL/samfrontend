@@ -76,7 +76,6 @@ const AdminWorkMonitoring = () => {
     fetchSchools();
   }, [fetchWorks, fetchTalukas, fetchSchools]);
 
-  // Apply filters
   const renderSegmentedProgressBar = (work) => {
     if (!work.stages || work.stages.length === 0) {
       return (
