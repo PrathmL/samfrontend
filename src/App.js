@@ -4,16 +4,15 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import LoginPage from './components/auth/LoginPage';
 import AdminLayout from './components/dashboard/AdminLayout';
 import AdminDashboardHome from './components/dashboard/AdminDashboardHome';
+import AdminDashboard from './components/dashboard/AdminDashboardHome';
 import UserManagement from './components/dashboard/UserManagement';
 import TalukaManagement from './components/dashboard/TalukaManagement';
 import SchoolManagement from './components/dashboard/SchoolManagement';
 import AdminWorkRequests from './components/dashboard/AdminWorkRequests';
 import WorkCreationForm from './components/dashboard/WorkCreationForm';
-import { 
-  SachivDashboard,  
-} from './components/dashboard/Dashboards';
 import HeadmasterDashboard from './components/dashboard/HeadmasterDashboard';
 import ClerkDashboard from './components/dashboard/ClerkDashboard';
+import SachivDashboard from './components/dashboard/SachivDashboard';
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user, loading } = useAuth();
@@ -58,6 +57,7 @@ function App() {
             } 
           />
           
+          {/* Sachiv Routes */}
           <Route 
             path="/sachiv/dashboard" 
             element={
@@ -67,6 +67,7 @@ function App() {
             } 
           />
           
+          {/* Headmaster Routes */}
           <Route 
             path="/headmaster/dashboard" 
             element={
@@ -76,6 +77,7 @@ function App() {
             } 
           />
           
+          {/* Clerk Routes */}
           <Route 
             path="/clerk/dashboard" 
             element={
