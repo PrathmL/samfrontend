@@ -21,6 +21,7 @@ const AdminSidebar = () => {
     { name: 'User Management', path: '/admin/users', icon: Users },
     { name: 'Taluka Management', path: '/admin/talukas', icon: MapPin },
     { name: 'School Management', path: '/admin/schools', icon: SchoolIcon },
+    { name: 'Work Monitoring', path: '/admin/work-monitoring', icon: BarChart3 },
     { name: 'Work Requests', path: '/admin/work-requests', icon: ClipboardList },
     { name: 'Blocker Management', path: '/admin/blockers', icon: AlertCircle },
     { name: 'Reports', path: '/admin/reports', icon: BarChart3 },
