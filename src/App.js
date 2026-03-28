@@ -11,10 +11,9 @@ import AdminWorkRequests from './components/dashboard/AdminWorkRequests';
 import WorkCreationForm from './components/dashboard/WorkCreationForm';
 import { 
   SachivDashboard,  
-  ClerkDashboard 
 } from './components/dashboard/Dashboards';
 import HeadmasterDashboard from './components/dashboard/HeadmasterDashboard';
-
+import ClerkDashboard from './components/dashboard/ClerkDashboard';
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user, loading } = useAuth();
