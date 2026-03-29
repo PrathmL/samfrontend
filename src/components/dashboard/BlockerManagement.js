@@ -535,9 +535,14 @@ const BlockerManagement = () => {
                   {/* Actions Bar */}
                   <div className="action-bar-blocker">
                     {user.role === 'ADMIN' && selectedBlocker.status === 'ESCALATED' && (
-                      <button className="assign-action" onClick={() => setIsAssignModalOpen(true)}>
-                        <RefreshCw size={16} /> {t('btn_reassign_sachiv')}
-                      </button>
+                      <>
+                        <button className="resolve-action" onClick={() => setIsResolveModalOpen(true)}>
+                          <CheckCircle2 size={16} /> {t('btn_mark_resolved')}
+                        </button>
+                        <button className="assign-action" onClick={() => setIsAssignModalOpen(true)}>
+                          <RefreshCw size={16} /> {t('btn_reassign_sachiv')}
+                        </button>
+                      </>
                     )}
                     {user.role === 'SACHIV' && selectedBlocker.status === 'NEW' && (
                       <button className="assign-action" onClick={() => setIsAssignModalOpen(true)}>
@@ -594,6 +599,179 @@ const BlockerManagement = () => {
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Escalate Modal */}
+      {isEscalateModalOpen && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <div className="modal-header">
+              <h2>{t('btn_escalate_admin')}</h2>
+              <button className="close-btn" onClick={() => setIsEscalateModalOpen(false)}><X size={24} /></button>
+            </div>
+            <form onSubmit={handleEscalateBlocker}>
+              <div className="modal-content">
+                <div className="warning-text">
+                  This will move the blocker to Admin dashboard for higher level intervention.
+                </div>
+                <div className="form-group">
+                  <label>Reason for Escalation *</label>
+                  <textarea 
+                    value={escalateFormData.reason}
+                    onChange={(e) => setEscalateFormData({...escalateFormData, reason: e.target.value})}
+                    placeholder="Describe why this needs Admin attention..."
+                    rows="4"
+                    required
+                  />
+                </div>
+              </div>
+              <div className="modal-footer">
+                <button type="button" className="cancel-btn" onClick={() => setIsEscalateModalOpen(false)}>{t('btn_cancel')}</button>
+                <button type="submit" className="escalate-btn-real" disabled={loading}>{t('btn_escalate_admin')}</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Assign Modal */}
+      {isAssignModalOpen && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <div className="modal-header">
+              <h2>{t('field_assigned_to')}</h2>
+              <button className="close-btn" onClick={() => setIsAssignModalOpen(false)}><X size={24} /></button>
+            </div>
+            <form onSubmit={handleAssignBlocker}>
+              <div className="modal-content">
+                <div className="form-group">
+                  <label>Select Person *</label>
+                  <select 
+                    value={assignFormData.assignedToId} 
+                    onChange={(e) => setAssignFormData({...assignFormData, assignedToId: e.target.value})}
+                    required
+                  >
+                    <option value="">-- Select --</option>
+                    {sachivUsers.map(s => (
+                      <option key={s.id} value={s.id}>{s.name} ({s.talukaName})</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label>{t('field_target_date')} *</label>
+                  <input 
+                    type="date" 
+                    value={assignFormData.targetDate}
+                    onChange={(e) => setAssignFormData({...assignFormData, targetDate: e.target.value})}
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Assignment Notes</label>
+                  <textarea 
+                    value={assignFormData.notes}
+                    onChange={(e) => setAssignFormData({...assignFormData, notes: e.target.value})}
+                    rows="3"
+                  />
+                </div>
+              </div>
+              <div className="modal-footer">
+                <button type="button" className="cancel-btn" onClick={() => setIsAssignModalOpen(false)}>{t('btn_cancel')}</button>
+                <button type="submit" className="save-btn" disabled={loading}>{t('btn_save')}</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Resolve Modal */}
+      {isResolveModalOpen && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <div className="modal-header">
+              <h2>{t('btn_mark_resolved')}</h2>
+              <button className="close-btn" onClick={() => setIsResolveModalOpen(false)}><X size={24} /></button>
+            </div>
+            <form onSubmit={handleResolveBlocker}>
+              <div className="modal-content">
+                <div className="form-group">
+                  <label>Resolution Notes *</label>
+                  <textarea 
+                    value={resolveFormData.resolutionNotes}
+                    onChange={(e) => setResolveFormData({...resolveFormData, resolutionNotes: e.target.value})}
+                    placeholder="Describe how the issue was resolved..."
+                    rows="4"
+                    required
+                  />
+                </div>
+              </div>
+              <div className="modal-footer">
+                <button type="button" className="cancel-btn" onClick={() => setIsResolveModalOpen(false)}>{t('btn_cancel')}</button>
+                <button type="submit" className="save-btn" disabled={loading}>{t('stat_resolved')}</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Request Info Modal */}
+      {isRequestInfoModalOpen && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <div className="modal-header">
+              <h2>{t('status_info_requested')}</h2>
+              <button className="close-btn" onClick={() => setIsRequestInfoModalOpen(false)}><X size={24} /></button>
+            </div>
+            <form onSubmit={handleRequestInfo}>
+              <div className="modal-content">
+                <div className="form-group">
+                  <label>Information Needed *</label>
+                  <textarea 
+                    value={resolveFormData.resolutionNotes}
+                    onChange={(e) => setResolveFormData({...resolveFormData, resolutionNotes: e.target.value})}
+                    placeholder="Describe what information is missing..."
+                    rows="4"
+                    required
+                  />
+                </div>
+              </div>
+              <div className="modal-footer">
+                <button type="button" className="cancel-btn" onClick={() => setIsRequestInfoModalOpen(false)}>{t('btn_cancel')}</button>
+                <button type="submit" className="save-btn" disabled={loading}>{t('btn_post')}</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Duplicate Modal */}
+      {isDuplicateModalOpen && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <div className="modal-header">
+              <h2>Mark as Duplicate</h2>
+              <button className="close-btn" onClick={() => setIsDuplicateModalOpen(false)}><X size={24} /></button>
+            </div>
+            <form onSubmit={handleMarkDuplicate}>
+              <div className="modal-content">
+                <div className="form-group">
+                  <label>Duplicate Of Blocker ID *</label>
+                  <input 
+                    type="number" 
+                    value={duplicateFormData.duplicateOfId}
+                    onChange={(e) => setDuplicateFormData({...duplicateFormData, duplicateOfId: e.target.value})}
+                    placeholder="Enter the original blocker ID"
+                    required
+                  />
+                </div>
+              </div>
+              <div className="modal-footer">
+                <button type="button" className="cancel-btn" onClick={() => setIsDuplicateModalOpen(false)}>{t('btn_cancel')}</button>
+                <button type="submit" className="save-btn" disabled={loading}>{t('btn_save')}</button>
+              </div>
+            </form>
           </div>
         </div>
       )}

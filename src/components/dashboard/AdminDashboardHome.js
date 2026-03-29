@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
 import { 
@@ -8,6 +8,10 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { 
+  PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend,
+  BarChart, Bar, XAxis, YAxis, CartesianGrid
+} from 'recharts';
 
 const AdminDashboardHome = () => {
   const { user } = useAuth();
@@ -27,6 +31,7 @@ const AdminDashboardHome = () => {
     escalatedBlockers: 0
   });
   const [workRequests, setWorkRequests] = useState([]);
+  const [worksData, setWorksData] = useState([]);
 
   useEffect(() => {
     fetchDashboardData();
@@ -45,6 +50,7 @@ const AdminDashboardHome = () => {
       ]);
 
       const works = worksRes.data || [];
+      setWorksData(works);
       const pendingRequests = (requestsRes.data || []).filter(r => r.status === 'PENDING_APPROVAL').length;
       const blockerStats = blockerStatsRes.data;
 
@@ -67,6 +73,33 @@ const AdminDashboardHome = () => {
     }
   };
 
+  const statusData = useMemo(() => {
+    const counts = worksData.reduce((acc, w) => {
+      const status = w.status || 'UNKNOWN';
+      acc[status] = (acc[status] || 0) + 1;
+      return acc;
+    }, {});
+
+    return Object.keys(counts).map(status => ({
+      name: status.replace('_', ' '),
+      value: counts[status]
+    }));
+  }, [worksData]);
+
+  const budgetData = useMemo(() => {
+    // Show top 5 works by sanctioned amount
+    return worksData
+      .sort((a, b) => (b.sanctionedAmount || 0) - (a.sanctionedAmount || 0))
+      .slice(0, 5)
+      .map(w => ({
+        name: w.workCode || w.title.substring(0, 10),
+        sanctioned: w.sanctionedAmount || 0,
+        utilized: w.totalUtilized || 0
+      }));
+  }, [worksData]);
+
+  const COLORS = ['#0ea5e9', '#10b981', '#f59e0b', '#ef4444', '#6366f1', '#8b5cf6'];
+
   const fetchWorkRequests = async () => {
     try {
       const res = await axios.get('http://localhost:8080/api/work-requests');
@@ -74,59 +107,6 @@ const AdminDashboardHome = () => {
     } catch (err) {
       console.error('Error fetching work requests:', err);
     }
-  };
-
-  const getStatusColor = (status) => {
-    switch(status) {
-      case 'ACTIVE': return { bg: '#dcfce7', color: '#166534' };
-      case 'IN_PROGRESS': return { bg: '#e0f2fe', color: '#0284c7' };
-      case 'COMPLETED': return { bg: '#dcfce7', color: '#166534' };
-      case 'ESCALATED': return { bg: '#fee2e2', color: '#dc2626' };
-      default: return { bg: '#f1f5f9', color: '#475569' };
-    }
-  };
-
-  const renderStatusChart = () => {
-    const statuses = ['ACTIVE', 'IN_PROGRESS', 'ON_HOLD', 'COMPLETED', 'PENDING_CLOSURE'];
-    return (
-      <div className="status-bars-mini">
-        {statuses.map(s => {
-          const style = getStatusColor(s);
-          const count = stats.totalWorks > 0 ? (
-            s === 'IN_PROGRESS' ? stats.worksInProgress : 
-            s === 'COMPLETED' ? stats.completedWorks : 
-            s === 'ACTIVE' ? stats.totalWorks - stats.completedWorks - stats.worksInProgress : 0
-          ) : 0;
-          const pct = stats.totalWorks > 0 ? (count / stats.totalWorks) * 100 : 0;
-          return (
-            <div key={s} className="bar-row-mini">
-              <span className="bar-lab">{s.split('_')[0]}</span>
-              <div className="bar-outer"><div className="bar-inner" style={{ width: `${pct}%`, background: style.color }}></div></div>
-              <span className="bar-val">{count}</span>
-            </div>
-          );
-        })}
-      </div>
-    );
-  };
-
-  const renderBudgetGauge = () => {
-    const pct = stats.totalFunds > 0 ? (stats.fundsUtilized / stats.totalFunds) * 100 : 0;
-    return (
-      <div className="gauge-container">
-        <div className="gauge-outer">
-          <div className="gauge-inner" style={{ transform: `rotate(${(pct * 1.8) - 90}deg)` }}></div>
-          <div className="gauge-center">
-            <span className="gauge-val">{pct.toFixed(0)}%</span>
-            <span className="gauge-lab">{t('dash_utilized')}</span>
-          </div>
-        </div>
-        <div className="gauge-meta">
-          <span>₹{stats.fundsUtilized.toLocaleString()} {t('dash_utilized')}</span>
-          <span>of ₹{stats.totalFunds.toLocaleString()}</span>
-        </div>
-      </div>
-    );
   };
 
   return (
@@ -224,14 +204,43 @@ const AdminDashboardHome = () => {
         <div className="preview-grid-home">
           <div className="preview-card-home">
             <h4>{t('dash_status_distribution')}</h4>
-            <div className="chart-placeholder">
-              {renderStatusChart()}
+            <div className="chart-container-recharts">
+              <ResponsiveContainer width="100%" height={250}>
+                <PieChart>
+                  <Pie
+                    data={statusData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={80}
+                    paddingAngle={5}
+                    dataKey="value"
+                    label={({name, percent}) => `${name} ${(percent * 100).toFixed(0)}%`}
+                  >
+                    {statusData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                  <Legend />
+                </PieChart>
+              </ResponsiveContainer>
             </div>
           </div>
           <div className="preview-card-home">
-            <h4>{t('dash_budget_utilization')}</h4>
-            <div className="gauge-placeholder">
-              {renderBudgetGauge()}
+            <h4>{t('dash_budget_utilization')} (Top Works)</h4>
+            <div className="chart-container-recharts">
+              <ResponsiveContainer width="100%" height={250}>
+                <BarChart data={budgetData}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                  <XAxis dataKey="name" fontSize={10} />
+                  <YAxis fontSize={10} />
+                  <Tooltip formatter={(value) => `₹${value.toLocaleString()}`} />
+                  <Legend />
+                  <Bar dataKey="sanctioned" name="Sanctioned" fill="#0ea5e9" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="utilized" name="Utilized" fill="#10b981" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
             </div>
           </div>
         </div>
@@ -279,22 +288,7 @@ const AdminDashboardHome = () => {
         .preview-card-home { background: #f8fafc; padding: 1.5rem; border-radius: 0.75rem; border: 1px solid #e2e8f0; }
         .preview-card-home h4 { margin: 0 0 1.25rem 0; font-size: 0.85rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; }
         
-        .status-bars-mini { display: flex; flex-direction: column; gap: 1rem; }
-        .bar-row-mini { display: flex; align-items: center; gap: 1rem; }
-        .bar-lab { font-size: 0.75rem; font-weight: 700; color: #475569; width: 80px; }
-        .bar-outer { flex: 1; height: 10px; background: #e2e8f0; border-radius: 5px; overflow: hidden; }
-        .bar-inner { height: 100%; border-radius: 5px; }
-        .bar-val { font-size: 0.85rem; font-weight: 800; color: #1e293b; width: 25px; text-align: right; }
-        
-        .gauge-container { display: flex; flex-direction: column; align-items: center; }
-        .gauge-outer { width: 160px; height: 80px; border-top-left-radius: 160px; border-top-right-radius: 160px; background: #e2e8f0; position: relative; overflow: hidden; }
-        .gauge-inner { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(90deg, #0ea5e9, #6366f1); transform-origin: bottom center; transition: transform 1.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
-        .gauge-center { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 110px; height: 55px; border-top-left-radius: 110px; border-top-right-radius: 110px; background: #f8fafc; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; padding-bottom: 8px; }
-        .gauge-val { font-size: 1.5rem; font-weight: 800; color: #1e293b; line-height: 1; }
-        .gauge-lab { font-size: 0.65rem; color: #94a3b8; text-transform: uppercase; font-weight: 800; margin-top: 2px; }
-        .gauge-meta { margin-top: 1.5rem; display: flex; flex-direction: column; align-items: center; gap: 0.25rem; }
-        .gauge-meta span { font-size: 0.8rem; color: #64748b; }
-        .gauge-meta span:first-child { font-weight: 700; color: #1e293b; }
+        .chart-container-recharts { width: 100%; height: 250px; margin-top: 1rem; }
 
         .recent-activities-home { background: white; padding: 1.5rem; border-radius: 1rem; border: 1px solid #e2e8f0; }
         .recent-activities-home h3 { margin: 0 0 1rem 0; font-size: 1.1rem; }

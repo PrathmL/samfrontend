@@ -275,7 +275,7 @@ const HeadmasterActiveWorks = () => {
 
                 <div className="work-actions-row">
                   <button className="update-btn" onClick={() => handleUpdateClick(work)}>
-                    <RefreshCw size={16} /> {t('btn_update')}
+                    <RefreshCw size={16} /> {t('btn_update_progress')}
                   </button>
                   <button className="view-btn-sm" onClick={() => handleViewDetails(work)}>
                     {t('btn_view')}
@@ -297,7 +297,7 @@ const HeadmasterActiveWorks = () => {
         <div className="modal-overlay">
           <div className="modal modal-lg">
             <div className="modal-header">
-              <h2>Update Progress: {selectedWork.workCode}</h2>
+              <h2>{t('btn_update_progress')}: {selectedWork.workCode}</h2>
               <button className="close-btn" onClick={() => { setIsUpdateModalOpen(false); stopCamera(); }}><X size={24} /></button>
             </div>
             <form onSubmit={handleProgressSubmit}>
@@ -383,8 +383,8 @@ const HeadmasterActiveWorks = () => {
                 </div>
               </div>
               <div className="modal-footer">
-                <button type="button" className="cancel-btn" onClick={() => setIsUpdateModalOpen(false)}>Cancel</button>
-                <button type="submit" className="submit-btn" disabled={loading || isCameraOpen}>Update</button>
+                <button type="button" className="cancel-btn" onClick={() => setIsUpdateModalOpen(false)}>{t('btn_cancel')}</button>
+                <button type="submit" className="submit-btn" disabled={loading || isCameraOpen}>{t('btn_submit_update')}</button>
               </div>
             </form>
           </div>
@@ -469,8 +469,32 @@ const HeadmasterActiveWorks = () => {
 
         .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 2000; padding: 2rem; }
         .modal { background: white; border-radius: 1.5rem; overflow: hidden; display: flex; flex-direction: column; width: 100%; }
-        .modal-xl { max-width: 1200px; }
-        .modal-header { padding: 1.5rem 2rem; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; background: #f8fafc; }
+        .modal-lg { max-width: 800px; width: 90%; max-height: 90vh; }
+        .modal-xl { max-width: 1200px; width: 95%; max-height: 95vh; }
+        .modal-header { padding: 1.5rem 2rem; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; background: #f8fafc; flex-shrink: 0; }
+        
+        form { display: flex; flex-direction: column; overflow: hidden; height: 100%; }
+        .modal-content { padding: 2rem; overflow-y: auto; flex-grow: 1; }
+        
+        /* Custom Scrollbar */
+        .modal-content::-webkit-scrollbar { width: 6px; }
+        .modal-content::-webkit-scrollbar-track { background: #f1f5f9; }
+        .modal-content::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+        .modal-content::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        .overflow-y-auto { overflow-y: auto; }
+        
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        .form-group { display: flex; flex-direction: column; gap: 0.5rem; }
+        .form-group.full-width { grid-column: 1 / -1; }
+        .form-group label { font-size: 0.9rem; font-weight: 600; color: #475569; }
+        .form-group input, .form-group select, .form-group textarea { padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 0.5rem; font-size: 1rem; width: 100%; }
+        
+        .modal-footer { padding: 1.5rem 2rem; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end; gap: 1rem; background: #f8fafc; flex-shrink: 0; }
+        .cancel-btn { padding: 0.75rem 1.5rem; border: 1px solid #e2e8f0; border-radius: 0.5rem; background: white; cursor: pointer; }
+        .submit-btn { padding: 0.75rem 1.5rem; border: none; border-radius: 0.5rem; background: #0ea5e9; color: white; font-weight: 600; cursor: pointer; }
+        .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
         .close-x { background: transparent; border: none; cursor: pointer; }
 
         .work-details-layout { display: grid; grid-template-columns: 1fr 300px; }
@@ -504,9 +528,11 @@ const HeadmasterActiveWorks = () => {
         .open-camera-btn { width: 100%; padding: 1.5rem; background: #f8fafc; border: 2px dashed #cbd5e1; border-radius: 0.75rem; cursor: pointer; }
         .live-camera-container { position: relative; background: #000; height: 350px; border-radius: 0.75rem; overflow: hidden; }
         .camera-preview { width: 100%; height: 100%; object-fit: cover; }
-        .camera-actions { position: absolute; bottom: 1rem; left: 0; right: 0; display: flex; justify-content: center; gap: 2rem; }
+        .camera-actions { position: absolute; bottom: 1rem; left: 0; right: 0; display: flex; justify-content: center; gap: 2rem; align-items: center; }
         .btn-capture { width: 50px; height: 50px; border-radius: 50%; border: 3px solid white; background: transparent; padding: 3px; cursor: pointer; }
         .capture-inner { width: 100%; height: 100%; border-radius: 50%; background: white; }
+        .btn-close-camera { background: rgba(0,0,0,0.5); color: white; border: 1px solid rgba(255,255,255,0.3); border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .btn-close-camera:hover { background: rgba(0,0,0,0.7); }
         .captured-photos-preview { display: flex; gap: 0.5rem; overflow-x: auto; margin-bottom: 1rem; }
         .preview-item { position: relative; flex: 0 0 100px; height: 80px; border-radius: 0.4rem; overflow: hidden; }
         .preview-item img { width: 100%; height: 100%; object-fit: cover; }
