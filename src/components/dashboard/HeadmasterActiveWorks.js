@@ -75,9 +75,10 @@ const HeadmasterActiveWorks = () => {
 
   const handleUpdateClick = (work) => {
     setSelectedWork(work);
+    const initialStage = work.stages?.find(s => s.status !== 'COMPLETED') || work.stages?.[0];
     setUpdateFormData({
-      stageId: work.stages?.find(s => s.status !== 'COMPLETED')?.id || '',
-      progressPercentage: 0,
+      stageId: initialStage?.id || '',
+      progressPercentage: initialStage?.progressPercentage || 0,
       remarks: '',
       materialCost: 0,
       laborCost: 0,
@@ -85,6 +86,15 @@ const HeadmasterActiveWorks = () => {
     });
     fetchWorkItems(work.id);
     setIsUpdateModalOpen(true);
+  };
+
+  const handleStageChange = (stageId) => {
+    const stage = selectedWork.stages?.find(s => s.id.toString() === stageId.toString());
+    setUpdateFormData({
+      ...updateFormData,
+      stageId,
+      progressPercentage: stage ? stage.progressPercentage : 0
+    });
   };
 
   const handleViewDetails = (work) => {
@@ -295,7 +305,7 @@ const HeadmasterActiveWorks = () => {
                 <div className="form-grid">
                   <div className="form-group full-width">
                     <label>{t('field_stage')}</label>
-                    <select value={updateFormData.stageId} onChange={e => setUpdateFormData({...updateFormData, stageId: e.target.value})} required>
+                    <select value={updateFormData.stageId} onChange={e => handleStageChange(e.target.value)} required>
                       <option value="">-- Choose Stage --</option>
                       {selectedWork.stages?.map(stage => (
                         <option key={stage.id} value={stage.id}>{stage.name} (Current: {stage.progressPercentage}%)</option>
@@ -307,9 +317,43 @@ const HeadmasterActiveWorks = () => {
                     <input type="number" min="0" max="100" required value={updateFormData.progressPercentage} onChange={e => setUpdateFormData({...updateFormData, progressPercentage: e.target.value})} />
                   </div>
                   <div className="form-group">
+                    <label>Material Cost (₹)</label>
+                    <input type="number" min="0" value={updateFormData.materialCost} onChange={e => setUpdateFormData({...updateFormData, materialCost: e.target.value})} />
+                  </div>
+                  <div className="form-group">
+                    <label>Labor Cost (₹)</label>
+                    <input type="number" min="0" value={updateFormData.laborCost} onChange={e => setUpdateFormData({...updateFormData, laborCost: e.target.value})} />
+                  </div>
+                  <div className="form-group">
+                    <label>Other Cost (₹)</label>
+                    <input type="number" min="0" value={updateFormData.otherCost} onChange={e => setUpdateFormData({...updateFormData, otherCost: e.target.value})} />
+                  </div>
+                  <div className="form-group full-width">
                     <label>{t('field_remarks')}</label>
                     <textarea rows="2" required value={updateFormData.remarks} onChange={e => setUpdateFormData({...updateFormData, remarks: e.target.value})} />
                   </div>
+
+                  {workItems.length > 0 && (
+                    <div className="form-group full-width">
+                      <label>Material Usage Report</label>
+                      <div className="item-usage-list">
+                        {workItems.map((item, index) => (
+                          <div key={index} className="usage-item-row">
+                            <span>{item.materialName}</span>
+                            <div className="usage-input-group">
+                              <input 
+                                type="number" 
+                                min="0" 
+                                value={itemUsage[index] || 0} 
+                                onChange={(e) => handleItemUsageChange(index, e.target.value)}
+                              />
+                              <span className="unit">Unit</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
 
                   <div className="form-group full-width">
                     <label>{t('field_photos')} (Geotagged Camera Only)</label>
@@ -449,6 +493,13 @@ const HeadmasterActiveWorks = () => {
         .progress-radial-box { text-align: center; background: white; padding: 1.5rem; border-radius: 1rem; border: 1px solid #e2e8f0; margin-bottom: 1.5rem; }
         .progress-big-val { font-size: 2.5rem; font-weight: 800; color: #1e293b; }
         .fin-row { display: flex; justify-content: space-between; font-size: 0.85rem; padding: 0.5rem 0; border-bottom: 1px solid #e2e8f0; }
+
+        .item-usage-list { background: #f8fafc; padding: 1rem; border-radius: 0.5rem; border: 1px solid #e2e8f0; margin-top: 0.5rem; }
+        .usage-item-row { display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 1px dotted #cbd5e1; }
+        .usage-item-row:last-child { border-bottom: none; }
+        .usage-input-group { display: flex; align-items: center; gap: 0.5rem; }
+        .usage-input-group input { width: 80px; padding: 0.3rem; border: 1px solid #cbd5e1; border-radius: 4px; }
+        .usage-input-group .unit { font-size: 0.8rem; color: #64748b; }
 
         .open-camera-btn { width: 100%; padding: 1.5rem; background: #f8fafc; border: 2px dashed #cbd5e1; border-radius: 0.75rem; cursor: pointer; }
         .live-camera-container { position: relative; background: #000; height: 350px; border-radius: 0.75rem; overflow: hidden; }
