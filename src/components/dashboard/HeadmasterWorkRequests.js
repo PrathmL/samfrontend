@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { 
   Plus, Search, Filter, Clock, CheckCircle2, 
   XCircle, FileText, Camera, MapPin, X, Eye,
-  AlertCircle, ChevronRight, Upload, Calendar, Tag
+  AlertCircle, ChevronRight, Upload, Calendar, Tag, Trash2
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useTranslation } from 'react-i18next';
@@ -18,6 +18,12 @@ const HeadmasterWorkRequests = () => {
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
 
+  // Camera State
+  const [isCameraOpen, setIsCameraOpen] = useState(false);
+  const videoRef = useRef(null);
+  const canvasRef = useRef(null);
+  const [cameraError, setCameraRefError] = useState('');
+
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -28,6 +34,7 @@ const HeadmasterWorkRequests = () => {
     expectedTimeline: ''
   });
   const [photos, setPhotos] = useState([]);
+  const [geotags, setGeotags] = useState([]);
 
   useEffect(() => {
     if (user?.schoolId) {
@@ -49,12 +56,73 @@ const HeadmasterWorkRequests = () => {
     }
   };
 
-  const handleFileChange = (e) => {
-    setPhotos([...e.target.files]);
+  const startCamera = async () => {
+    try {
+      setIsCameraOpen(true);
+      setCameraRefError('');
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        video: { facingMode: 'environment' },
+        audio: false 
+      });
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+      }
+    } catch (err) {
+      console.error("Camera access error:", err);
+      setCameraRefError("Could not access camera. Please ensure you have given permissions.");
+    }
+  };
+
+  const stopCamera = () => {
+    if (videoRef.current && videoRef.current.srcObject) {
+      const tracks = videoRef.current.srcObject.getTracks();
+      tracks.forEach(track => track.stop());
+    }
+    setIsCameraOpen(false);
+  };
+
+  const capturePhoto = () => {
+    if (!videoRef.current || !canvasRef.current) return;
+
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+    const context = canvas.getContext('2d');
+
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition((position) => {
+        const { latitude, longitude } = position.coords;
+        
+        canvas.toBlob((blob) => {
+          const file = new File([blob], `capture_${Date.now()}.jpg`, { type: 'image/jpeg' });
+          setPhotos(prev => [...prev, file]);
+          setGeotags(prev => [...prev, { latitude, longitude }]);
+          stopCamera();
+        }, 'image/jpeg', 0.85);
+      }, (err) => {
+        alert("Location is required for geotagged photos. Please enable GPS.");
+        console.error(err);
+      });
+    } else {
+      alert("Geolocation is not supported by your browser.");
+    }
+  };
+
+  const removePhoto = (index) => {
+    setPhotos(photos.filter((_, i) => i !== index));
+    setGeotags(geotags.filter((_, i) => i !== index));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (photos.length === 0) {
+      setError('At least one geotagged photo is required.');
+      return;
+    }
+
     setLoading(true);
     setError('');
 
@@ -68,8 +136,12 @@ const HeadmasterWorkRequests = () => {
     data.append('createdById', user.id);
     data.append('expectedTimeline', formData.expectedTimeline);
     
-    photos.forEach(photo => {
+    photos.forEach((photo, index) => {
       data.append('photos', photo);
+      if (geotags[index]) {
+        data.append('latitudes', geotags[index].latitude);
+        data.append('longitudes', geotags[index].longitude);
+      }
     });
 
     try {
@@ -99,6 +171,7 @@ const HeadmasterWorkRequests = () => {
       expectedTimeline: ''
     });
     setPhotos([]);
+    setGeotags([]);
   };
 
   const getStatusInfo = (status) => {
@@ -195,7 +268,7 @@ const HeadmasterWorkRequests = () => {
           <div className="modal modal-lg">
             <div className="modal-header">
               <h2>{t('btn_create_request')}</h2>
-              <button className="close-btn" onClick={() => setIsModalOpen(false)}><X size={24} /></button>
+              <button className="close-btn" onClick={() => { setIsModalOpen(false); stopCamera(); }}><X size={24} /></button>
             </div>
             <form onSubmit={handleSubmit}>
               <div className="modal-content">
@@ -257,21 +330,51 @@ const HeadmasterWorkRequests = () => {
                       placeholder="Describe the work required in detail..."
                     />
                   </div>
+                  
                   <div className="form-group full-width">
-                    <label>{t('field_photos')} (Max 10)</label>
-                    <div className="file-upload">
-                      <input type="file" multiple accept="image/*" onChange={handleFileChange} id="photos" />
-                      <label htmlFor="photos">
-                        <Upload size={20} />
-                        <span>{photos.length > 0 ? `${photos.length} files selected` : 'Choose photos of the issue...'}</span>
-                      </label>
-                    </div>
+                    <label>{t('field_photos')} (Geotagged Camera Only)</label>
+                    
+                    {photos.length > 0 && (
+                      <div className="captured-photos-preview">
+                        {photos.map((photo, index) => (
+                          <div key={index} className="preview-item">
+                            <img src={URL.createObjectURL(photo)} alt="Captured" />
+                            <button type="button" className="remove-photo-btn" onClick={() => removePhoto(index)}>
+                              <Trash2 size={14} />
+                            </button>
+                            <div className="geo-tag-badge">
+                              <MapPin size={10} /> {geotags[index]?.latitude.toFixed(4)}, {geotags[index]?.longitude.toFixed(4)}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {!isCameraOpen ? (
+                      <button type="button" className="open-camera-btn" onClick={startCamera}>
+                        <Camera size={24} /> <span>Capture Geotagged Photo</span>
+                      </button>
+                    ) : (
+                      <div className="live-camera-container">
+                        <video ref={videoRef} autoPlay playsInline className="camera-preview"></video>
+                        <canvas ref={canvasRef} style={{ display: 'none' }}></canvas>
+                        <div className="camera-actions">
+                          <button type="button" className="btn-capture" onClick={capturePhoto}>
+                            <div className="capture-inner"></div>
+                          </button>
+                          <button type="button" className="btn-close-camera" onClick={stopCamera}>
+                            <X size={20} />
+                          </button>
+                        </div>
+                        {cameraError && <p className="camera-error">{cameraError}</p>}
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
               <div className="modal-footer">
-                <button type="button" className="cancel-btn" onClick={() => setIsModalOpen(false)}>{t('btn_cancel')}</button>
-                <button type="submit" className="submit-btn" disabled={loading}>
+                <button type="button" className="cancel-btn" onClick={() => { setIsModalOpen(false); stopCamera(); }}>{t('btn_cancel')}</button>
+                <button type="submit" className="submit-btn" disabled={loading || isCameraOpen}>
                   {loading ? 'Submitting...' : t('btn_submit')}
                 </button>
               </div>
@@ -398,9 +501,25 @@ const HeadmasterWorkRequests = () => {
         .form-group label { font-weight: 600; color: #475569; font-size: 0.875rem; }
         .form-group input, .form-group select, .form-group textarea { padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.5rem; font-size: 0.95rem; }
         
-        .file-upload input { display: none; }
-        .file-upload label { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; padding: 2rem; border: 2px dashed #cbd5e1; border-radius: 0.5rem; cursor: pointer; color: #64748b; transition: all 0.2s; }
-        .file-upload label:hover { border-color: #0ea5e9; color: #0ea5e9; background: #f0f9ff; }
+        /* Camera UI Styles */
+        .open-camera-btn { display: flex; align-items: center; justify-content: center; gap: 0.75rem; padding: 1.5rem; background: #f8fafc; border: 2px dashed #cbd5e1; border-radius: 0.75rem; color: #475569; font-weight: 700; cursor: pointer; transition: all 0.2s; width: 100%; }
+        .open-camera-btn:hover { background: #f0f9ff; border-color: #0ea5e9; color: #0ea5e9; }
+        
+        .live-camera-container { position: relative; background: #000; border-radius: 0.75rem; overflow: hidden; height: 400px; display: flex; flex-direction: column; }
+        .camera-preview { width: 100%; height: 100%; object-fit: cover; }
+        .camera-actions { position: absolute; bottom: 1.5rem; left: 0; right: 0; display: flex; justify-content: center; align-items: center; gap: 2rem; }
+        
+        .btn-capture { width: 64px; height: 64px; border-radius: 50%; border: 4px solid white; background: transparent; padding: 4px; cursor: pointer; }
+        .capture-inner { width: 100%; height: 100%; border-radius: 50%; background: white; }
+        .btn-capture:active .capture-inner { transform: scale(0.9); background: #e2e8f0; }
+        
+        .btn-close-camera { width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.2); border: none; color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; backdrop-filter: blur(4px); }
+        
+        .captured-photos-preview { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+        .preview-item { position: relative; height: 100px; border-radius: 0.5rem; overflow: hidden; border: 1px solid #e2e8f0; }
+        .preview-item img { width: 100%; height: 100%; object-fit: cover; }
+        .remove-photo-btn { position: absolute; top: 0.25rem; right: 0.25rem; width: 24px; height: 24px; border-radius: 50%; background: rgba(239, 68, 68, 0.9); border: none; color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .geo-tag-badge { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.6); color: white; font-size: 0.6rem; padding: 0.2rem; display: flex; align-items: center; gap: 0.2rem; }
 
         .details-layout { display: grid; grid-template-columns: 1fr 300px; gap: 2rem; }
         .status-timeline { display: flex; flex-direction: column; gap: 1.5rem; margin-bottom: 2rem; padding: 1.5rem; background: #f8fafc; border-radius: 0.75rem; }
