@@ -8,9 +8,11 @@ import {
   ChevronRight, ChevronLeft, Download,
   Save, AlertTriangle, X
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const WorkVerification = ({ work, onComplete, onCancel }) => {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -113,9 +115,9 @@ const WorkVerification = ({ work, onComplete, onCancel }) => {
   const renderStepIndicator = () => (
     <div className="step-indicator">
       {[
-        { n: 1, label: 'Inspection', icon: ClipboardCheck },
-        { n: 2, label: 'Punch List', icon: List },
-        { n: 3, label: 'Handover', icon: FileCheck }
+        { n: 1, label: t('step_inspection'), icon: ClipboardCheck },
+        { n: 2, label: t('step_punch_list'), icon: List },
+        { n: 3, label: t('step_handover'), icon: FileCheck }
       ].map((s) => (
         <div key={s.n} className={`step-item ${step === s.n ? 'active' : ''} ${step > s.n ? 'completed' : ''}`}>
           <div className="step-icon"><s.icon size={20} /></div>
@@ -130,7 +132,7 @@ const WorkVerification = ({ work, onComplete, onCancel }) => {
     <div className="verification-container">
       <div className="verification-header">
         <div className="work-brief">
-          <h2>Work Verification: {work.workCode}</h2>
+          <h2>{t('title_work_verification')}: {work.workCode}</h2>
           <p>{work.title}</p>
         </div>
         <button className="close-btn" onClick={onCancel}><X size={24} /></button>
@@ -143,10 +145,10 @@ const WorkVerification = ({ work, onComplete, onCancel }) => {
 
         {step === 1 && (
           <div className="inspection-form">
-            <h3>Step 1: Site Inspection Details</h3>
+            <h3>{t('step_inspection')}</h3>
             <div className="form-grid">
               <div className="form-group">
-                <label>Inspector Name</label>
+                <label>{t('label_inspector_name')}</label>
                 <input 
                   type="text" 
                   value={inspection.inspectorName} 
@@ -155,19 +157,19 @@ const WorkVerification = ({ work, onComplete, onCancel }) => {
                 />
               </div>
               <div className="form-group">
-                <label>Quality Assessment</label>
+                <label>{t('label_quality_assessment')}</label>
                 <select 
                   value={inspection.qualityScore} 
                   onChange={e => setInspection({...inspection, qualityScore: e.target.value})}
                 >
-                  <option value="Excellent">Excellent</option>
-                  <option value="Good">Good</option>
-                  <option value="Satisfactory">Satisfactory</option>
-                  <option value="Needs Improvement">Needs Improvement</option>
+                  <option value="Excellent">{t('quality_excellent')}</option>
+                  <option value="Good">{t('quality_good')}</option>
+                  <option value="Satisfactory">{t('quality_satisfactory')}</option>
+                  <option value="Needs Improvement">{t('quality_needs_improvement')}</option>
                 </select>
               </div>
               <div className="form-group full-width">
-                <label>Inspection Notes & Observations</label>
+                <label>{t('label_inspection_notes')}</label>
                 <textarea 
                   value={inspection.notes} 
                   onChange={e => setInspection({...inspection, notes: e.target.value})}
@@ -182,12 +184,12 @@ const WorkVerification = ({ work, onComplete, onCancel }) => {
                   onChange={e => setInspection({...inspection, complianceWithSpecifications: e.target.checked})}
                   id="compliance"
                 />
-                <label htmlFor="compliance">Work complies with technical specifications</label>
+                <label htmlFor="compliance">{t('label_compliance')}</label>
               </div>
             </div>
             <div className="step-actions">
               <button className="next-btn" onClick={handleSaveInspection} disabled={loading}>
-                Save & Continue <ChevronRight size={18} />
+                {t('btn_save_continue')} <ChevronRight size={18} />
               </button>
             </div>
           </div>
@@ -195,13 +197,13 @@ const WorkVerification = ({ work, onComplete, onCancel }) => {
 
         {step === 2 && (
           <div className="punch-list-section">
-            <h3>Step 2: Punch List Management</h3>
-            <p className="section-desc">Add any pending minor works or corrections needed before final handover.</p>
+            <h3>{t('title_punch_list_mgmt')}</h3>
+            <p className="section-desc">{t('desc_punch_list')}</p>
             
             <form className="add-punch-form" onSubmit={handleAddPunchItem}>
               <input 
                 type="text" 
-                placeholder="Description of issue" 
+                placeholder={t('placeholder_issue_desc')} 
                 value={newPunchItem.description}
                 onChange={e => setNewPunchItem({...newPunchItem, description: e.target.value})}
                 required
@@ -216,72 +218,72 @@ const WorkVerification = ({ work, onComplete, onCancel }) => {
                 value={newPunchItem.severity}
                 onChange={e => setNewPunchItem({...newPunchItem, severity: e.target.value})}
               >
-                <option value="Minor">Minor</option>
-                <option value="Critical">Critical</option>
+                <option value="Minor">{t('severity_minor')}</option>
+                <option value="Critical">{t('severity_critical')}</option>
               </select>
-              <button type="submit" className="add-btn"><Plus size={18} /> Add</button>
+              <button type="submit" className="add-btn"><Plus size={18} /> {t('btn_save')}</button>
             </form>
 
             <div className="punch-items-list">
               {punchList.map(item => (
                 <div key={item.id} className={`punch-card ${item.status.toLowerCase()}`}>
                   <div className="punch-info">
-                    <div className="punch-severity">{item.severity}</div>
+                    <div className="punch-severity">{item.severity === 'Minor' ? t('severity_minor') : t('severity_critical')}</div>
                     <h4>{item.description}</h4>
                     <p><MapPin size={12} /> {item.location}</p>
                   </div>
                   <div className="punch-status-actions">
                     {item.status === 'Open' ? (
                       <button className="resolve-btn" onClick={() => handleResolvePunchItem(item.id)}>
-                        Mark Resolved
+                        {t('btn_mark_resolved')}
                       </button>
                     ) : (
-                      <span className="resolved-tag"><CheckCircle2 size={14} /> Resolved</span>
+                      <span className="resolved-tag"><CheckCircle2 size={14} /> {t('stat_resolved')}</span>
                     )}
                   </div>
                 </div>
               ))}
-              {punchList.length === 0 && <div className="empty-punch">No items in punch list. All clear for handover.</div>}
+              {punchList.length === 0 && <div className="empty-punch">{t('msg_no_punch_items')}</div>}
             </div>
 
             <div className="step-actions">
               <button className="back-btn" onClick={() => setStep(1)}><ChevronLeft size={18} /> Back</button>
-              <button className="next-btn" onClick={() => setStep(3)}>Continue to Handover <ChevronRight size={18} /></button>
+              <button className="next-btn" onClick={() => setStep(3)}>{t('btn_continue_handover')} <ChevronRight size={18} /></button>
             </div>
           </div>
         )}
 
         {step === 3 && (
           <div className="handover-section">
-            <h3>Step 3: Final Handover Certificate</h3>
+            <h3>{t('title_handover_cert')}</h3>
             
             <div className="summary-box">
               <div className="summary-item">
-                <label>Sanctioned Amount</label>
+                <label>{t('field_sanctioned')}</label>
                 <span>₹{work.sanctionedAmount?.toLocaleString()}</span>
               </div>
               <div className="summary-item">
-                <label>Total Utilized</label>
+                <label>{t('field_utilized_amt')}</label>
                 <span>₹{work.totalUtilized?.toLocaleString()}</span>
               </div>
               <div className="summary-item">
-                <label>Completion Date</label>
+                <label>{t('label_completion_date')}</label>
                 <span>{new Date(work.completedAt || Date.now()).toLocaleDateString()}</span>
               </div>
             </div>
 
             <div className="esign-section">
               <div className="esign-box">
-                <label><ShieldCheck size={16} /> Sachiv E-Sign (Digital)</label>
+                <label><ShieldCheck size={16} /> {t('label_sachiv_esign')}</label>
                 <div className="esign-pad">
                   {user.name}
-                  <small>Digitally Verified</small>
+                  <small>{t('msg_digitally_verified')}</small>
                 </div>
               </div>
               <div className="esign-box">
-                <label><User size={16} /> Head Master E-Sign</label>
+                <label><User size={16} /> {t('label_hm_esign')}</label>
                 <div className="esign-pad placeholder">
-                  Pending HM Signature
+                  {t('msg_pending_hm_sign')}
                 </div>
               </div>
             </div>
@@ -289,7 +291,7 @@ const WorkVerification = ({ work, onComplete, onCancel }) => {
             <div className="step-actions">
               <button className="back-btn" onClick={() => setStep(2)}><ChevronLeft size={18} /> Back</button>
               <button className="finish-btn" onClick={handleGenerateCertificate} disabled={loading}>
-                <FileCheck size={18} /> Generate Certificate & Close Work
+                <FileCheck size={18} /> {t('btn_generate_cert')}
               </button>
             </div>
           </div>

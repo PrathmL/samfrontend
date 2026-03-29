@@ -5,9 +5,11 @@ import {
   Plus, ClipboardList, Clock, CheckCircle2, 
   TrendingUp, Building2, User
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const HeadmasterDashboard = () => {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [requests, setRequests] = useState([]);
   const [activeWorks, setActiveWorks] = useState([]);
@@ -40,8 +42,8 @@ const HeadmasterDashboard = () => {
   return (
     <div className="hm-dashboard">
       <div className="welcome-section">
-        <h1>School Dashboard</h1>
-        <p>Welcome back, {user?.name}</p>
+        <h1>{t('dash_school_dashboard')}</h1>
+        <p>{t('dash_welcome')}, {user?.name}</p>
       </div>
 
       <div className="stats-grid-hm">
@@ -51,7 +53,7 @@ const HeadmasterDashboard = () => {
           </div>
           <div className="stat-content-hm">
             <h3>{activeWorks.length}</h3>
-            <p>Active Works</p>
+            <p>{t('dash_total_works')}</p>
           </div>
         </div>
         <div className="stat-card-hm">
@@ -60,7 +62,7 @@ const HeadmasterDashboard = () => {
           </div>
           <div className="stat-content-hm">
             <h3>{requests.filter(r => r.status === 'PENDING_QUOTATION').length}</h3>
-            <p>Pending Requests</p>
+            <p>{t('dash_pending_requests')}</p>
           </div>
         </div>
         <div className="stat-card-hm">
@@ -69,7 +71,7 @@ const HeadmasterDashboard = () => {
           </div>
           <div className="stat-content-hm">
             <h3>{activeWorks.filter(w => w.status === 'COMPLETED').length}</h3>
-            <p>Completed Works</p>
+            <p>{t('dash_completed')}</p>
           </div>
         </div>
       </div>

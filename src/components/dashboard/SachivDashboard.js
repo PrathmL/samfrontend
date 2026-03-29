@@ -5,9 +5,11 @@ import {
   Briefcase, AlertCircle, CheckCircle2,
   Clock, Building2, Eye, BarChart3
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const SachivDashboard = () => {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [stats, setStats] = useState({
     totalWorks: 0,
     activeWorks: 0,
@@ -48,8 +50,8 @@ const SachivDashboard = () => {
   return (
     <div className="sachiv-dashboard">
       <div className="welcome-section">
-        <h1>Taluka Dashboard</h1>
-        <p>Welcome back, {user?.name} | Taluka: {user?.talukaId}</p>
+        <h1>{t('dash_taluka_dashboard')}</h1>
+        <p>{t('dash_welcome')}, {user?.name} | {t('field_taluka')}: {user?.talukaId}</p>
       </div>
 
       <div className="stats-grid">
@@ -59,7 +61,7 @@ const SachivDashboard = () => {
           </div>
           <div className="stat-info">
             <h3>{stats.totalWorks}</h3>
-            <p>Total Works</p>
+            <p>{t('dash_total_works')}</p>
           </div>
         </div>
         <div className="stat-card" style={{ borderLeftColor: '#10b981' }}>
@@ -68,7 +70,7 @@ const SachivDashboard = () => {
           </div>
           <div className="stat-info">
             <h3>{stats.activeWorks}</h3>
-            <p>Active Works</p>
+            <p>{t('menu_active_works')}</p>
           </div>
         </div>
         <div className="stat-card" style={{ borderLeftColor: '#f59e0b' }}>
@@ -77,7 +79,7 @@ const SachivDashboard = () => {
           </div>
           <div className="stat-info">
             <h3>{stats.pendingVerification}</h3>
-            <p>Pending Verification</p>
+            <p>{t('dash_pending_verification')}</p>
           </div>
         </div>
         <div className="stat-card" style={{ borderLeftColor: '#06b6d4' }}>
@@ -86,7 +88,7 @@ const SachivDashboard = () => {
           </div>
           <div className="stat-info">
             <h3>{stats.totalSchools}</h3>
-            <p>Schools</p>
+            <p>{t('menu_schools')}</p>
           </div>
         </div>
       </div>

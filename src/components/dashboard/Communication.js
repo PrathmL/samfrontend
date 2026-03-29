@@ -9,9 +9,11 @@ import {
   MapPin, Globe, Inbox
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { useTranslation } from 'react-i18next';
 
 const Communication = () => {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const isSender = user?.role === 'ADMIN' || user?.role === 'SACHIV';
   
   // Default to 'inbox' for HM/Clerk, 'send' for Admin/Sachiv
@@ -104,7 +106,7 @@ const Communication = () => {
   const fetchReceivedMessages = async () => {
     try {
       setLoading(true);
-      const res = await axios.get(`http://localhost:8080/api/communications/received`, {
+      const res = await axios.get('http://localhost:8080/api/communications/received', {
         params: { 
           schoolId: user.schoolId || 0, 
           talukaId: user.talukaId || 0 
@@ -191,14 +193,24 @@ const Communication = () => {
     }
   };
 
+  const translateMessageType = (type) => {
+    switch(type) {
+      case 'ANNOUNCEMENT': return t('type_announcement');
+      case 'REMINDER': return t('type_reminder');
+      case 'MEETING': return t('type_meeting');
+      case 'GUIDELINE': return t('type_guideline');
+      default: return type;
+    }
+  };
+
   return (
     <div className="comm-container">
       <div className="comm-header">
-        <h1>Communication Module</h1>
+        <h1>{t('title_comm_module')}</h1>
         <p>
           {isSender 
             ? `Send notifications across the ${user?.role === 'ADMIN' ? 'District' : 'Taluka'}` 
-            : 'Messages and notifications from authorities'}
+            : t('subtitle_comm_hm')}
         </p>
       </div>
 
@@ -209,7 +221,7 @@ const Communication = () => {
             onClick={() => setActiveTab('send')}
           >
             <Send size={18} />
-            Send Notification
+            {t('btn_send')}
           </button>
         )}
         
@@ -221,7 +233,7 @@ const Communication = () => {
           }}
         >
           <Inbox size={18} />
-          Inbox
+          {t('tab_inbox')}
         </button>
 
         {isSender && (
@@ -230,7 +242,7 @@ const Communication = () => {
             onClick={() => setActiveTab('history')}
           >
             <History size={18} />
-            Sent History
+            {t('tab_sent')}
           </button>
         )}
       </div>
@@ -274,7 +286,7 @@ const Communication = () => {
 
                 {user?.role === 'ADMIN' && formData.recipientMode !== 'DISTRICT' && (
                   <div className="form-group">
-                    <label>Select Taluka</label>
+                    <label>{t('field_taluka')}</label>
                     <select 
                       value={formData.talukaId} 
                       onChange={(e) => setFormData({...formData, talukaId: e.target.value, schoolId: ''})}
@@ -290,7 +302,7 @@ const Communication = () => {
 
                 {formData.recipientMode === 'SCHOOL' && (
                   <div className="form-group">
-                    <label>Select School</label>
+                    <label>{t('field_school')}</label>
                     <select 
                       value={formData.schoolId} 
                       onChange={(e) => setFormData({...formData, schoolId: e.target.value})}
@@ -311,15 +323,15 @@ const Communication = () => {
                     value={formData.type} 
                     onChange={(e) => setFormData({...formData, type: e.target.value})}
                   >
-                    <option value="ANNOUNCEMENT">Announcement</option>
-                    <option value="REMINDER">Reminder</option>
-                    <option value="MEETING">Meeting</option>
-                    <option value="GUIDELINE">Guideline/Documentation</option>
+                    <option value="ANNOUNCEMENT">{t('type_announcement')}</option>
+                    <option value="REMINDER">{t('type_reminder')}</option>
+                    <option value="MEETING">{t('type_meeting')}</option>
+                    <option value="GUIDELINE">{t('type_guideline')}</option>
                   </select>
                 </div>
 
                 <div className="form-group">
-                  <label>Subject / Title</label>
+                  <label>{t('field_title')}</label>
                   <input 
                     type="text" 
                     value={formData.title}
@@ -344,7 +356,7 @@ const Communication = () => {
                   {loading ? 'Sending...' : (
                     <>
                       <Send size={18} />
-                      Send Notification
+                      {t('btn_send')}
                     </>
                   )}
                 </button>
@@ -373,7 +385,7 @@ const Communication = () => {
                     <div className="msg-header">
                       <div className="msg-type" style={{ backgroundColor: getTypeColor(msg.type) + '20', color: getTypeColor(msg.type) }}>
                         {getTypeIcon(msg.type)}
-                        <span>{msg.type}</span>
+                        <span>{translateMessageType(msg.type)}</span>
                       </div>
                       <span className="msg-date">{new Date(msg.createdAt).toLocaleString()}</span>
                     </div>
@@ -382,7 +394,7 @@ const Communication = () => {
                     <div className="msg-footer">
                       <div className="msg-recipient">
                         <User size={14} />
-                        <span>From: Authorities</span>
+                        <span>{t('msg_from_authorities')}</span>
                         {msg.isBulk && <span className="bulk-tag" style={{ marginLeft: '1rem', background: '#f1f5f9', padding: '0.1rem 0.4rem', borderRadius: '4px', fontSize: '0.7rem' }}>Broadcast</span>}
                       </div>
                     </div>
@@ -392,8 +404,8 @@ const Communication = () => {
             ) : (
               <div className="empty-history">
                 <Inbox size={48} />
-                <h3>Your inbox is empty</h3>
-                <p>Messages from Admin and Sachiv will appear here.</p>
+                <h3>{t('empty_inbox_title')}</h3>
+                <p>{t('empty_inbox_desc')}</p>
               </div>
             )}
           </div>
@@ -406,7 +418,7 @@ const Communication = () => {
                     <div className="msg-header">
                       <div className="msg-type" style={{ backgroundColor: getTypeColor(msg.type) + '20', color: getTypeColor(msg.type) }}>
                         {getTypeIcon(msg.type)}
-                        <span>{msg.type}</span>
+                        <span>{translateMessageType(msg.type)}</span>
                       </div>
                       <span className="msg-date">{new Date(msg.createdAt).toLocaleString()}</span>
                     </div>

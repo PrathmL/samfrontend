@@ -1,459 +1,251 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Plus, Edit2, Trash2, X, Search, Filter, Eye, EyeOff, Power, RefreshCw, AlertCircle, CheckCircle, XCircle } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext';
+import { 
+  Users, UserPlus, Search, Edit2, 
+  Trash2, Shield, Mail, Phone, MapPin, 
+  CheckCircle, XCircle, Filter, X
+} from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const UserManagement = () => {
-  const { user: currentUser } = useAuth();
+  const { t } = useTranslation();
   const [users, setUsers] = useState([]);
-  const [filteredUsers, setFilteredUsers] = useState([]);
-  const [talukas, setTalukas] = useState([]);
   const [schools, setSchools] = useState([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingUser, setEditingUser] = useState(null);
-  const [activeTab, setActiveTab] = useState('SACHIV');
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('ALL');
+  const [talukas, setTalukas] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
-  const [stats, setStats] = useState({
-    totalActive: 0,
-    totalSachivs: 0,
-    totalHeadMasters: 0,
-    totalClerks: 0
-  });
-
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedRole, setSelectedRole] = useState('ALL');
+  
   const [formData, setFormData] = useState({
     name: '',
-    mobileNumber: '',
     email: '',
+    mobileNumber: '',
     password: '',
-    role: 'SACHIV',
-    status: 'Active',
+    role: 'CLERK',
+    schoolId: '',
     talukaId: '',
-    schoolId: ''
+    active: true
   });
 
   useEffect(() => {
     fetchUsers();
-    fetchTalukas();
     fetchSchools();
-    fetchStats();
+    fetchTalukas();
   }, []);
-
-  useEffect(() => {
-    filterUsers();
-  }, [users, activeTab, searchTerm, statusFilter]);
 
   const fetchUsers = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/api/admin/users');
-      setUsers(response.data);
-    } catch (error) {
-      console.error('Error fetching users:', error);
-      setError('Failed to fetch users');
-    }
-  };
-
-  const fetchTalukas = async () => {
-    try {
-      const response = await axios.get('http://localhost:8080/api/talukas');
-      setTalukas(response.data);
-    } catch (error) {
-      console.error('Error fetching talukas:', error);
-    }
-  };
-
-  const fetchSchools = async () => {
-    try {
-      const response = await axios.get('http://localhost:8080/api/schools');
-      setSchools(response.data);
-    } catch (error) {
-      console.error('Error fetching schools:', error);
-    }
-  };
-
-  const fetchStats = async () => {
-    try {
-      const response = await axios.get('http://localhost:8080/api/admin/users/stats');
-      setStats(response.data);
-    } catch (error) {
-      console.error('Error fetching stats:', error);
-    }
-  };
-
-  const filterUsers = () => {
-    let filtered = users.filter(user => user.role === activeTab);
-    
-    if (searchTerm) {
-      filtered = filtered.filter(user => 
-        user.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.mobileNumber?.includes(searchTerm) ||
-        user.email?.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-    
-    if (statusFilter !== 'ALL') {
-      filtered = filtered.filter(user => user.status === statusFilter);
-    }
-    
-    setFilteredUsers(filtered);
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
-    
-    try {
-      const dataToSend = { ...formData, role: activeTab };
-      
-      if (editingUser) {
-        await axios.put(`http://localhost:8080/api/admin/users/${editingUser.id}`, dataToSend);
-        setSuccess('User updated successfully');
-      } else {
-        await axios.post('http://localhost:8080/api/admin/users', dataToSend);
-        setSuccess('User created successfully');
-      }
-      
-      setIsModalOpen(false);
-      setEditingUser(null);
-      resetForm();
-      fetchUsers();
-      fetchStats();
-      
-      setTimeout(() => setSuccess(''), 3000);
-    } catch (error) {
-      setError(error.response?.data?.error || 'Failed to save user');
+      setLoading(true);
+      const res = await axios.get('http://localhost:8080/api/admin/users');
+      setUsers(res.data || []);
+    } catch (err) {
+      console.error('Error fetching users:', err);
     } finally {
       setLoading(false);
     }
   };
 
+  const fetchSchools = async () => {
+    try {
+      const res = await axios.get('http://localhost:8080/api/schools');
+      setSchools(res.data || []);
+    } catch (err) {
+      console.error('Error fetching schools:', err);
+    }
+  };
+
+  const fetchTalukas = async () => {
+    try {
+      const res = await axios.get('http://localhost:8080/api/talukas');
+      setTalukas(res.data || []);
+    } catch (err) {
+      console.error('Error fetching talukas:', err);
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.post('http://localhost:8080/api/admin/users', formData);
+      setIsModalOpen(false);
+      fetchUsers();
+      resetForm();
+    } catch (err) {
+      alert('Failed to save user');
+    }
+  };
+
   const resetForm = () => {
     setFormData({
-      name: '',
-      mobileNumber: '',
-      email: '',
-      password: '',
-      role: activeTab,
-      status: 'Active',
-      talukaId: '',
-      schoolId: ''
+      name: '', email: '', mobileNumber: '',
+      password: '', role: 'CLERK', schoolId: '',
+      talukaId: '', active: true
     });
-    setShowPassword(false);
   };
 
-  const handleEdit = (user) => {
-    setEditingUser(user);
-    setFormData({
-      name: user.name,
-      mobileNumber: user.mobileNumber,
-      email: user.email,
-      password: '',
-      role: user.role,
-      status: user.status,
-      talukaId: user.talukaId || '',
-      schoolId: user.schoolId || ''
-    });
-    setActiveTab(user.role);
-    setIsModalOpen(true);
-  };
-
-  const handleDelete = async (id, name) => {
-    if (window.confirm(`Are you sure you want to delete ${name}?`)) {
-      try {
-        await axios.delete(`http://localhost:8080/api/admin/users/${id}`);
-        setSuccess('User deleted successfully');
-        fetchUsers();
-        fetchStats();
-        setTimeout(() => setSuccess(''), 3000);
-      } catch (error) {
-        setError('Failed to delete user');
-      }
-    }
-  };
-
-  const handleToggleStatus = async (id, currentStatus, name) => {
-    const action = currentStatus === 'Active' ? 'deactivate' : 'activate';
-    if (window.confirm(`Are you sure you want to ${action} ${name}?`)) {
-      try {
-        await axios.post(`http://localhost:8080/api/admin/users/${id}/${action}`);
-        setSuccess(`User ${action}d successfully`);
-        fetchUsers();
-        fetchStats();
-        setTimeout(() => setSuccess(''), 3000);
-      } catch (error) {
-        setError(`Failed to ${action} user`);
-      }
-    }
-  };
-
-  const handleResetPassword = async (id, name) => {
-    if (window.confirm(`Reset password for ${name}? Password will be set to their mobile number.`)) {
-      try {
-        await axios.post(`http://localhost:8080/api/admin/users/${id}/reset-password`, {
-          newPassword: ''
-        });
-        setSuccess('Password reset successfully');
-        setTimeout(() => setSuccess(''), 3000);
-      } catch (error) {
-        setError('Failed to reset password');
-      }
-    }
-  };
-
-  const getStatusColor = (status) => {
-    switch(status) {
-      case 'Active': return { bg: '#dcfce7', text: '#166534', icon: CheckCircle };
-      case 'Inactive': return { bg: '#fee2e2', text: '#991b1b', icon: XCircle };
-      default: return { bg: '#f1f5f9', text: '#475569', icon: AlertCircle };
-    }
-  };
+  const filteredUsers = users.filter(user => {
+    const matchesSearch = user.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         user.mobileNumber?.includes(searchTerm);
+    const matchesRole = selectedRole === 'ALL' || user.role === selectedRole;
+    return matchesSearch && matchesRole;
+  });
 
   return (
-    <div className="management-container">
-      <div className="management-header">
-        <h1>User Management</h1>
-        <button className="add-button" onClick={() => { resetForm(); setIsModalOpen(true); }}>
-          <Plus size={20} /> Add {activeTab.toLowerCase()}
+    <div className="user-management">
+      <div className="module-header">
+        <div>
+          <h1>{t('title_user_mgmt')}</h1>
+          <p>Create and manage portal access for different stakeholders</p>
+        </div>
+        <button className="add-btn" onClick={() => setIsModalOpen(true)}>
+          <UserPlus size={20} /> {t('btn_add_user')}
         </button>
       </div>
 
-      {/* Stats Cards */}
-      <div className="stats-cards">
-        <div className="stat-card-mini">
-          <div className="stat-value-mini">{stats.totalSachivs}</div>
-          <div className="stat-label-mini">Sachivs</div>
-        </div>
-        <div className="stat-card-mini">
-          <div className="stat-value-mini">{stats.totalHeadMasters}</div>
-          <div className="stat-label-mini">Head Masters</div>
-        </div>
-        <div className="stat-card-mini">
-          <div className="stat-value-mini">{stats.totalClerks}</div>
-          <div className="stat-label-mini">Clerks</div>
-        </div>
-        <div className="stat-card-mini">
-          <div className="stat-value-mini">{stats.totalActive}</div>
-          <div className="stat-label-mini">Active Users</div>
-        </div>
-      </div>
-
-      {/* Alerts */}
-      {error && (
-        <div className="alert error">
-          <AlertCircle size={18} />
-          <span>{error}</span>
-          <button onClick={() => setError('')}><X size={16} /></button>
-        </div>
-      )}
-      {success && (
-        <div className="alert success">
-          <CheckCircle size={18} />
-          <span>{success}</span>
-          <button onClick={() => setSuccess('')}><X size={16} /></button>
-        </div>
-      )}
-
-      {/* Tabs */}
-      <div className="tabs">
-        <button className={activeTab === 'SACHIV' ? 'active' : ''} onClick={() => setActiveTab('SACHIV')}>
-          Sachivs
-        </button>
-        <button className={activeTab === 'HEADMASTER' ? 'active' : ''} onClick={() => setActiveTab('HEADMASTER')}>
-          Head Masters
-        </button>
-        <button className={activeTab === 'CLERK' ? 'active' : ''} onClick={() => setActiveTab('CLERK')}>
-          Clerks
-        </button>
-      </div>
-
-      {/* Search and Filters */}
-      <div className="filters-bar">
+      <div className="filter-bar">
         <div className="search-box">
-          <Search size={18} />
-          <input
-            type="text"
-            placeholder="Search by name, mobile, email..."
+          <Search size={20} />
+          <input 
+            type="text" 
+            placeholder={`${t('btn_search')} ${t('field_name')}...`}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <div className="filter-box">
-          <Filter size={18} />
-          <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
-            <option value="ALL">All Status</option>
-            <option value="Active">Active</option>
-            <option value="Inactive">Inactive</option>
+        <div className="role-filter">
+          <Filter size={20} />
+          <select value={selectedRole} onChange={(e) => setSelectedRole(e.target.value)}>
+            <option value="ALL">All Roles</option>
+            <option value="ADMIN">Admin</option>
+            <option value="SACHIV">Sachiv</option>
+            <option value="HEADMASTER">Headmaster</option>
+            <option value="CLERK">Clerk</option>
           </select>
         </div>
       </div>
 
-      {/* Users Table */}
-      <div className="table-container">
-        <table>
+      <div className="users-table-container">
+        <table className="users-table">
           <thead>
             <tr>
-              <th>Name</th>
-              <th>Mobile</th>
-              <th>Email</th>
-              {activeTab === 'SACHIV' && <th>Taluka</th>}
-              {(activeTab === 'HEADMASTER' || activeTab === 'CLERK') && <th>School</th>}
-              <th>Status</th>
-              <th>Created</th>
-              <th>Actions</th>
+              <th>{t('field_name')}</th>
+              <th>{t('field_role')}</th>
+              <th>{t('field_mobile')}</th>
+              <th>{t('field_status')}</th>
+              <th>{t('field_actions')}</th>
             </tr>
           </thead>
           <tbody>
-            {filteredUsers.map((user) => {
-              const StatusIcon = getStatusColor(user.status).icon;
-              return (
-                <tr key={user.id}>
-                  <td><strong>{user.name}</strong></td>
-                  <td>{user.mobileNumber}</td>
-                  <td>{user.email || '-'}</td>
-                  {activeTab === 'SACHIV' && <td>{user.talukaName || 'N/A'}</td>}
-                  {(activeTab === 'HEADMASTER' || activeTab === 'CLERK') && (
-                    <td>{user.schoolName || 'N/A'}</td>
-                  )}
-                  <td>
-                    <span className={`status-badge ${user.status.toLowerCase()}`}>
-                      <StatusIcon size={12} />
-                      {user.status}
-                    </span>
-                  </td>
-                  <td className="date-cell">{user.createdAt?.split(' ')[0] || '-'}</td>
-                  <td>
-                    <div className="action-buttons">
-                      <button className="edit-btn" onClick={() => handleEdit(user)} title="Edit">
-                        <Edit2 size={16} />
-                      </button>
-                      <button className="reset-pwd-btn" onClick={() => handleResetPassword(user.id, user.name)} title="Reset Password">
-                        <RefreshCw size={16} />
-                      </button>
-                      <button className="toggle-status-btn" onClick={() => handleToggleStatus(user.id, user.status, user.name)} title={user.status === 'Active' ? 'Deactivate' : 'Activate'}>
-                        <Power size={16} />
-                      </button>
-                      <button className="delete-btn" onClick={() => handleDelete(user.id, user.name)} title="Delete">
-                        <Trash2 size={16} />
-                      </button>
+            {filteredUsers.map(user => (
+              <tr key={user.id}>
+                <td>
+                  <div className="user-info-cell">
+                    <div className="user-avatar">{user.name?.charAt(0)}</div>
+                    <div>
+                      <div className="user-name-text">{user.name}</div>
+                      <div className="user-email-text">{user.email}</div>
                     </div>
-                  </td>
-                </tr>
-              );
-            })}
+                  </div>
+                </td>
+                <td>
+                  <span className={`role-badge ${user.role?.toLowerCase()}`}>
+                    {user.role}
+                  </span>
+                </td>
+                <td>{user.mobileNumber}</td>
+                <td>
+                  <span className={`status-badge ${user.active ? 'active' : 'inactive'}`}>
+                    {user.active ? t('status_active') : t('status_inactive')}
+                  </span>
+                </td>
+                <td>
+                  <div className="action-btns">
+                    <button className="edit-btn-icon"><Edit2 size={16} /></button>
+                    <button className="delete-btn-icon"><Trash2 size={16} /></button>
+                  </div>
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
-        {filteredUsers.length === 0 && (
-          <div className="empty-state">
-            <p>No users found.</p>
-          </div>
-        )}
       </div>
 
-      {/* Modal */}
       {isModalOpen && (
         <div className="modal-overlay">
           <div className="modal">
             <div className="modal-header">
-              <h2>{editingUser ? 'Edit' : 'Add'} {activeTab.toLowerCase()}</h2>
-              <button className="close-btn" onClick={() => setIsModalOpen(false)}><X size={24} /></button>
+              <h2>{t('btn_add_user')}</h2>
+              <button onClick={() => setIsModalOpen(false)}><X size={24} /></button>
             </div>
             <form onSubmit={handleSubmit}>
-              <div className="form-grid">
-                <div className="form-group full-width">
-                  <label>Full Name *</label>
-                  <input 
-                    type="text" 
-                    value={formData.name} 
-                    onChange={(e) => setFormData({...formData, name: e.target.value})}
-                    required 
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Mobile Number *</label>
-                  <input 
-                    type="tel" 
-                    value={formData.mobileNumber} 
-                    onChange={(e) => setFormData({...formData, mobileNumber: e.target.value})}
-                    required 
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Email</label>
-                  <input 
-                    type="email" 
-                    value={formData.email} 
-                    onChange={(e) => setFormData({...formData, email: e.target.value})}
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Password {editingUser && '(Leave blank to keep current)'}</label>
-                  <div className="password-input-wrapper">
-                    <input 
-                      type={showPassword ? "text" : "password"}
-                      value={formData.password} 
-                      onChange={(e) => setFormData({...formData, password: e.target.value})}
-                      required={!editingUser}
-                      placeholder={!editingUser ? "Default: mobile number" : "New password"}
-                    />
-                    <button type="button" className="toggle-password" onClick={() => setShowPassword(!showPassword)}>
-                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                    </button>
-                  </div>
-                </div>
-
-                {activeTab === 'SACHIV' && (
+              <div className="modal-body">
+                <div className="form-grid">
                   <div className="form-group">
-                    <label>Assign Taluka *</label>
-                    <select 
-                      value={formData.talukaId} 
-                      onChange={(e) => setFormData({...formData, talukaId: e.target.value})}
-                      required
-                    >
-                      <option value="">Select Taluka</option>
-                      {talukas.filter(t => t.status === 'Active').map(t => (
-                        <option key={t.id} value={t.id}>{t.name}</option>
-                      ))}
+                    <label>{t('field_name')}</label>
+                    <input type="text" required value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
+                  </div>
+                  <div className="form-group">
+                    <label>{t('field_mobile')}</label>
+                    <input type="tel" required value={formData.mobileNumber} onChange={e => setFormData({...formData, mobileNumber: e.target.value})} />
+                  </div>
+                  <div className="form-group">
+                    <label>{t('field_email')}</label>
+                    <input type="email" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} />
+                  </div>
+                  <div className="form-group">
+                    <label>{t('field_role')}</label>
+                    <select value={formData.role} onChange={e => setFormData({...formData, role: e.target.value, schoolId: '', talukaId: ''})}>
+                      <option value="ADMIN">Admin</option>
+                      <option value="SACHIV">Sachiv</option>
+                      <option value="HEADMASTER">Headmaster</option>
+                      <option value="CLERK">Clerk</option>
                     </select>
                   </div>
-                )}
 
-                {(activeTab === 'HEADMASTER' || activeTab === 'CLERK') && (
+                  {/* Conditional School Dropdown for HM and Clerk */}
+                  {(formData.role === 'HEADMASTER' || formData.role === 'CLERK') && (
+                    <div className="form-group full-width-modal">
+                      <label>{t('field_school')} *</label>
+                      <select 
+                        required 
+                        value={formData.schoolId} 
+                        onChange={e => setFormData({...formData, schoolId: e.target.value})}
+                      >
+                        <option value="">Select School</option>
+                        {schools.map(s => (
+                          <option key={s.id} value={s.id}>{s.name} ({s.code})</option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+
+                  {/* Conditional Taluka Dropdown for Sachiv */}
+                  {formData.role === 'SACHIV' && (
+                    <div className="form-group full-width-modal">
+                      <label>{t('field_taluka')}</label>
+                      <select 
+                        required 
+                        value={formData.talukaId} 
+                        onChange={e => setFormData({...formData, talukaId: e.target.value})}
+                      >
+                        <option value="">Select Taluka</option>
+                        {talukas.map(t => (
+                          <option key={t.id} value={t.id}>{t.name}</option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+
                   <div className="form-group">
-                    <label>Assign School *</label>
-                    <select 
-                      value={formData.schoolId} 
-                      onChange={(e) => setFormData({...formData, schoolId: e.target.value})}
-                      required
-                    >
-                      <option value="">Select School</option>
-                      {schools.filter(s => s.status === 'Active').map(s => (
-                        <option key={s.id} value={s.id}>{s.name}</option>
-                      ))}
-                    </select>
+                    <label>{t('field_password')}</label>
+                    <input type="password" required value={formData.password} onChange={e => setFormData({...formData, password: e.target.value})} />
                   </div>
-                )}
-
-                <div className="form-group">
-                  <label>Status</label>
-                  <select 
-                    value={formData.status} 
-                    onChange={(e) => setFormData({...formData, status: e.target.value})}
-                  >
-                    <option value="Active">Active</option>
-                    <option value="Inactive">Inactive</option>
-                  </select>
                 </div>
               </div>
               <div className="modal-footer">
-                <button type="button" className="cancel-btn" onClick={() => setIsModalOpen(false)}>Cancel</button>
-                <button type="submit" className="save-btn" disabled={loading}>
-                  {loading ? 'Saving...' : (editingUser ? 'Update User' : 'Save User')}
-                </button>
+                <button type="button" className="cancel-btn" onClick={() => setIsModalOpen(false)}>{t('btn_cancel')}</button>
+                <button type="submit" className="save-btn">{t('btn_save')}</button>
               </div>
             </form>
           </div>
@@ -461,65 +253,60 @@ const UserManagement = () => {
       )}
 
       <style>{`
-        .management-container { padding: 1rem; }
-        .management-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
-        .add-button { display: flex; align-items: center; gap: 0.5rem; background-color: #0ea5e9; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 0.5rem; cursor: pointer; font-weight: 600; }
+        .user-management { padding: 0; }
+        .module-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+        .module-header h1 { margin: 0; font-size: 1.75rem; color: #1e293b; }
+        .module-header p { margin: 0.25rem 0 0; color: #64748b; }
         
-        .stats-cards { display: flex; gap: 1rem; margin-bottom: 1.5rem; }
-        .stat-card-mini { background: white; padding: 1rem 1.5rem; border-radius: 0.75rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); text-align: center; flex: 1; }
-        .stat-value-mini { font-size: 1.75rem; font-weight: 700; color: #0ea5e9; }
-        .stat-label-mini { font-size: 0.8rem; color: #64748b; }
-        
-        .alert { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; border-radius: 0.5rem; margin-bottom: 1rem; }
-        .alert.error { background-color: #fee2e2; color: #991b1b; }
-        .alert.success { background-color: #dcfce7; color: #166534; }
-        .alert button { background: none; border: none; margin-left: auto; cursor: pointer; color: inherit; }
-        
-        .tabs { display: flex; gap: 1rem; margin-bottom: 1.5rem; border-bottom: 2px solid #e2e8f0; }
-        .tabs button { padding: 0.75rem 1.5rem; border: none; background: none; cursor: pointer; font-weight: 600; color: #64748b; border-bottom: 2px solid transparent; margin-bottom: -2px; }
-        .tabs button.active { color: #0ea5e9; border-bottom-color: #0ea5e9; }
-        
-        .filters-bar { display: flex; gap: 1rem; margin-bottom: 1.5rem; }
-        .search-box { display: flex; align-items: center; gap: 0.5rem; background: white; border: 1px solid #e2e8f0; border-radius: 0.5rem; padding: 0.5rem 0.75rem; flex: 1; }
-        .search-box input { border: none; outline: none; flex: 1; }
-        .filter-box { display: flex; align-items: center; gap: 0.5rem; background: white; border: 1px solid #e2e8f0; border-radius: 0.5rem; padding: 0.5rem 0.75rem; }
-        .filter-box select { border: none; outline: none; background: transparent; }
-        
-        .table-container { background: white; border-radius: 0.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; text-align: left; }
-        th { background-color: #f1f5f9; padding: 1rem; font-weight: 600; color: #475569; }
-        td { padding: 1rem; border-top: 1px solid #f1f5f9; }
-        .date-cell { font-size: 0.85rem; color: #64748b; }
-        
-        .status-badge { display: inline-flex; align-items: center; gap: 0.25rem; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
-        .status-badge.active { background-color: #dcfce7; color: #166534; }
-        .status-badge.inactive { background-color: #fee2e2; color: #991b1b; }
-        
-        .action-buttons { display: flex; gap: 0.5rem; }
-        .edit-btn, .reset-pwd-btn, .toggle-status-btn, .delete-btn { padding: 0.5rem; border: 1px solid #e2e8f0; border-radius: 0.25rem; background: white; cursor: pointer; color: #64748b; display: inline-flex; align-items: center; }
-        .edit-btn:hover { color: #0ea5e9; border-color: #0ea5e9; }
-        .reset-pwd-btn:hover { color: #f59e0b; border-color: #f59e0b; }
-        .toggle-status-btn:hover { color: #8b5cf6; border-color: #8b5cf6; }
-        .delete-btn:hover { color: #ef4444; border-color: #ef4444; }
-        
-        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 1000; }
-        .modal { background: white; border-radius: 0.75rem; width: 100%; max-width: 700px; padding: 2rem; max-height: 90vh; overflow-y: auto; }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
-        .close-btn { background: none; border: none; cursor: pointer; color: #64748b; }
+        .add-btn { display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.5rem; background: #0ea5e9; color: white; border: none; border-radius: 0.75rem; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+        .add-btn:hover { background: #0284c7; transform: translateY(-2px); }
+
+        .filter-bar { display: flex; gap: 1rem; margin-bottom: 2rem; }
+        .search-box { flex: 1; position: relative; display: flex; align-items: center; }
+        .search-box svg { position: absolute; left: 1rem; color: #94a3b8; }
+        .search-box input { width: 100%; padding: 0.75rem 1rem 0.75rem 3rem; border: 1px solid #e2e8f0; border-radius: 0.75rem; outline: none; transition: border-color 0.2s; }
+        .search-box input:focus { border-color: #0ea5e9; }
+
+        .role-filter { display: flex; align-items: center; gap: 0.75rem; background: white; padding: 0 1rem; border: 1px solid #e2e8f0; border-radius: 0.75rem; }
+        .role-filter select { border: none; padding: 0.75rem 0; outline: none; font-weight: 600; color: #475569; }
+
+        .users-table-container { background: white; border-radius: 1rem; border: 1px solid #e2e8f0; overflow: hidden; }
+        .users-table { width: 100%; border-collapse: collapse; }
+        .users-table th { background: #f8fafc; padding: 1rem; text-align: left; font-size: 0.85rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; }
+        .users-table td { padding: 1rem; border-top: 1px solid #f1f5f9; }
+
+        .user-info-cell { display: flex; align-items: center; gap: 1rem; }
+        .user-avatar { width: 40px; height: 40px; border-radius: 50%; background: #e0f2fe; color: #0ea5e9; display: flex; align-items: center; justify-content: center; font-weight: 700; }
+        .user-name-text { font-weight: 700; color: #1e293b; }
+        .user-email-text { font-size: 0.85rem; color: #64748b; }
+
+        .role-badge { padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; }
+        .role-badge.admin { background: #fee2e2; color: #dc2626; }
+        .role-badge.sachiv { background: #fef3c7; color: #d97706; }
+        .role-badge.headmaster { background: #dcfce7; color: #16a34a; }
+        .role-badge.clerk { background: #e0f2fe; color: #0ea5e9; }
+
+        .status-badge { padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 700; }
+        .status-badge.active { background: #dcfce7; color: #16a34a; }
+        .status-badge.inactive { background: #f1f5f9; color: #64748b; }
+
+        .action-btns { display: flex; gap: 0.5rem; }
+        .edit-btn-icon, .delete-btn-icon { width: 32px; height: 32px; border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; border: 1px solid #e2e8f0; background: white; cursor: pointer; transition: all 0.2s; }
+        .edit-btn-icon:hover { color: #0ea5e9; border-color: #0ea5e9; }
+        .delete-btn-icon:hover { color: #ef4444; border-color: #ef4444; }
+
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1100; }
+        .modal { background: white; border-radius: 1.5rem; width: 100%; max-width: 600px; overflow: hidden; }
+        .modal-header { padding: 1.5rem; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; }
+        .modal-body { padding: 1.5rem; }
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
-        .form-group.full-width { grid-column: span 2; }
+        .full-width-modal { grid-column: span 2; }
         .form-group { display: flex; flex-direction: column; gap: 0.5rem; }
-        .form-group label { font-weight: 600; color: #334155; font-size: 0.9rem; }
-        .form-group input, .form-group select { padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.5rem; }
-        .password-input-wrapper { position: relative; display: flex; }
-        .password-input-wrapper input { flex: 1; }
-        .toggle-password { position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #64748b; }
-        .modal-footer { display: flex; justify-content: flex-end; gap: 1rem; margin-top: 2rem; }
-        .cancel-btn { padding: 0.75rem 1.5rem; border: 1px solid #d1d5db; border-radius: 0.5rem; background: white; cursor: pointer; }
-        .save-btn { padding: 0.75rem 1.5rem; border: none; border-radius: 0.5rem; background: #0ea5e9; color: white; cursor: pointer; font-weight: 600; }
-        .save-btn:disabled { background-color: #93c5fd; cursor: not-allowed; }
-        
-        .empty-state { text-align: center; padding: 3rem; color: #94a3b8; }
+        .form-group label { font-size: 0.875rem; font-weight: 600; color: #475569; }
+        .form-group input, .form-group select { padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.75rem; outline: none; }
+        .modal-footer { padding: 1.5rem; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end; gap: 1rem; }
+        .save-btn { padding: 0.75rem 2rem; background: #0ea5e9; color: white; border: none; border-radius: 0.75rem; font-weight: 700; cursor: pointer; }
+        .cancel-btn { padding: 0.75rem 2rem; background: #f1f5f9; color: #475569; border: none; border-radius: 0.75rem; font-weight: 700; cursor: pointer; }
       `}</style>
     </div>
   );

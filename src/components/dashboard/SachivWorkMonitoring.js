@@ -3,11 +3,13 @@ import axios from 'axios';
 import { 
   BarChart3, TrendingUp, Clock, CheckCircle2, 
   AlertTriangle, Search, Filter, ChevronRight,
-  IndianRupee, Building2, MapPin
+  IndianRupee, Building2, MapPin, Briefcase
 } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
 import { useTranslation } from 'react-i18next';
 
-const AdminWorkMonitoring = () => {
+const SachivWorkMonitoring = () => {
+  const { user } = useAuth();
   const { t } = useTranslation();
   const [works, setWorks] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -15,13 +17,15 @@ const AdminWorkMonitoring = () => {
   const [filterStatus, setStatusFilter] = useState('ALL');
 
   useEffect(() => {
-    fetchWorks();
-  }, []);
+    if (user?.talukaId) {
+      fetchWorks();
+    }
+  }, [user?.talukaId]);
 
   const fetchWorks = async () => {
     try {
       setLoading(true);
-      const res = await axios.get('http://localhost:8080/api/works');
+      const res = await axios.get(`http://localhost:8080/api/works/taluka/${user.talukaId}`);
       setWorks(res.data || []);
     } catch (err) {
       console.error('Error fetching works:', err);
@@ -51,13 +55,13 @@ const AdminWorkMonitoring = () => {
     <div className="work-monitoring">
       <div className="module-header">
         <h1>{t('title_work_monitoring')}</h1>
-        <p>Comprehensive tracking of all ongoing and completed education projects</p>
+        <p>Tracking ongoing and completed education projects in your Taluka</p>
       </div>
 
       <div className="monitor-stats-row">
         <div className="mini-stat-card">
           <span className="mini-stat-label">{t('dash_in_progress')}</span>
-          <span className="mini-stat-val">{works.filter(w => w.status === 'IN_PROGRESS').length}</span>
+          <span className="mini-stat-val">{works.filter(w => w.status === 'IN_PROGRESS' || w.status === 'ACTIVE').length}</span>
         </div>
         <div className="mini-stat-card">
           <span className="mini-stat-label">{t('dash_completed')}</span>
@@ -134,13 +138,19 @@ const AdminWorkMonitoring = () => {
             ))}
           </tbody>
         </table>
+        {filteredWorks.length === 0 && !loading && (
+          <div className="empty-state" style={{ textAlign: 'center', padding: '3rem', color: '#94a3b8' }}>
+            <Briefcase size={48} style={{ marginBottom: '1rem' }} />
+            <p>No works found matching your criteria.</p>
+          </div>
+        )}
       </div>
 
       <style>{`
         .work-monitoring { padding: 0; }
         .module-header { margin-bottom: 2rem; }
-        .module-header h1 { margin: 0; font-size: 1.75rem; color: #1e293b; }
-        .module-header p { margin: 0.25rem 0 0; color: #64748b; }
+        .module-header h1 { margin: 0; font-size: 1.875rem; color: #1e293b; }
+        .module-header p { color: #64748b; margin: 0.5rem 0 0; }
 
         .monitor-stats-row { display: flex; gap: 1.5rem; margin-bottom: 2rem; }
         .mini-stat-card { background: white; padding: 1rem 1.5rem; border-radius: 0.75rem; border: 1px solid #e2e8f0; min-width: 150px; }
@@ -182,4 +192,4 @@ const AdminWorkMonitoring = () => {
   );
 };
 
-export default AdminWorkMonitoring;
+export default SachivWorkMonitoring;

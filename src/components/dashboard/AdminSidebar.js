@@ -13,132 +13,79 @@ import {
   Eye,
   FileText,
   Bell,
-  MessageSquare
+  MessageSquare,
+  IndianRupee
 } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext';
+import { useTranslation } from 'react-i18next';
 
 const AdminSidebar = () => {
-  const { logout } = useAuth();
+  const { t } = useTranslation();
 
-  const navItems = [
-    { name: 'Dashboard', path: '/admin/dashboard', icon: LayoutDashboard },
-    { name: 'User Management', path: '/admin/users', icon: Users },
-    { name: 'Taluka Management', path: '/admin/talukas', icon: MapPin },
-    { name: 'School Management', path: '/admin/schools', icon: SchoolIcon },
-    { name: 'Work Monitoring', path: '/admin/work-monitoring', icon: Eye },
-    { name: 'Work Requests', path: '/admin/work-requests', icon: ClipboardList },
-    { name: 'Blocker Management', path: '/admin/blockers', icon: AlertCircle },
-    { name: 'Blocker Analytics', path: '/admin/analytics', icon: BarChart3 },
-    { name: 'Alerts & Notifications', path: '/admin/alerts', icon: Bell },
-    { name: 'Reports', path: '/admin/reports', icon: FileText },
-    { name: 'Communication', path: '/admin/communication', icon: MessageSquare },
-    { name: 'Audit Logs', path: '/admin/audit-logs', icon: ClipboardList },
-    { name: 'Settings', path: '/admin/settings', icon: Settings },
+  const menuItems = [
+    { name: t('menu_dashboard'), path: '/admin/dashboard', icon: LayoutDashboard },
+    { name: t('menu_users'), path: '/admin/users', icon: Users },
+    { name: t('menu_talukas'), path: '/admin/talukas', icon: MapPin },
+    { name: t('menu_schools'), path: '/admin/schools', icon: SchoolIcon },
+    { name: t('menu_work_monitoring'), path: '/admin/work-monitoring', icon: Eye },
+    { name: t('menu_work_requests'), path: '/admin/work-requests', icon: ClipboardList },
+    { name: t('menu_blockers'), path: '/admin/blockers', icon: AlertCircle },
+    { name: t('menu_analytics'), path: '/admin/analytics', icon: BarChart3 },
+    { name: t('menu_alerts'), path: '/admin/alerts', icon: Bell },
+    { name: t('menu_reports'), path: '/admin/reports', icon: FileText },
+    { name: t('menu_communication'), path: '/admin/communication', icon: MessageSquare },
+    { name: t('menu_audit_logs'), path: '/admin/audit-logs', icon: Settings },
   ];
 
   return (
-    <div className="admin-sidebar">
-      <div className="sidebar-header">
-        <h2>ESSP Admin</h2>
-      </div>
-      <nav className="sidebar-nav">
-        {navItems.map((item) => (
-          <NavLink 
-            key={item.path} 
+    <div className="sidebar">
+      <div className="sidebar-menu">
+        {menuItems.map((item) => (
+          <NavLink
+            key={item.path}
             to={item.path}
-            className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+            className={({ isActive }) => `menu-item ${isActive ? 'active' : ''}`}
           >
             <item.icon size={20} />
             <span>{item.name}</span>
           </NavLink>
         ))}
-      </nav>
-      <div className="sidebar-footer">
-        <button onClick={logout} className="logout-button">
-          <LogOut size={20} />
-          <span>Logout</span>
-        </button>
       </div>
 
       <style>{`
-        .admin-sidebar {
+        .sidebar {
           width: 260px;
-          background-color: #1e293b;
-          color: white;
-          display: flex;
-          flex-direction: column;
-          height: 100vh;
+          background-color: white;
+          border-right: 1px solid #e2e8f0;
+          height: calc(100vh - 70px);
           position: fixed;
           left: 0;
-          top: 0;
-        }
-        .sidebar-header {
-          padding: 1.5rem;
-          border-bottom: 1px solid #334155;
-          text-align: center;
-        }
-        .sidebar-header h2 {
-          margin: 0;
-          font-size: 1.25rem;
-          color: #38bdf8;
-        }
-        .sidebar-nav {
-          flex: 1;
-          padding: 1rem 0;
+          overflow-y: auto;
           display: flex;
           flex-direction: column;
-          gap: 0.25rem;
-          overflow-y: auto;
         }
-        .sidebar-nav::-webkit-scrollbar {
-          width: 4px;
+        .sidebar-menu {
+          padding: 1.5rem 1rem;
+          flex: 1;
         }
-        .sidebar-nav::-webkit-scrollbar-track {
-          background: transparent;
-        }
-        .sidebar-nav::-webkit-scrollbar-thumb {
-          background: #334155;
-          border-radius: 10px;
-        }
-        .sidebar-nav::-webkit-scrollbar-thumb:hover {
-          background: #475569;
-        }
-        .nav-item {
+        .menu-item {
           display: flex;
           align-items: center;
           gap: 0.75rem;
-          padding: 0.75rem 1.5rem;
+          padding: 0.75rem 1rem;
+          color: #64748b;
           text-decoration: none;
-          color: #cbd5e1;
+          border-radius: 0.5rem;
+          margin-bottom: 0.25rem;
           transition: all 0.2s;
+          font-weight: 500;
         }
-        .nav-item:hover {
-          background-color: #334155;
-          color: white;
+        .menu-item:hover {
+          background-color: #f1f5f9;
+          color: #0f172a;
         }
-        .nav-item.active {
-          background-color: #0ea5e9;
-          color: white;
-        }
-        .sidebar-footer {
-          padding: 1rem;
-          border-top: 1px solid #334155;
-        }
-        .logout-button {
-          display: flex;
-          align-items: center;
-          gap: 0.75rem;
-          width: 100%;
-          padding: 0.75rem;
-          background: none;
-          border: none;
-          color: #cbd5e1;
-          cursor: pointer;
-          transition: color 0.2s;
-          font-size: 1rem;
-        }
-        .logout-button:hover {
-          color: #ef4444;
+        .menu-item.active {
+          background-color: #f0f9ff;
+          color: #0ea5e9;
         }
       `}</style>
     </div>

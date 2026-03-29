@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { BarChart3, PieChart, TrendingUp, Clock, MapPin, AlertCircle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const BlockerAnalytics = ({ talukaId = null }) => {
+  const { t } = useTranslation();
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -21,8 +23,8 @@ const BlockerAnalytics = ({ talukaId = null }) => {
     fetchStats();
   }, [talukaId]);
 
-  if (loading) return <div className="loading-analytics">Loading Analytics...</div>;
-  if (!stats) return <div className="no-data">No analytics data available</div>;
+  if (loading) return <div className="loading-analytics">{t('msg_loading_analytics')}</div>;
+  if (!stats) return <div className="no-data">{t('msg_no_analytics')}</div>;
 
   const renderProgressBar = (value, total, color) => {
     const percentage = total > 0 ? (value / total) * 100 : 0;
@@ -38,6 +40,36 @@ const BlockerAnalytics = ({ talukaId = null }) => {
     );
   };
 
+  const translateStatus = (status) => {
+    switch(status) {
+      case 'NEW': return t('status_new');
+      case 'IN_PROGRESS': return t('status_in_progress');
+      case 'RESOLVED': return t('stat_resolved');
+      case 'ESCALATED': return t('stat_escalated');
+      default: return status;
+    }
+  };
+
+  const translatePriority = (priority) => {
+    switch(priority) {
+      case 'HIGH': return t('priority_high');
+      case 'MEDIUM': return t('priority_medium');
+      case 'LOW': return t('priority_low');
+      default: return priority;
+    }
+  };
+
+  const translateType = (type) => {
+    switch(type) {
+      case 'Material Shortage': return t('type_material_shortage');
+      case 'Labor Availability': return t('type_labor_availability');
+      case 'Fund Issues': return t('type_fund_issues');
+      case 'Technical Issue': return t('type_technical_issue');
+      case 'Administrative Delay': return t('type_admin_delay');
+      default: return type;
+    }
+  };
+
   return (
     <div className="analytics-container">
       <div className="analytics-grid">
@@ -45,12 +77,12 @@ const BlockerAnalytics = ({ talukaId = null }) => {
         <div className="analytics-card">
           <div className="card-head">
             <PieChart size={18} />
-            <h3>Status Distribution</h3>
+            <h3>{t('dash_status_distribution')}</h3>
           </div>
           <div className="card-body">
             {Object.entries(stats.blockersByStatus || {}).map(([status, count]) => (
               <div key={status} className="stat-row">
-                <label>{status}</label>
+                <label>{translateStatus(status)}</label>
                 {renderProgressBar(count, stats.totalBlockers, getStatusColor(status))}
               </div>
             ))}
@@ -61,12 +93,12 @@ const BlockerAnalytics = ({ talukaId = null }) => {
         <div className="analytics-card">
           <div className="card-head">
             <AlertCircle size={18} />
-            <h3>Priority (Active)</h3>
+            <h3>{t('dash_priority_active')}</h3>
           </div>
           <div className="card-body">
             {Object.entries(stats.blockersByPriority || {}).map(([priority, count]) => (
               <div key={priority} className="stat-row">
-                <label>{priority}</label>
+                <label>{translatePriority(priority)}</label>
                 {renderProgressBar(count, stats.totalBlockers - stats.resolvedBlockers, getPriorityColor(priority))}
               </div>
             ))}
@@ -78,7 +110,7 @@ const BlockerAnalytics = ({ talukaId = null }) => {
           <div className="analytics-card full-width">
             <div className="card-head">
               <MapPin size={18} />
-              <h3>Blockers by Taluka</h3>
+              <h3>{t('dash_blockers_taluka')}</h3>
             </div>
             <div className="taluka-grid">
               {Object.entries(stats.blockersByTaluka).map(([name, count]) => (
@@ -95,14 +127,14 @@ const BlockerAnalytics = ({ talukaId = null }) => {
         <div className="analytics-card">
           <div className="card-head">
             <Clock size={18} />
-            <h3>Avg. Resolution Time</h3>
+            <h3>{t('dash_avg_resolution')}</h3>
           </div>
           <div className="card-body central">
             <div className="big-stat">
               {stats.averageResolutionTimeDays?.toFixed(1) || 0}
-              <span>days</span>
+              <span>{t('dash_days')}</span>
             </div>
-            <p>Average time from report to resolution (last 30 days)</p>
+            <p>{t('dash_avg_desc')}</p>
           </div>
         </div>
 
@@ -110,12 +142,12 @@ const BlockerAnalytics = ({ talukaId = null }) => {
         <div className="analytics-card">
           <div className="card-head">
             <BarChart3 size={18} />
-            <h3>Most Common Types</h3>
+            <h3>{t('dash_common_types')}</h3>
           </div>
           <div className="card-body">
             {Object.entries(stats.blockersByType || {}).sort((a,b) => b[1] - a[1]).slice(0, 5).map(([type, count]) => (
               <div key={type} className="stat-row">
-                <label>{type}</label>
+                <label>{translateType(type)}</label>
                 {renderProgressBar(count, stats.totalBlockers, '#6366f1')}
               </div>
             ))}

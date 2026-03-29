@@ -7,9 +7,11 @@ import {
   Package, IndianRupee, Trash2
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { useTranslation } from 'react-i18next';
 
 const HeadmasterActiveWorks = () => {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [works, setWorks] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedWork, setSelectedWork] = useState(null);
@@ -27,6 +29,8 @@ const HeadmasterActiveWorks = () => {
     otherCost: 0
   });
   const [updatePhotos, setUpdatePhotos] = useState([]);
+  const [workItems, setWorkItems] = useState([]);
+  const [itemUsage, setItemUsage] = useState({}); // {itemIdx: quantityUsed}
 
   useEffect(() => {
     if (user?.schoolId) {
@@ -46,6 +50,23 @@ const HeadmasterActiveWorks = () => {
     }
   };
 
+  const fetchWorkItems = async (workId) => {
+    try {
+      const res = await axios.get(`http://localhost:8080/api/works/${workId}/items`);
+      const items = res.data || [];
+      setWorkItems(items);
+      
+      // Initialize item usage state using item ID or index
+      const initialUsage = {};
+      items.forEach((item, index) => {
+        initialUsage[index] = 0;
+      });
+      setItemUsage(initialUsage);
+    } catch (err) {
+      console.error('Error fetching work items:', err);
+    }
+  };
+
   const handleUpdateClick = (work) => {
     setSelectedWork(work);
     setUpdateFormData({
@@ -56,7 +77,15 @@ const HeadmasterActiveWorks = () => {
       laborCost: 0,
       otherCost: 0
     });
+    fetchWorkItems(work.id);
     setIsUpdateModalOpen(true);
+  };
+
+  const handleItemUsageChange = (index, value) => {
+    setItemUsage({
+      ...itemUsage,
+      [index]: value
+    });
   };
 
   const handleProgressSubmit = async (e) => {
@@ -74,6 +103,17 @@ const HeadmasterActiveWorks = () => {
     data.append('otherCost', updateFormData.otherCost);
     data.append('updatedById', user.id);
     data.append('updatedByRole', user.role);
+    
+    // Prepare item usage as JSON
+    const usageList = workItems
+      .map((item, index) => ({
+        materialId: item.materialId,
+        materialName: item.materialName,
+        quantityUsed: Number(itemUsage[index] || 0)
+      }))
+      .filter(u => u.quantityUsed > 0);
+
+    data.append('itemUsage', JSON.stringify(usageList));
     
     updatePhotos.forEach(photo => {
       data.append('photos', photo);
@@ -109,7 +149,7 @@ const HeadmasterActiveWorks = () => {
     <div className="active-works-container">
       <div className="module-header">
         <div>
-          <h1>Active Works</h1>
+          <h1>{t('menu_active_works')}</h1>
           <p>Monitor execution and update progress of ongoing projects</p>
         </div>
       </div>
@@ -133,7 +173,7 @@ const HeadmasterActiveWorks = () => {
                 <h3>{work.title}</h3>
                 <div className="work-progress-section">
                   <div className="progress-label-row">
-                    <span>Overall Progress</span>
+                    <span>{t('field_progress')}</span>
                     <strong>{work.progressPercentage}%</strong>
                   </div>
                   <div className="progress-bar-bg">
@@ -154,10 +194,10 @@ const HeadmasterActiveWorks = () => {
 
                 <div className="work-actions-row">
                   <button className="update-btn" onClick={() => handleUpdateClick(work)}>
-                    <RefreshCw size={16} /> Update Progress
+                    <RefreshCw size={16} /> {t('btn_update')}
                   </button>
-                  <button className="view-btn-sm" onClick={() => setSelectedWork(work)}>
-                    Details
+                  <button className="view-btn-sm" onClick={() => { setSelectedWork(work); fetchWorkItems(work.id); }}>
+                    {t('btn_view')}
                   </button>
                 </div>
               </div>
@@ -177,14 +217,14 @@ const HeadmasterActiveWorks = () => {
         <div className="modal-overlay">
           <div className="modal modal-lg">
             <div className="modal-header">
-              <h2>Update Progress: {selectedWork.workCode}</h2>
+              <h2>{t('btn_update')}: {selectedWork.workCode}</h2>
               <button className="close-btn" onClick={() => setIsUpdateModalOpen(false)}><X size={24} /></button>
             </div>
             <form onSubmit={handleProgressSubmit}>
-              <div className="modal-content">
+              <div className="modal-content overflow-y-auto" style={{ maxHeight: '75vh' }}>
                 <div className="form-grid">
                   <div className="form-group full-width">
-                    <label>Select Stage to Update</label>
+                    <label>{t('field_stage')}</label>
                     <select 
                       value={updateFormData.stageId} 
                       onChange={e => setUpdateFormData({...updateFormData, stageId: e.target.value})}
@@ -200,7 +240,7 @@ const HeadmasterActiveWorks = () => {
                   </div>
                   
                   <div className="form-group">
-                    <label>Stage Progress (%)</label>
+                    <label>{t('field_progress')} (%)</label>
                     <input 
                       type="number" 
                       min="0" 
@@ -212,12 +252,12 @@ const HeadmasterActiveWorks = () => {
                   </div>
 
                   <div className="form-group">
-                    <label>Date of Update</label>
+                    <label>{t('field_date')}</label>
                     <input type="date" defaultValue={new Date().toISOString().split('T')[0]} readOnly />
                   </div>
 
                   <div className="form-group full-width">
-                    <label>Work Remarks / Challenges Faced</label>
+                    <label>{t('field_remarks')}</label>
                     <textarea 
                       rows="3" 
                       required
@@ -227,10 +267,42 @@ const HeadmasterActiveWorks = () => {
                     />
                   </div>
 
+                  {workItems.length > 0 && (
+                    <div className="full-width">
+                      <div className="form-section-title">Item Usage for this Update</div>
+                      <div className="items-usage-grid">
+                        <div className="usage-header">
+                          <span style={{ flex: 2 }}>{t('field_material')}</span>
+                          <span style={{ flex: 1 }}>Total Required</span>
+                          <span style={{ flex: 1 }}>{t('field_quantity')}</span>
+                        </div>
+                        {workItems.map((item, index) => (
+                          <div key={index} className="usage-row">
+                            <div style={{ flex: 2 }}>
+                              <div className="item-main-name">{item.materialName}</div>
+                              {item.materialId && <span className="item-sub-id">Inventory Linked</span>}
+                            </div>
+                            <div style={{ flex: 1 }} className="item-req-val">{item.quantity}</div>
+                            <div style={{ flex: 1 }}>
+                              <input 
+                                type="number" 
+                                step="0.1"
+                                min="0"
+                                className="usage-input"
+                                value={itemUsage[index] || 0}
+                                onChange={e => handleItemUsageChange(index, e.target.value)}
+                              />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
                   <div className="form-section-title">Financial Data (Expenditure since last update)</div>
                   
                   <div className="form-group">
-                    <label>Material Cost (₹)</label>
+                    <label>{t('field_material_cost')} (₹)</label>
                     <input 
                       type="number" 
                       value={updateFormData.materialCost}
@@ -239,7 +311,7 @@ const HeadmasterActiveWorks = () => {
                   </div>
                   
                   <div className="form-group">
-                    <label>Labor Cost (₹)</label>
+                    <label>{t('field_labor_cost')} (₹)</label>
                     <input 
                       type="number" 
                       value={updateFormData.laborCost}
@@ -248,7 +320,7 @@ const HeadmasterActiveWorks = () => {
                   </div>
 
                   <div className="form-group full-width">
-                    <label>Upload Photos (Progress Evidence)</label>
+                    <label>{t('field_photos')}</label>
                     <div className="file-upload">
                       <input type="file" multiple accept="image/*" onChange={e => setUpdatePhotos([...e.target.files])} id="update-photos" />
                       <label htmlFor="update-photos">
@@ -260,9 +332,9 @@ const HeadmasterActiveWorks = () => {
                 </div>
               </div>
               <div className="modal-footer">
-                <button type="button" className="cancel-btn" onClick={() => setIsUpdateModalOpen(false)}>Cancel</button>
+                <button type="button" className="cancel-btn" onClick={() => setIsUpdateModalOpen(false)}>{t('btn_cancel')}</button>
                 <button type="submit" className="submit-btn" disabled={loading}>
-                  {loading ? 'Updating...' : 'Save Progress Update'}
+                  {loading ? 'Updating...' : t('btn_save')}
                 </button>
               </div>
             </form>
@@ -270,7 +342,7 @@ const HeadmasterActiveWorks = () => {
         </div>
       )}
 
-      {/* Work Detail / View Modal (Simplified for now) */}
+      {/* Work Detail / View Modal */}
       {selectedWork && !isUpdateModalOpen && (
         <div className="modal-overlay">
           <div className="modal modal-lg">
@@ -278,10 +350,10 @@ const HeadmasterActiveWorks = () => {
               <h2>{selectedWork.title} ({selectedWork.workCode})</h2>
               <button className="close-btn" onClick={() => setSelectedWork(null)}><X size={24} /></button>
             </div>
-            <div className="modal-content">
+            <div className="modal-content overflow-y-auto" style={{ maxHeight: '75vh' }}>
               <div className="details-layout-active">
                 <div className="stages-overview">
-                  <h4>Construction Stages</h4>
+                  <h4>{t('title_construction_stages')}</h4>
                   <div className="stages-list-mini">
                     {selectedWork.stages?.map((stage, i) => (
                       <div key={stage.id} className={`stage-card-mini ${stage.status?.toLowerCase()}`}>
@@ -299,26 +371,45 @@ const HeadmasterActiveWorks = () => {
                   </div>
                 </div>
 
-                <div className="financial-summary-card">
-                  <h4>Financial Summary</h4>
-                  <div className="fin-row">
-                    <span>Sanctioned</span>
-                    <strong>₹{selectedWork.sanctionedAmount?.toLocaleString()}</strong>
+                <div className="side-cards">
+                  <div className="financial-summary-card">
+                    <h4>{t('title_financial_summary')}</h4>
+                    <div className="fin-row">
+                      <span>{t('field_sanctioned')}</span>
+                      <strong>₹{selectedWork.sanctionedAmount?.toLocaleString()}</strong>
+                    </div>
+                    <div className="fin-row">
+                      <span>{t('field_utilized_amt')}</span>
+                      <strong style={{ color: '#0ea5e9' }}>₹{selectedWork.totalUtilized?.toLocaleString()}</strong>
+                    </div>
+                    <div className="fin-row total">
+                      <span>{t('field_balance')}</span>
+                      <strong>₹{(selectedWork.sanctionedAmount - selectedWork.totalUtilized)?.toLocaleString()}</strong>
+                    </div>
                   </div>
-                  <div className="fin-row">
-                    <span>Utilized</span>
-                    <strong style={{ color: '#0ea5e9' }}>₹{selectedWork.totalUtilized?.toLocaleString()}</strong>
-                  </div>
-                  <div className="fin-row total">
-                    <span>Balance</span>
-                    <strong>₹{(selectedWork.sanctionedAmount - selectedWork.totalUtilized)?.toLocaleString()}</strong>
+                  
+                  <div className="inventory-summary-card mt-4">
+                    <h4>{t('title_quotation_items')}</h4>
+                    <div className="items-mini-list">
+                      <div className="item-mini-header">
+                        <span>{t('field_name')}</span>
+                        <span>{t('field_quantity')}</span>
+                      </div>
+                      {workItems.map((item, index) => (
+                        <div key={index} className="item-mini-row">
+                          <span>{item.materialName}</span>
+                          <strong>{item.quantity}</strong>
+                        </div>
+                      ))}
+                      {workItems.length === 0 && <p className="no-items-text">No items linked to this work.</p>}
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
             <div className="modal-footer">
-              <button className="cancel-btn" onClick={() => setSelectedWork(null)}>Close</button>
-              <button className="submit-btn" onClick={() => handleUpdateClick(selectedWork)}>Update Progress</button>
+              <button className="cancel-btn" onClick={() => setSelectedWork(null)}>{t('btn_cancel')}</button>
+              <button className="submit-btn" onClick={() => handleUpdateClick(selectedWork)}>{t('btn_update')}</button>
             </div>
           </div>
         </div>
@@ -366,12 +457,42 @@ const HeadmasterActiveWorks = () => {
         .stage-card-mini.completed { border-left: 4px solid #10b981; }
         .stage-card-mini.completed .stage-num { background: #dcfce7; color: #10b981; }
 
-        .financial-summary-card { background: white; padding: 1.5rem; border-radius: 0.75rem; border: 1px solid #e2e8f0; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .financial-summary-card, .inventory-summary-card { background: white; padding: 1.5rem; border-radius: 0.75rem; border: 1px solid #e2e8f0; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
         .fin-row { display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid #f1f5f9; font-size: 0.9rem; }
         .fin-row.total { border-bottom: none; padding-top: 1rem; margin-top: 0.5rem; border-top: 2px solid #f1f5f9; }
-        .fin-row label { color: #64748b; }
+        
+        .item-mini-header { display: flex; justify-content: space-between; font-weight: 700; font-size: 0.7rem; color: #94a3b8; text-transform: uppercase; margin-bottom: 0.5rem; }
+        .item-mini-row { display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px dashed #f1f5f9; font-size: 0.85rem; }
+        .no-items-text { font-size: 0.85rem; color: #94a3b8; font-style: italic; }
 
         .form-section-title { font-weight: 700; color: #1e293b; margin: 1.5rem 0 0.5rem; grid-column: span 2; font-size: 0.95rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.5rem; }
+        
+        .items-usage-grid { background: #f8fafc; border-radius: 0.5rem; border: 1px solid #e2e8f0; padding: 1rem; }
+        .usage-header { display: flex; gap: 1rem; font-weight: 700; font-size: 0.75rem; color: #64748b; text-transform: uppercase; margin-bottom: 0.75rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.5rem; }
+        .usage-row { display: flex; gap: 1rem; align-items: center; padding: 0.75rem 0; border-bottom: 1px dashed #e2e8f0; }
+        .usage-row:last-child { border-bottom: none; }
+        .item-main-name { font-size: 0.9rem; font-weight: 600; color: #1e293b; }
+        .item-sub-id { font-size: 0.7rem; color: #10b981; display: block; }
+        .item-req-val { font-size: 0.9rem; color: #64748b; font-weight: 500; }
+        .usage-input { width: 100%; padding: 0.4rem; border: 1px solid #d1d5db; border-radius: 0.25rem; text-align: right; }
+        
+        .overflow-y-auto { overflow-y: auto; }
+        .mt-4 { margin-top: 1rem; }
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 1000; }
+        .modal { background: white; border-radius: 1rem; width: 100%; max-width: 900px; }
+        .modal-header { padding: 1.5rem; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; }
+        .modal-content { padding: 1.5rem; }
+        .modal-footer { padding: 1.5rem; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end; gap: 1rem; }
+        .alert { padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem; }
+        .alert.success { background: #dcfce7; color: #16a34a; }
+        .submit-btn { padding: 0.6rem 1.5rem; background: #0ea5e9; color: white; border: none; border-radius: 0.4rem; cursor: pointer; font-weight: 600; }
+        .cancel-btn { padding: 0.6rem 1.5rem; background: #f1f5f9; color: #475569; border: none; border-radius: 0.4rem; cursor: pointer; font-weight: 600; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .full-width { grid-column: span 2; }
+        .form-group { display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 1rem; }
+        .form-group input, .form-group select, .form-group textarea { padding: 0.6rem; border: 1px solid #d1d5db; border-radius: 0.4rem; width: 100%; }
+        .file-upload input { display: none; }
+        .file-upload label { display: flex; align-items: center; gap: 0.5rem; padding: 1rem; background: #f8fafc; border: 2px dashed #e2e8f0; border-radius: 0.5rem; cursor: pointer; color: #64748b; }
       `}</style>
     </div>
   );

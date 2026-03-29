@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Plus, Edit2, Trash2, X, Check } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const TalukaManagement = () => {
+  const { t } = useTranslation();
   const [talukas, setTalukas] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTaluka, setEditingTaluka] = useState(null);
@@ -55,7 +57,7 @@ const TalukaManagement = () => {
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm('Are you sure you want to delete this taluka?')) {
+    if (window.confirm(t('confirm_delete_taluka'))) {
       try {
         await axios.delete(`http://localhost:8080/api/talukas/${id}`);
         fetchTalukas();
@@ -68,9 +70,9 @@ const TalukaManagement = () => {
   return (
     <div className="management-container">
       <div className="management-header">
-        <h1>Taluka Management</h1>
+        <h1>{t('menu_talukas')}</h1>
         <button className="add-button" onClick={() => setIsModalOpen(true)}>
-          <Plus size={20} /> Add Taluka
+          <Plus size={20} /> {t('btn_add_taluka')}
         </button>
       </div>
 
@@ -78,11 +80,11 @@ const TalukaManagement = () => {
         <table>
           <thead>
             <tr>
-              <th>Code</th>
-              <th>Taluka Name</th>
-              <th>District</th>
-              <th>Status</th>
-              <th>Actions</th>
+              <th>{t('field_code')}</th>
+              <th>{t('field_taluka')}</th>
+              <th>{t('field_district')}</th>
+              <th>{t('field_status')}</th>
+              <th>{t('field_actions')}</th>
             </tr>
           </thead>
           <tbody>
@@ -93,7 +95,7 @@ const TalukaManagement = () => {
                 <td>{taluka.district}</td>
                 <td>
                   <span className={`status-badge ${taluka.status.toLowerCase()}`}>
-                    {taluka.status}
+                    {taluka.status === 'Active' ? t('status_active') : t('status_inactive')}
                   </span>
                 </td>
                 <td>
@@ -112,13 +114,13 @@ const TalukaManagement = () => {
         <div className="modal-overlay">
           <div className="modal">
             <div className="modal-header">
-              <h2>{editingTaluka ? 'Edit Taluka' : 'Add New Taluka'}</h2>
+              <h2>{editingTaluka ? t('btn_edit') + ' ' + t('field_taluka') : t('btn_add_taluka')}</h2>
               <button className="close-btn" onClick={() => setIsModalOpen(false)}><X size={24} /></button>
             </div>
             <form onSubmit={handleSubmit}>
               <div className="form-grid">
                 <div className="form-group">
-                  <label>Taluka Name</label>
+                  <label>{t('field_taluka')}</label>
                   <input 
                     type="text" 
                     value={formData.name} 
@@ -127,7 +129,7 @@ const TalukaManagement = () => {
                   />
                 </div>
                 <div className="form-group">
-                  <label>Taluka Code</label>
+                  <label>{t('field_code')}</label>
                   <input 
                     type="text" 
                     value={formData.code} 
@@ -136,7 +138,7 @@ const TalukaManagement = () => {
                   />
                 </div>
                 <div className="form-group">
-                  <label>District</label>
+                  <label>{t('field_district')}</label>
                   <input 
                     type="text" 
                     value={formData.district} 
@@ -144,20 +146,20 @@ const TalukaManagement = () => {
                   />
                 </div>
                 <div className="form-group">
-                  <label>Status</label>
+                  <label>{t('field_status')}</label>
                   <select 
                     value={formData.status} 
                     onChange={(e) => setFormData({...formData, status: e.target.value})}
                   >
-                    <option value="Active">Active</option>
-                    <option value="Inactive">Inactive</option>
+                    <option value="Active">{t('status_active')}</option>
+                    <option value="Inactive">{t('status_inactive')}</option>
                   </select>
                 </div>
               </div>
               <div className="modal-footer">
-                <button type="button" className="cancel-btn" onClick={() => setIsModalOpen(false)}>Cancel</button>
+                <button type="button" className="cancel-btn" onClick={() => setIsModalOpen(false)}>{t('btn_cancel')}</button>
                 <button type="submit" className="save-btn">
-                  {editingTaluka ? 'Update Taluka' : 'Save Taluka'}
+                  {editingTaluka ? t('btn_save') : t('btn_save')}
                 </button>
               </div>
             </form>

@@ -6,9 +6,11 @@ import {
   Search, Filter, Eye, RefreshCw, Send, X, Plus, 
   MessageSquare, ChevronRight, AlertCircle, Trash2, Link as LinkIcon, Briefcase
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const BlockerManagement = () => {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [blockers, setBlockers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -289,21 +291,32 @@ const BlockerManagement = () => {
 
   const getPriorityBadge = (priority) => {
     switch(priority) {
-      case 'HIGH': return { bg: '#fee2e2', color: '#dc2626' };
-      case 'MEDIUM': return { bg: '#fef3c7', color: '#d97706' };
-      default: return { bg: '#dcfce7', color: '#16a34a' };
+      case 'HIGH': return { bg: '#fee2e2', color: '#dc2626', text: t('priority_high') };
+      case 'MEDIUM': return { bg: '#fef3c7', color: '#d97706', text: t('priority_medium') };
+      default: return { bg: '#dcfce7', color: '#16a34a', text: t('priority_low') };
     }
   };
 
   const getStatusBadge = (status) => {
     switch(status) {
-      case 'NEW': return { bg: '#fef3c7', color: '#92400e' };
-      case 'IN_PROGRESS': return { bg: '#e0f2fe', color: '#0284c7' };
-      case 'RESOLVED': return { bg: '#dcfce7', color: '#166534' };
-      case 'ESCALATED': return { bg: '#fee2e2', color: '#dc2626' };
-      case 'INFO_REQUESTED': return { bg: '#fff7ed', color: '#c2410c' };
-      case 'DUPLICATE': return { bg: '#f1f5f9', color: '#475569' };
-      default: return { bg: '#f1f5f9', color: '#475569' };
+      case 'NEW': return { bg: '#fef3c7', color: '#92400e', text: t('status_new') };
+      case 'IN_PROGRESS': return { bg: '#e0f2fe', color: '#0284c7', text: t('status_in_progress') };
+      case 'RESOLVED': return { bg: '#dcfce7', color: '#166534', text: t('stat_resolved') };
+      case 'ESCALATED': return { bg: '#fee2e2', color: '#dc2626', text: t('stat_escalated') };
+      case 'INFO_REQUESTED': return { bg: '#fff7ed', color: '#c2410c', text: t('status_info_requested') };
+      case 'DUPLICATE': return { bg: '#f1f5f9', color: '#475569', text: t('status_duplicate') };
+      default: return { bg: '#f1f5f9', color: '#475569', text: status };
+    }
+  };
+
+  const translateBlockerType = (type) => {
+    switch(type) {
+      case 'Material Shortage': return t('type_material_shortage');
+      case 'Labor Availability': return t('type_labor_availability');
+      case 'Fund Issues': return t('type_fund_issues');
+      case 'Technical Issue': return t('type_technical_issue');
+      case 'Administrative Delay': return t('type_admin_delay');
+      default: return type;
     }
   };
 
@@ -320,12 +333,12 @@ const BlockerManagement = () => {
     <div className="blocker-management">
       <div className="module-header">
         <div>
-          <h2>Blocker Management</h2>
-          <p>Track and resolve issues affecting work progress</p>
+          <h2>{t('title_blocker_mgmt')}</h2>
+          <p>{t('subtitle_blocker_mgmt')}</p>
         </div>
         {user.role === 'HEADMASTER' && (
           <button className="create-btn" onClick={() => setIsReportModalOpen(true)}>
-            <Plus size={18} /> Report Blocker
+            <Plus size={18} /> {t('btn_report_blocker')}
           </button>
         )}
       </div>
@@ -334,19 +347,19 @@ const BlockerManagement = () => {
       <div className="stats-strip">
         <div className="stat-item">
           <span className="val">{blockers.filter(b => b.status !== 'RESOLVED').length}</span>
-          <span className="lab">Active Blockers</span>
+          <span className="lab">{t('stat_active_blockers')}</span>
         </div>
         <div className="stat-item">
           <span className="val">{blockers.filter(b => b.priority === 'HIGH' && b.status !== 'RESOLVED').length}</span>
-          <span className="lab">High Priority</span>
+          <span className="lab">{t('stat_high_priority')}</span>
         </div>
         <div className="stat-item">
           <span className="val">{blockers.filter(b => b.status === 'ESCALATED').length}</span>
-          <span className="lab">Escalated</span>
+          <span className="lab">{t('stat_escalated')}</span>
         </div>
         <div className="stat-item">
           <span className="val">{blockers.filter(b => b.status === 'RESOLVED').length}</span>
-          <span className="lab">Resolved</span>
+          <span className="lab">{t('stat_resolved')}</span>
         </div>
       </div>
 
@@ -356,50 +369,50 @@ const BlockerManagement = () => {
           <Search size={18} />
           <input 
             type="text" 
-            placeholder="Search by title or work..." 
+            placeholder={`${t('btn_search')}...`} 
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
         <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
           <option value="ALL">All Status</option>
-          <option value="NEW">New</option>
-          <option value="IN_PROGRESS">In Progress</option>
-          <option value="ESCALATED">Escalated</option>
-          <option value="RESOLVED">Resolved</option>
-          <option value="DUPLICATE">Duplicate</option>
+          <option value="NEW">{t('status_new')}</option>
+          <option value="IN_PROGRESS">{t('status_in_progress')}</option>
+          <option value="ESCALATED">{t('stat_escalated')}</option>
+          <option value="RESOLVED">{t('stat_resolved')}</option>
+          <option value="DUPLICATE">{t('status_duplicate')}</option>
         </select>
         <select value={priorityFilter} onChange={(e) => setPriorityFilter(e.target.value)}>
           <option value="ALL">All Priority</option>
-          <option value="HIGH">High</option>
-          <option value="MEDIUM">Medium</option>
-          <option value="LOW">Low</option>
+          <option value="HIGH">{t('priority_high')}</option>
+          <option value="MEDIUM">{t('priority_medium')}</option>
+          <option value="LOW">{t('priority_low')}</option>
         </select>
         <select value={typeFilter} onChange={(e) => setTypeFilter(e.target.value)}>
           <option value="ALL">All Types</option>
-          <option value="Material Shortage">Material Shortage</option>
-          <option value="Labor Availability">Labor Availability</option>
-          <option value="Fund Issues">Fund Issues</option>
-          <option value="Technical Issue">Technical Issue</option>
-          <option value="Administrative Delay">Administrative Delay</option>
+          <option value="Material Shortage">{t('type_material_shortage')}</option>
+          <option value="Labor Availability">{t('type_labor_availability')}</option>
+          <option value="Fund Issues">{t('type_fund_issues')}</option>
+          <option value="Technical Issue">{t('type_technical_issue')}</option>
+          <option value="Administrative Delay">{t('type_admin_delay')}</option>
         </select>
       </div>
 
       {/* Blocker Grid */}
       <div className="blockers-grid">
         {filteredBlockers.map(blocker => {
-          const statusStyle = getStatusBadge(blocker.status);
-          const priorityStyle = getPriorityBadge(blocker.priority);
+          const statusBadge = getStatusBadge(blocker.status);
+          const priorityBadge = getPriorityBadge(blocker.priority);
           return (
             <div key={blocker.id} className={`blocker-card priority-${blocker.priority?.toLowerCase()}`}>
               <div className="card-top">
                 <div className="blocker-id">#{blocker.id}</div>
                 <div className="badges">
-                  <span className="p-badge" style={{ backgroundColor: priorityStyle.bg, color: priorityStyle.color }}>
-                    {blocker.priority}
+                  <span className="p-badge" style={{ backgroundColor: priorityBadge.bg, color: priorityBadge.color }}>
+                    {priorityBadge.text}
                   </span>
-                  <span className="s-badge" style={{ backgroundColor: statusStyle.bg, color: statusStyle.color }}>
-                    {blocker.status}
+                  <span className="s-badge" style={{ backgroundColor: statusBadge.bg, color: statusBadge.color }}>
+                    {statusBadge.text}
                   </span>
                 </div>
               </div>
@@ -427,7 +440,7 @@ const BlockerManagement = () => {
                 setSelectedBlocker(blocker);
                 setIsBlockerDetailModalOpen(true);
               }}>
-                <Eye size={14} /> View Details
+                <Eye size={14} /> {t('btn_view')}
               </button>
             </div>
           );
@@ -445,7 +458,7 @@ const BlockerManagement = () => {
         <div className="modal-overlay">
           <div className="modal modal-xl">
             <div className="modal-header">
-              <h2>Blocker Details: {selectedBlocker.title}</h2>
+              <h2>{t('btn_view')}: {selectedBlocker.title}</h2>
               <button className="close-btn" onClick={() => setIsBlockerDetailModalOpen(false)}>
                 <X size={24} />
               </button>
@@ -454,19 +467,19 @@ const BlockerManagement = () => {
               <div className="detail-layout">
                 <div className="detail-info">
                   <div className="info-section">
-                    <h3>Blocker Information</h3>
+                    <h3>{t('title_blocker_info')}</h3>
                     <div className="info-grid">
                       <div className="info-item">
-                        <label>Status</label>
-                        <span className="status-badge-large" style={getStatusBadge(selectedBlocker.status)}>
-                          {selectedBlocker.status}
+                        <label>{t('field_status')}</label>
+                        <span className="status-badge-large" style={{ backgroundColor: getStatusBadge(selectedBlocker.status).bg, color: getStatusBadge(selectedBlocker.status).color }}>
+                          {getStatusBadge(selectedBlocker.status).text}
                         </span>
                       </div>
                       <div className="info-item">
-                        <label>Priority</label>
+                        <label>{t('field_priority')}</label>
                         <div className="priority-actions">
                           <span className="priority-text" style={{ color: getPriorityColor(selectedBlocker.priority) }}>
-                            {selectedBlocker.priority}
+                            {getPriorityBadge(selectedBlocker.priority).text}
                           </span>
                           {(user.role === 'ADMIN' || user.role === 'SACHIV') && selectedBlocker.status !== 'RESOLVED' && (
                             <div className="p-buttons">
@@ -478,44 +491,44 @@ const BlockerManagement = () => {
                         </div>
                       </div>
                       <div className="info-item">
-                        <label>Type</label>
-                        <span>{selectedBlocker.type}</span>
+                        <label>{t('field_blocker_type')}</label>
+                        <span>{translateBlockerType(selectedBlocker.type)}</span>
                       </div>
                       <div className="info-item">
-                        <label>Reported By</label>
+                        <label>{t('field_reported_by')}</label>
                         <span>{selectedBlocker.reportedBy} ({selectedBlocker.reportedByRole})</span>
                       </div>
                       <div className="info-item">
-                        <label>Estimated Delay</label>
-                        <span>{selectedBlocker.estimatedDelayDays || 0} days</span>
+                        <label>{t('field_est_delay')}</label>
+                        <span>{selectedBlocker.estimatedDelayDays || 0} {t('field_date')}</span>
                       </div>
                       <div className="info-item">
-                        <label>Target Resolution</label>
+                        <label>{t('field_target_date')}</label>
                         <span>{selectedBlocker.targetDate ? new Date(selectedBlocker.targetDate).toLocaleDateString() : 'Not set'}</span>
                       </div>
                     </div>
                     <div className="desc-block">
-                      <label>Description</label>
+                      <label>{t('field_description')}</label>
                       <p>{selectedBlocker.description}</p>
                     </div>
                     <div className="desc-block">
-                      <label>Impact on Work</label>
+                      <label>{t('field_impact')}</label>
                       <p>{selectedBlocker.impact || 'Not specified'}</p>
                     </div>
                     {selectedBlocker.status === 'DUPLICATE' && (
                       <div className="duplicate-info">
                         <LinkIcon size={16} />
-                        <span>Duplicate of: <strong>#{selectedBlocker.duplicateOfId}</strong> {selectedBlocker.duplicateOfTitle}</span>
+                        <span>{t('label_duplicate_of')}: <strong>#{selectedBlocker.duplicateOfId}</strong> {selectedBlocker.duplicateOfTitle}</span>
                       </div>
                     )}
                   </div>
 
                   <div className="info-section">
-                    <h3>Work Context</h3>
+                    <h3>{t('title_work_context')}</h3>
                     <div className="work-context-box">
-                      <p><strong>School:</strong> {selectedBlocker.schoolName}</p>
-                      <p><strong>Work Title:</strong> {selectedBlocker.workTitle}</p>
-                      <p><strong>Work Code:</strong> {selectedBlocker.workCode}</p>
+                      <p><strong>{t('field_school')}:</strong> {selectedBlocker.schoolName}</p>
+                      <p><strong>{t('field_work_title')}:</strong> {selectedBlocker.workTitle}</p>
+                      <p><strong>{t('field_work_code')}:</strong> {selectedBlocker.workCode}</p>
                     </div>
                   </div>
 
@@ -523,39 +536,39 @@ const BlockerManagement = () => {
                   <div className="action-bar-blocker">
                     {user.role === 'ADMIN' && selectedBlocker.status === 'ESCALATED' && (
                       <button className="assign-action" onClick={() => setIsAssignModalOpen(true)}>
-                        <RefreshCw size={16} /> Reassign to Sachiv
+                        <RefreshCw size={16} /> {t('btn_reassign_sachiv')}
                       </button>
                     )}
                     {user.role === 'SACHIV' && selectedBlocker.status === 'NEW' && (
                       <button className="assign-action" onClick={() => setIsAssignModalOpen(true)}>
-                        <User size={16} /> Assign for Resolution
+                        <User size={16} /> {t('field_assigned_to')}
                       </button>
                     )}
                     {(user.role === 'SACHIV' || user.role === 'ADMIN') && selectedBlocker.status === 'IN_PROGRESS' && (
                       <button className="resolve-action" onClick={() => setIsResolveModalOpen(true)}>
-                        <CheckCircle2 size={16} /> Mark Resolved
+                        <CheckCircle2 size={16} /> {t('btn_mark_resolved')}
                       </button>
                     )}
                     {user.role === 'SACHIV' && selectedBlocker.status !== 'RESOLVED' && (
                       <button className="escalate-action" onClick={() => setIsEscalateModalOpen(true)}>
-                        <AlertTriangle size={16} /> Escalate to Admin
+                        <AlertTriangle size={16} /> {t('btn_escalate_admin')}
                       </button>
                     )}
                     {(user.role === 'ADMIN' || user.role === 'SACHIV') && selectedBlocker.status === 'NEW' && (
                       <button className="duplicate-action" style={{ background: '#fff7ed', color: '#c2410c' }} onClick={() => setIsRequestInfoModalOpen(true)}>
-                        <MessageSquare size={16} /> Request More Info
+                        <MessageSquare size={16} /> {t('status_info_requested')}
                       </button>
                     )}
                     {(user.role === 'ADMIN' || user.role === 'SACHIV') && selectedBlocker.status !== 'RESOLVED' && (
                       <button className="duplicate-action" onClick={() => setIsDuplicateModalOpen(true)}>
-                        <LinkIcon size={16} /> Mark as Duplicate
+                        <LinkIcon size={16} /> {t('status_duplicate')}
                       </button>
                     )}
                   </div>
                 </div>
 
                 <div className="detail-timeline">
-                  <h3>Timeline & Comments</h3>
+                  <h3>{t('title_timeline_comments')}</h3>
                   <div className="comments-container">
                     {selectedBlocker.comments?.map((c, i) => (
                       <div key={i} className="comment-bubble">
@@ -570,12 +583,12 @@ const BlockerManagement = () => {
                   </div>
                   <div className="comment-input-area">
                     <textarea 
-                      placeholder="Add an update or comment..." 
+                      placeholder={t('placeholder_comment')} 
                       value={commentText}
                       onChange={(e) => setCommentText(e.target.value)}
                     />
                     <button onClick={handleAddComment} disabled={loading || !commentText.trim()}>
-                      <Send size={16} /> Post
+                      <Send size={16} /> {t('btn_post')}
                     </button>
                   </div>
                 </div>
@@ -590,13 +603,13 @@ const BlockerManagement = () => {
         <div className="modal-overlay">
           <div className="modal">
             <div className="modal-header">
-              <h2>Report New Blocker</h2>
+              <h2>{t('btn_report_blocker')}</h2>
               <button className="close-btn" onClick={() => setIsReportModalOpen(false)}><X size={24} /></button>
             </div>
             <form onSubmit={handleReportBlocker}>
               <div className="modal-content">
                 <div className="form-group">
-                  <label>Affected Work *</label>
+                  <label>{t('field_affected_work')} *</label>
                   <select 
                     value={reportFormData.workId} 
                     onChange={(e) => setReportFormData({...reportFormData, workId: e.target.value})}
@@ -609,7 +622,7 @@ const BlockerManagement = () => {
                   </select>
                 </div>
                 <div className="form-group">
-                  <label>Blocker Title *</label>
+                  <label>{t('field_blocker_title')} *</label>
                   <input 
                     type="text" 
                     value={reportFormData.title}
@@ -620,29 +633,26 @@ const BlockerManagement = () => {
                 </div>
                 <div className="form-grid">
                   <div className="form-group">
-                    <label>Blocker Type</label>
+                    <label>{t('field_blocker_type')}</label>
                     <select value={reportFormData.type} onChange={(e) => setReportFormData({...reportFormData, type: e.target.value})}>
-                      <option>Material Shortage</option>
-                      <option>Labor Availability</option>
-                      <option>Fund Issues</option>
-                      <option>Technical Issue</option>
-                      <option>Administrative Delay</option>
-                      <option>Weather/Seasonal</option>
-                      <option>Contractor Issue</option>
-                      <option>Other</option>
+                      <option value="Material Shortage">{t('type_material_shortage')}</option>
+                      <option value="Labor Availability">{t('type_labor_availability')}</option>
+                      <option value="Fund Issues">{t('type_fund_issues')}</option>
+                      <option value="Technical Issue">{t('type_technical_issue')}</option>
+                      <option value="Administrative Delay">{t('type_admin_delay')}</option>
                     </select>
                   </div>
                   <div className="form-group">
-                    <label>Priority</label>
+                    <label>{t('field_priority')}</label>
                     <select value={reportFormData.priority} onChange={(e) => setReportFormData({...reportFormData, priority: e.target.value})}>
-                      <option>Low</option>
-                      <option>Medium</option>
-                      <option>High</option>
+                      <option value="LOW">{t('priority_low')}</option>
+                      <option value="MEDIUM">{t('priority_medium')}</option>
+                      <option value="HIGH">{t('priority_high')}</option>
                     </select>
                   </div>
                 </div>
                 <div className="form-group">
-                  <label>Description *</label>
+                  <label>{t('field_description')} *</label>
                   <textarea 
                     value={reportFormData.description}
                     onChange={(e) => setReportFormData({...reportFormData, description: e.target.value})}
@@ -651,7 +661,7 @@ const BlockerManagement = () => {
                   />
                 </div>
                 <div className="form-group">
-                  <label>Impact on Work</label>
+                  <label>{t('field_impact')}</label>
                   <input 
                     type="text" 
                     value={reportFormData.impact}
@@ -660,7 +670,7 @@ const BlockerManagement = () => {
                   />
                 </div>
                 <div className="form-group">
-                  <label>Estimated Delay (Days)</label>
+                  <label>{t('field_est_delay')}</label>
                   <input 
                     type="number" 
                     value={reportFormData.estimatedDelayDays}
@@ -669,183 +679,8 @@ const BlockerManagement = () => {
                 </div>
               </div>
               <div className="modal-footer">
-                <button type="button" className="cancel-btn" onClick={() => setIsReportModalOpen(false)}>Cancel</button>
-                <button type="submit" className="save-btn" disabled={loading}>Report Blocker</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* Assign Modal */}
-      {isAssignModalOpen && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <div className="modal-header">
-              <h2>Assign Blocker</h2>
-              <button className="close-btn" onClick={() => setIsAssignModalOpen(false)}><X size={24} /></button>
-            </div>
-            <form onSubmit={handleAssignBlocker}>
-              <div className="modal-content">
-                <div className="form-group">
-                  <label>Assign To Sachiv *</label>
-                  <select 
-                    value={assignFormData.assignedToId}
-                    onChange={(e) => setAssignFormData({...assignFormData, assignedToId: e.target.value})}
-                    required
-                  >
-                    <option value="">Select Sachiv</option>
-                    {sachivUsers.map(s => (
-                      <option key={s.id} value={s.id}>{s.name} ({s.talukaName})</option>
-                    ))}
-                  </select>
-                </div>
-                <div className="form-group">
-                  <label>Target Resolution Date</label>
-                  <input 
-                    type="date" 
-                    value={assignFormData.targetDate}
-                    onChange={(e) => setAssignFormData({...assignFormData, targetDate: e.target.value})}
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Assignment Notes</label>
-                  <textarea 
-                    value={assignFormData.notes}
-                    onChange={(e) => setAssignFormData({...assignFormData, notes: e.target.value})}
-                    rows="2"
-                  />
-                </div>
-              </div>
-              <div className="modal-footer">
-                <button type="button" className="cancel-btn" onClick={() => setIsAssignModalOpen(false)}>Cancel</button>
-                <button type="submit" className="save-btn" disabled={loading}>Assign Now</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* Resolve Modal */}
-      {isResolveModalOpen && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <div className="modal-header">
-              <h2>Resolve Blocker</h2>
-              <button className="close-btn" onClick={() => setIsResolveModalOpen(false)}><X size={24} /></button>
-            </div>
-            <form onSubmit={handleResolveBlocker}>
-              <div className="modal-content">
-                <div className="form-group">
-                  <label>Resolution Description *</label>
-                  <textarea 
-                    value={resolveFormData.resolutionNotes}
-                    onChange={(e) => setResolveFormData({...resolveFormData, resolutionNotes: e.target.value})}
-                    rows="4"
-                    placeholder="Explain how the issue was fixed..."
-                    required
-                  />
-                </div>
-              </div>
-              <div className="modal-footer">
-                <button type="button" className="cancel-btn" onClick={() => setIsResolveModalOpen(false)}>Cancel</button>
-                <button type="submit" className="save-btn" disabled={loading}>Mark as Resolved</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* Escalate Modal */}
-      {isEscalateModalOpen && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <div className="modal-header">
-              <h2>Escalate to Admin</h2>
-              <button className="close-btn" onClick={() => setIsEscalateModalOpen(false)}><X size={24} /></button>
-            </div>
-            <form onSubmit={handleEscalateBlocker}>
-              <div className="modal-content">
-                <p className="warning-text">
-                  Escalating will notify the District Admin and mark this blocker for their intervention.
-                </p>
-                <div className="form-group">
-                  <label>Reason for Escalation *</label>
-                  <textarea 
-                    value={escalateFormData.reason}
-                    onChange={(e) => setEscalateFormData({...escalateFormData, reason: e.target.value})}
-                    rows="4"
-                    required
-                  />
-                </div>
-              </div>
-              <div className="modal-footer">
-                <button type="button" className="cancel-btn" onClick={() => setIsEscalateModalOpen(false)}>Cancel</button>
-                <button type="submit" className="escalate-btn-real" disabled={loading}>Escalate Now</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* Duplicate Modal */}
-      {isDuplicateModalOpen && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <div className="modal-header">
-              <h2>Mark as Duplicate</h2>
-              <button className="close-btn" onClick={() => setIsDuplicateModalOpen(false)}><X size={24} /></button>
-            </div>
-            <form onSubmit={handleMarkDuplicate}>
-              <div className="modal-content">
-                <div className="form-group">
-                  <label>Select Original Blocker ID *</label>
-                  <select 
-                    value={duplicateFormData.duplicateOfId}
-                    onChange={(e) => setDuplicateFormData({...duplicateFormData, duplicateOfId: e.target.value})}
-                    required
-                  >
-                    <option value="">Select Original Blocker</option>
-                    {blockers.filter(b => b.id !== selectedBlocker.id && b.status !== 'DUPLICATE').map(b => (
-                      <option key={b.id} value={b.id}>#{b.id} - {b.title}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-              <div className="modal-footer">
-                <button type="button" className="cancel-btn" onClick={() => setIsDuplicateModalOpen(false)}>Cancel</button>
-                <button type="submit" className="save-btn" disabled={loading}>Confirm Duplicate</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* Request Info Modal */}
-      {isRequestInfoModalOpen && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <div className="modal-header">
-              <h2>Request Additional Information</h2>
-              <button className="close-btn" onClick={() => setIsRequestInfoModalOpen(false)}><X size={24} /></button>
-            </div>
-            <form onSubmit={handleRequestInfo}>
-              <div className="modal-content">
-                <p className="info-text">Ask the reporter for more details to help resolve this blocker.</p>
-                <div className="form-group">
-                  <label>Specific Information Needed *</label>
-                  <textarea 
-                    value={resolveFormData.resolutionNotes}
-                    onChange={(e) => setResolveFormData({...resolveFormData, resolutionNotes: e.target.value})}
-                    rows="4"
-                    placeholder="e.g., Please provide current stock counts for cement..."
-                    required
-                  />
-                </div>
-              </div>
-              <div className="modal-footer">
-                <button type="button" className="cancel-btn" onClick={() => setIsRequestInfoModalOpen(false)}>Cancel</button>
-                <button type="submit" className="save-btn" style={{ background: '#f59e0b' }} disabled={loading}>Send Request</button>
+                <button type="button" className="cancel-btn" onClick={() => setIsReportModalOpen(false)}>{t('btn_cancel')}</button>
+                <button type="submit" className="save-btn" disabled={loading}>{t('btn_report_blocker')}</button>
               </div>
             </form>
           </div>

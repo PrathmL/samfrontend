@@ -5,9 +5,11 @@ import {
   AlertTriangle, Bell, CheckCircle2, Clock, X, Eye, 
   RefreshCw, Package, FileText, Briefcase, Minus, Trash2
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const Alerts = () => {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [alerts, setAlerts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -90,11 +92,11 @@ const Alerts = () => {
     <div className="alerts-module">
       <div className="module-header">
         <div>
-          <h2>Notifications & Alerts</h2>
-          <p>System generated warnings and tasks requiring your attention</p>
+          <h2>{t('title_alerts')}</h2>
+          <p>{t('subtitle_alerts')}</p>
         </div>
         <button className="refresh-btn" onClick={fetchAlerts} disabled={loading}>
-          <RefreshCw size={18} className={loading ? 'spin' : ''} /> Refresh
+          <RefreshCw size={18} className={loading ? 'spin' : ''} /> {t('btn_refresh')}
         </button>
       </div>
 
@@ -121,14 +123,14 @@ const Alerts = () => {
                 <div className="alert-actions">
                   {alert.status === 'UNREAD' && (
                     <button className="action-btn read" onClick={() => handleMarkAsRead(alert.id)}>
-                      Mark as Read
+                      {t('btn_mark_read')}
                     </button>
                   )}
                   <button className="action-btn resolve" onClick={() => handleResolve(alert.id)}>
-                    <CheckCircle2 size={14} /> Resolve
+                    <CheckCircle2 size={14} /> {t('btn_resolve')}
                   </button>
                   <button className="action-btn snooze" onClick={() => handleSnooze(alert.id, 1)}>
-                    <Clock size={14} /> Snooze 1 Day
+                    <Clock size={14} /> {t('btn_snooze')}
                   </button>
                 </div>
               </div>
@@ -142,8 +144,8 @@ const Alerts = () => {
         {alerts.length === 0 && !loading && (
           <div className="empty-alerts">
             <CheckCircle2 size={48} color="#10b981" />
-            <h3>No active alerts</h3>
-            <p>You're all caught up! No tasks require immediate attention.</p>
+            <h3>{t('empty_alerts_title')}</h3>
+            <p>{t('empty_alerts_desc')}</p>
           </div>
         )}
       </div>

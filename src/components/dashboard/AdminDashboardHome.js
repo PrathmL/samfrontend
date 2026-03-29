@@ -7,9 +7,11 @@ import {
   ArrowRight, FileText
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 const AdminDashboardHome = () => {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [stats, setStats] = useState({
@@ -116,11 +118,11 @@ const AdminDashboardHome = () => {
           <div className="gauge-inner" style={{ transform: `rotate(${(pct * 1.8) - 90}deg)` }}></div>
           <div className="gauge-center">
             <span className="gauge-val">{pct.toFixed(0)}%</span>
-            <span className="gauge-lab">Utilized</span>
+            <span className="gauge-lab">{t('dash_utilized')}</span>
           </div>
         </div>
         <div className="gauge-meta">
-          <span>₹{stats.fundsUtilized.toLocaleString()} utilized</span>
+          <span>₹{stats.fundsUtilized.toLocaleString()} {t('dash_utilized')}</span>
           <span>of ₹{stats.totalFunds.toLocaleString()}</span>
         </div>
       </div>
@@ -130,8 +132,8 @@ const AdminDashboardHome = () => {
   return (
     <div className="admin-dashboard-home">
       <div className="welcome-section-home">
-        <h1>Dashboard Overview</h1>
-        <p>Welcome back, {user?.name}</p>
+        <h1>{t('dash_overview')}</h1>
+        <p>{t('dash_welcome')}, {user?.name}</p>
       </div>
 
       <div className="stats-grid">
@@ -141,7 +143,7 @@ const AdminDashboardHome = () => {
           </div>
           <div className="stat-info">
             <h3>{stats.totalWorks}</h3>
-            <p>Total Works</p>
+            <p>{t('dash_total_works')}</p>
           </div>
         </div>
         <div className="stat-card" style={{ borderLeftColor: '#f59e0b' }}>
@@ -150,7 +152,7 @@ const AdminDashboardHome = () => {
           </div>
           <div className="stat-info">
             <h3>{stats.worksInProgress}</h3>
-            <p>In Progress</p>
+            <p>{t('dash_in_progress')}</p>
           </div>
         </div>
         <div className="stat-card" style={{ borderLeftColor: '#10b981' }}>
@@ -159,7 +161,7 @@ const AdminDashboardHome = () => {
           </div>
           <div className="stat-info">
             <h3>{stats.completedWorks}</h3>
-            <p>Completed</p>
+            <p>{t('dash_completed')}</p>
           </div>
         </div>
         <div className="stat-card" style={{ borderLeftColor: '#6366f1' }}>
@@ -168,7 +170,7 @@ const AdminDashboardHome = () => {
           </div>
           <div className="stat-info">
             <h3>₹{stats.totalFunds.toLocaleString()}</h3>
-            <p>Total Funds</p>
+            <p>{t('dash_total_funds')}</p>
           </div>
         </div>
         <div className="stat-card" style={{ borderLeftColor: '#ec4899' }}>
@@ -177,7 +179,7 @@ const AdminDashboardHome = () => {
           </div>
           <div className="stat-info">
             <h3>{stats.activeSchools}</h3>
-            <p>Active Schools</p>
+            <p>{t('dash_active_schools')}</p>
           </div>
         </div>
         <div className="stat-card" style={{ borderLeftColor: '#ef4444' }}>
@@ -186,48 +188,48 @@ const AdminDashboardHome = () => {
           </div>
           <div className="stat-info">
             <h3>{stats.pendingRequests}</h3>
-            <p>Pending Requests</p>
+            <p>{t('dash_pending_requests')}</p>
           </div>
         </div>
       </div>
 
       <div className="quick-actions-section">
-        <h3>Quick Actions</h3>
+        <h3>{t('dash_quick_actions')}</h3>
         <div className="actions-grid-home">
           <button className="action-btn-home" onClick={() => navigate('/admin/users')}>
-            <Users size={20} /> Manage Users
+            <Users size={20} /> {t('menu_users')}
           </button>
           <button className="action-btn-home" onClick={() => navigate('/admin/work-requests')}>
-            <ClipboardList size={20} /> Review Requests
+            <ClipboardList size={20} /> {t('menu_work_requests')}
           </button>
           <button className="action-btn-home" onClick={() => navigate('/admin/blockers')}>
-            <AlertTriangle size={20} /> View Blockers
+            <AlertTriangle size={20} /> {t('menu_blockers')}
           </button>
           <button className="action-btn-home" onClick={() => navigate('/admin/analytics')}>
-            <BarChart3 size={20} /> View Analytics
+            <BarChart3 size={20} /> {t('menu_analytics')}
           </button>
           <button className="action-btn-home" onClick={() => navigate('/admin/reports')}>
-            <FileText size={20} /> Generate Reports
+            <FileText size={20} /> {t('menu_reports')}
           </button>
         </div>
       </div>
 
       <div className="analytics-preview-home">
         <div className="preview-header">
-          <h3>Quick Analytics</h3>
+          <h3>{t('dash_quick_analytics')}</h3>
           <button className="view-all-btn" onClick={() => navigate('/admin/analytics')}>
-            View Detailed Analytics <ArrowRight size={16} />
+            {t('dash_view_all')} <ArrowRight size={16} />
           </button>
         </div>
         <div className="preview-grid-home">
           <div className="preview-card-home">
-            <h4>Work Status Distribution</h4>
+            <h4>{t('dash_status_distribution')}</h4>
             <div className="chart-placeholder">
               {renderStatusChart()}
             </div>
           </div>
           <div className="preview-card-home">
-            <h4>Budget Utilization</h4>
+            <h4>{t('dash_budget_utilization')}</h4>
             <div className="gauge-placeholder">
               {renderBudgetGauge()}
             </div>
@@ -236,7 +238,7 @@ const AdminDashboardHome = () => {
       </div>
 
       <div className="recent-activities-home">
-        <h3>Recent Activity</h3>
+        <h3>{t('dash_recent_activity')}</h3>
         <div className="activity-list-home">
           {workRequests.slice(0, 5).map(req => (
             <div key={req.id} className="activity-item-home">

@@ -3,6 +3,8 @@ import AdminSidebar from './AdminSidebar';
 import SachivSidebar from './SachivSidebar';
 import HeadmasterSidebar from './HeadmasterSidebar';
 import ClerkSidebar from './ClerkSidebar';
+import Navbar from '../common/Navbar';
+import Footer from '../common/Footer';
 import { useAuth } from '../../context/AuthContext';
 
 const DashboardLayout = ({ children }) => {
@@ -25,27 +27,44 @@ const DashboardLayout = ({ children }) => {
   };
 
   const getMarginLeft = () => {
-    if (user?.role === 'ADMIN') return '260px'; // AdminSidebar is currently fixed at 260px
+    if (user?.role === 'ADMIN') return '260px';
     return collapsed ? '70px' : '260px';
   };
 
   return (
-    <div className="dashboard-layout">
-      {renderSidebar()}
-      <main className="dashboard-main" style={{ marginLeft: getMarginLeft() }}>
-        {children}
-      </main>
+    <div className="dashboard-wrapper">
+      <Navbar />
+      <div className="dashboard-layout">
+        {renderSidebar()}
+        <div className="dashboard-container" style={{ marginLeft: getMarginLeft() }}>
+          <main className="dashboard-main">
+            {children}
+          </main>
+          <Footer />
+        </div>
+      </div>
 
       <style>{`
+        .dashboard-wrapper {
+          display: flex;
+          flex-direction: column;
+          min-height: 100vh;
+        }
         .dashboard-layout {
           display: flex;
-          min-height: 100vh;
+          flex: 1;
           background-color: #f8fafc;
+        }
+        .dashboard-container {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          transition: margin-left 0.3s ease;
+          min-width: 0; /* Prevents flex items from overflowing */
         }
         .dashboard-main {
           flex: 1;
           padding: 2rem;
-          transition: margin-left 0.3s ease;
         }
       `}</style>
     </div>

@@ -1,110 +1,86 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { 
-  Home, Briefcase, AlertCircle, BarChart3, 
-  Bell, CheckCircle2, FileText, MessageSquare, 
-  User, LogOut, Menu
+  LayoutDashboard, 
+  Briefcase, 
+  AlertCircle, 
+  BarChart3, 
+  Bell, 
+  CheckCircle, 
+  FileText, 
+  MessageSquare, 
+  User 
 } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext';
+import { useTranslation } from 'react-i18next';
 
-const SachivSidebar = ({ collapsed, setCollapsed }) => {
-  const { logout } = useAuth();
+const SachivSidebar = ({ collapsed }) => {
+  const { t } = useTranslation();
 
-  const navItems = [
-    { name: 'Dashboard', path: '/sachiv/dashboard', icon: Home },
-    { name: 'Works Monitoring', path: '/sachiv/works', icon: Briefcase },
-    { name: 'Blocker Management', path: '/sachiv/blockers', icon: AlertCircle },
-    { name: 'Analytics', path: '/sachiv/analytics', icon: BarChart3 },
-    { name: 'Alerts', path: '/sachiv/alerts', icon: Bell },
-    { name: 'Verification', path: '/sachiv/verification', icon: CheckCircle2 },
-    { name: 'Reports', path: '/sachiv/reports', icon: FileText },
-    { name: 'Communication', path: '/sachiv/communication', icon: MessageSquare },
-    { name: 'Profile', path: '/sachiv/profile', icon: User },
+  const menuItems = [
+    { name: t('menu_dashboard'), path: '/sachiv/dashboard', icon: LayoutDashboard },
+    { name: t('menu_work_monitoring'), path: '/sachiv/works', icon: Briefcase },
+    { name: t('menu_blockers'), path: '/sachiv/blockers', icon: AlertCircle },
+    { name: t('menu_analytics'), path: '/sachiv/analytics', icon: BarChart3 },
+    { name: t('menu_alerts'), path: '/sachiv/alerts', icon: Bell },
+    { name: t('menu_verification'), path: '/sachiv/verification', icon: CheckCircle },
+    { name: t('menu_reports'), path: '/sachiv/reports', icon: FileText },
+    { name: t('menu_communication'), path: '/sachiv/communication', icon: MessageSquare },
+    { name: t('profile'), path: '/sachiv/profile', icon: User },
   ];
 
   return (
     <div className={`sidebar ${collapsed ? 'collapsed' : ''}`}>
-      <div className="sidebar-header">
-        <h2>{collapsed ? 'SC' : 'Sachiv'}</h2>
-        <button className="collapse-btn" onClick={() => setCollapsed(!collapsed)}>
-          <Menu size={20} />
-        </button>
-      </div>
-      <nav className="sidebar-nav">
-        {navItems.map((item) => (
-          <NavLink 
-            key={item.path} 
+      <div className="sidebar-menu">
+        {menuItems.map((item) => (
+          <NavLink
+            key={item.path}
             to={item.path}
-            className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+            className={({ isActive }) => `menu-item ${isActive ? 'active' : ''}`}
           >
             <item.icon size={20} />
             {!collapsed && <span>{item.name}</span>}
           </NavLink>
         ))}
-      </nav>
-      <div className="sidebar-footer">
-        <button onClick={logout} className="logout-btn">
-          <LogOut size={20} />
-          {!collapsed && <span>Logout</span>}
-        </button>
       </div>
 
       <style>{`
-        .sidebar { 
-          width: 260px; 
-          background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); 
-          color: white; 
-          display: flex; 
-          flex-direction: column; 
-          position: fixed; 
-          height: 100vh; 
-          transition: width 0.3s ease; 
-          z-index: 100; 
+        .sidebar {
+          width: 260px;
+          background-color: white;
+          border-right: 1px solid #e2e8f0;
+          height: calc(100vh - 70px);
+          position: fixed;
           left: 0;
-          top: 0;
-        }
-        .sidebar.collapsed { width: 70px; }
-        .sidebar-header { padding: 1.5rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; }
-        .sidebar-header h2 { margin: 0; font-size: 1.25rem; color: #38bdf8; }
-        .collapse-btn { background: none; border: none; color: #94a3b8; cursor: pointer; }
-        .sidebar-nav {
-          flex: 1;
-          padding: 1rem 0;
-          display: flex;
-          flex-direction: column;
-          gap: 0.25rem;
           overflow-y: auto;
+          transition: width 0.3s ease;
         }
-        .sidebar-nav::-webkit-scrollbar {
-          width: 4px;
+        .sidebar.collapsed {
+          width: 70px;
         }
-        .sidebar-nav::-webkit-scrollbar-track {
-          background: transparent;
+        .sidebar-menu {
+          padding: 1.5rem 1rem;
         }
-        .sidebar-nav::-webkit-scrollbar-thumb {
-          background: #334155;
-          border-radius: 10px;
-        }
-        .nav-item { 
-          display: flex; 
-          align-items: center; 
-          gap: 0.75rem; 
-          padding: 0.75rem 1.5rem; 
-          background: none; 
-          border: none; 
-          color: #cbd5e1; 
-          cursor: pointer; 
-          transition: all 0.2s; 
-          width: 100%; 
-          text-align: left; 
-          font-size: 0.95rem;
+        .menu-item {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          padding: 0.75rem 1rem;
+          color: #64748b;
           text-decoration: none;
+          border-radius: 0.5rem;
+          margin-bottom: 0.25rem;
+          transition: all 0.2s;
+          font-weight: 500;
+          white-space: nowrap;
         }
-        .nav-item:hover { background-color: #334155; color: white; }
-        .nav-item.active { background-color: #0ea5e9; color: white; }
-        .sidebar-footer { padding: 1rem; border-top: 1px solid #334155; }
-        .logout-btn { display: flex; align-items: center; gap: 0.75rem; width: 100%; padding: 0.75rem; background: none; border: none; color: #cbd5e1; cursor: pointer; }
-        .logout-btn:hover { color: #ef4444; }
+        .menu-item:hover {
+          background-color: #f1f5f9;
+          color: #0f172a;
+        }
+        .menu-item.active {
+          background-color: #f0f9ff;
+          color: #0ea5e9;
+        }
       `}</style>
     </div>
   );

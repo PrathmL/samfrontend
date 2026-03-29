@@ -5,9 +5,11 @@ import {
   Package, AlertTriangle, TrendingUp,
   RefreshCw, DollarSign
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const ClerkDashboard = () => {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [stats, setStats] = useState({
     totalMaterials: 0,
     lowStockItems: 0,
@@ -35,8 +37,8 @@ const ClerkDashboard = () => {
   return (
     <div className="clerk-dashboard">
       <div className="welcome-section">
-        <h1>Inventory Dashboard</h1>
-        <p>Welcome back, {user?.name}</p>
+        <h1>{t('dash_inventory_dashboard')}</h1>
+        <p>{t('dash_welcome')}, {user?.name}</p>
       </div>
 
       <div className="stats-grid">
@@ -46,7 +48,7 @@ const ClerkDashboard = () => {
           </div>
           <div className="stat-info">
             <h3>{stats.totalMaterials}</h3>
-            <p>Total Materials</p>
+            <p>{t('dash_total_materials')}</p>
           </div>
         </div>
         <div className="stat-card">
@@ -55,7 +57,7 @@ const ClerkDashboard = () => {
           </div>
           <div className="stat-info">
             <h3>{stats.lowStockItems}</h3>
-            <p>Low Stock Items</p>
+            <p>{t('dash_low_stock_items')}</p>
           </div>
         </div>
         <div className="stat-card">
@@ -64,7 +66,7 @@ const ClerkDashboard = () => {
           </div>
           <div className="stat-info">
             <h3>₹{stats.totalInventoryValue?.toLocaleString()}</h3>
-            <p>Inventory Value</p>
+            <p>{t('dash_inventory_value')}</p>
           </div>
         </div>
       </div>

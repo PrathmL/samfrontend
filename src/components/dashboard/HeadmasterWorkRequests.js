@@ -3,12 +3,14 @@ import axios from 'axios';
 import { 
   Plus, Search, Filter, Clock, CheckCircle2, 
   XCircle, FileText, Camera, MapPin, X, Eye,
-  AlertCircle, ChevronRight, Upload, Calendar
+  AlertCircle, ChevronRight, Upload, Calendar, Tag
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { useTranslation } from 'react-i18next';
 
 const HeadmasterWorkRequests = () => {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -98,14 +100,34 @@ const HeadmasterWorkRequests = () => {
     setPhotos([]);
   };
 
-  const getStatusStyle = (status) => {
+  const getStatusInfo = (status) => {
     switch (status) {
-      case 'PENDING_QUOTATION': return { bg: '#e0f2fe', color: '#0369a1', text: 'Pending Quotation' };
-      case 'PENDING_APPROVAL': return { bg: '#fef3c7', color: '#92400e', text: 'Awaiting Approval' };
-      case 'APPROVED': return { bg: '#dcfce7', color: '#166534', text: 'Approved' };
-      case 'REJECTED': return { bg: '#fee2e2', color: '#991b1b', text: 'Rejected' };
-      case 'WORK_CREATED': return { bg: '#f3e8ff', color: '#6b21a8', text: 'Work Started' };
+      case 'PENDING_QUOTATION': return { bg: '#e0f2fe', color: '#0369a1', text: t('status_pending_quotation') };
+      case 'PENDING_APPROVAL': return { bg: '#fef3c7', color: '#92400e', text: t('status_awaiting_approval') };
+      case 'APPROVED': return { bg: '#dcfce7', color: '#166534', text: t('status_approved') };
+      case 'REJECTED': return { bg: '#fee2e2', color: '#991b1b', text: t('status_rejected') };
+      case 'WORK_CREATED': return { bg: '#f3e8ff', color: '#6b21a8', text: t('status_work_started') };
       default: return { bg: '#f1f5f9', color: '#475569', text: status };
+    }
+  };
+
+  const translateType = (type) => {
+    switch(type) {
+      case 'Maintenance': return t('type_maintenance');
+      case 'Repair': return t('type_repair');
+      case 'New Construction': return t('type_new_construction');
+      case 'Renovation': return t('type_renovation');
+      default: return type;
+    }
+  };
+
+  const translatePriority = (p) => {
+    switch(p) {
+      case 'Low': return t('priority_low');
+      case 'Medium': return t('priority_medium');
+      case 'High': return t('priority_high');
+      case 'Urgent': return t('priority_urgent');
+      default: return p;
     }
   };
 
@@ -113,11 +135,11 @@ const HeadmasterWorkRequests = () => {
     <div className="requests-container">
       <div className="module-header">
         <div>
-          <h1>Work Requests</h1>
+          <h1>{t('menu_work_requests')}</h1>
           <p>Create and track infrastructure work requests for your school</p>
         </div>
         <button className="create-btn" onClick={() => setIsModalOpen(true)}>
-          <Plus size={20} /> Create New Request
+          <Plus size={20} /> {t('btn_create_request')}
         </button>
       </div>
 
@@ -130,27 +152,27 @@ const HeadmasterWorkRequests = () => {
         ) : requests.length > 0 ? (
           <div className="requests-grid">
             {requests.map(req => {
-              const statusStyle = getStatusStyle(req.status);
+              const statusInfo = getStatusInfo(req.status);
               return (
                 <div key={req.id} className="request-card">
                   <div className="request-header">
                     <span className="request-id">#{req.id}</span>
-                    <span className="status-badge" style={{ backgroundColor: statusStyle.bg, color: statusStyle.color }}>
-                      {statusStyle.text}
+                    <span className="status-badge" style={{ backgroundColor: statusInfo.bg, color: statusInfo.color }}>
+                      {statusInfo.text}
                     </span>
                   </div>
                   <h3>{req.title}</h3>
                   <p className="request-desc">{req.description?.substring(0, 100)}...</p>
                   <div className="request-meta">
-                    <div className="meta-item"><Tag size={14} /> {req.type}</div>
+                    <div className="meta-item"><Tag size={14} /> {translateType(req.type)}</div>
                     <div className="meta-item"><Calendar size={14} /> {new Date(req.createdAt).toLocaleDateString()}</div>
                   </div>
                   <div className="request-footer">
                     <div className={`priority-text ${req.priority?.toLowerCase()}`}>
-                      {req.priority} Priority
+                      {translatePriority(req.priority)} {t('field_priority')}
                     </div>
                     <button className="view-details-link" onClick={() => setSelectedRequest(req)}>
-                      View Details <ChevronRight size={16} />
+                      {t('btn_view')} <ChevronRight size={16} />
                     </button>
                   </div>
                 </div>
@@ -160,7 +182,7 @@ const HeadmasterWorkRequests = () => {
         ) : (
           <div className="empty-state">
             <FileText size={48} />
-            <h3>No Work Requests</h3>
+            <h3>{t('menu_work_requests')}</h3>
             <p>You haven't created any work requests yet.</p>
           </div>
         )}
@@ -171,14 +193,14 @@ const HeadmasterWorkRequests = () => {
         <div className="modal-overlay">
           <div className="modal modal-lg">
             <div className="modal-header">
-              <h2>New Work Request</h2>
+              <h2>{t('btn_create_request')}</h2>
               <button className="close-btn" onClick={() => setIsModalOpen(false)}><X size={24} /></button>
             </div>
             <form onSubmit={handleSubmit}>
               <div className="modal-content">
                 <div className="form-grid">
                   <div className="form-group full-width">
-                    <label>Work Title *</label>
+                    <label>{t('field_work_title')} *</label>
                     <input 
                       type="text" 
                       required 
@@ -188,35 +210,35 @@ const HeadmasterWorkRequests = () => {
                     />
                   </div>
                   <div className="form-group">
-                    <label>Work Type</label>
+                    <label>{t('field_type')}</label>
                     <select value={formData.type} onChange={e => setFormData({...formData, type: e.target.value})}>
-                      <option>Maintenance</option>
-                      <option>Repair</option>
-                      <option>New Construction</option>
-                      <option>Renovation</option>
+                      <option value="Maintenance">{t('type_maintenance')}</option>
+                      <option value="Repair">{t('type_repair')}</option>
+                      <option value="New Construction">{t('type_new_construction')}</option>
+                      <option value="Renovation">{t('type_renovation')}</option>
                     </select>
                   </div>
                   <div className="form-group">
-                    <label>Category</label>
+                    <label>{t('field_category')}</label>
                     <select value={formData.category} onChange={e => setFormData({...formData, category: e.target.value})}>
-                      <option>Building</option>
-                      <option>Electrical</option>
-                      <option>Plumbing</option>
-                      <option>Furniture</option>
-                      <option>Sanitation</option>
+                      <option value="Building">{t('cat_building')}</option>
+                      <option value="Electrical">{t('cat_electrical')}</option>
+                      <option value="Plumbing">{t('cat_plumbing')}</option>
+                      <option value="Furniture">{t('cat_furniture')}</option>
+                      <option value="Sanitation">{t('cat_sanitation')}</option>
                     </select>
                   </div>
                   <div className="form-group">
-                    <label>Priority</label>
+                    <label>{t('field_priority')}</label>
                     <select value={formData.priority} onChange={e => setFormData({...formData, priority: e.target.value})}>
-                      <option>Low</option>
-                      <option>Medium</option>
-                      <option>High</option>
-                      <option>Urgent</option>
+                      <option value="Low">{t('priority_low')}</option>
+                      <option value="Medium">{t('priority_medium')}</option>
+                      <option value="High">{t('priority_high')}</option>
+                      <option value="Urgent">{t('priority_urgent')}</option>
                     </select>
                   </div>
                   <div className="form-group">
-                    <label>Expected Timeline</label>
+                    <label>{t('field_expected_timeline')}</label>
                     <input 
                       type="text" 
                       value={formData.expectedTimeline}
@@ -225,7 +247,7 @@ const HeadmasterWorkRequests = () => {
                     />
                   </div>
                   <div className="form-group full-width">
-                    <label>Description *</label>
+                    <label>{t('field_description')} *</label>
                     <textarea 
                       required 
                       rows="4"
@@ -235,7 +257,7 @@ const HeadmasterWorkRequests = () => {
                     />
                   </div>
                   <div className="form-group full-width">
-                    <label>Upload Photos (Max 10)</label>
+                    <label>{t('field_photos')} (Max 10)</label>
                     <div className="file-upload">
                       <input type="file" multiple accept="image/*" onChange={handleFileChange} id="photos" />
                       <label htmlFor="photos">
@@ -247,9 +269,9 @@ const HeadmasterWorkRequests = () => {
                 </div>
               </div>
               <div className="modal-footer">
-                <button type="button" className="cancel-btn" onClick={() => setIsModalOpen(false)}>Cancel</button>
+                <button type="button" className="cancel-btn" onClick={() => setIsModalOpen(false)}>{t('btn_cancel')}</button>
                 <button type="submit" className="submit-btn" disabled={loading}>
-                  {loading ? 'Submitting...' : 'Submit Request'}
+                  {loading ? 'Submitting...' : t('btn_submit')}
                 </button>
               </div>
             </form>
@@ -262,7 +284,7 @@ const HeadmasterWorkRequests = () => {
         <div className="modal-overlay">
           <div className="modal modal-lg">
             <div className="modal-header">
-              <h2>Request Details: {selectedRequest.title}</h2>
+              <h2>{t('btn_view')}: {selectedRequest.title}</h2>
               <button className="close-btn" onClick={() => setSelectedRequest(null)}><X size={24} /></button>
             </div>
             <div className="modal-content">
@@ -279,13 +301,13 @@ const HeadmasterWorkRequests = () => {
                       <span>Clerk Quotation</span>
                     </div>
                     <div className={`timeline-step ${['APPROVED', 'REJECTED', 'WORK_CREATED'].includes(selectedRequest.status) ? 'completed' : ''}`}>
-                      {['APPROVED', 'REJECTED', 'WORK_CREATED'].includes(selectedRequest.status) ? <CheckCircle2 size={16} /> : <Minus size={16} />}
+                      {['APPROVED', 'REJECTED', 'WORK_CREATED'].includes(selectedRequest.status) ? <CheckCircle2 size={16} /> : <div style={{ width: 16, height: 2, background: 'currentColor' }} />}
                       <span>Admin Decision</span>
                     </div>
                   </div>
 
                   <div className="info-section">
-                    <h4>Description</h4>
+                    <h4>{t('field_description')}</h4>
                     <p>{selectedRequest.description}</p>
                   </div>
 
@@ -305,11 +327,11 @@ const HeadmasterWorkRequests = () => {
                           <span>₹{selectedRequest.quotation.grandTotal?.toLocaleString()}</span>
                         </div>
                         <div className="quote-item">
-                          <label>Material Cost</label>
+                          <label>{t('field_material_cost')}</label>
                           <span>₹{selectedRequest.quotation.materialCost?.toLocaleString()}</span>
                         </div>
                         <div className="quote-item">
-                          <label>Labor Cost</label>
+                          <label>{t('field_labor_cost')}</label>
                           <span>₹{selectedRequest.quotation.laborCost?.toLocaleString()}</span>
                         </div>
                       </div>
@@ -318,7 +340,7 @@ const HeadmasterWorkRequests = () => {
                 </div>
 
                 <div className="details-photos">
-                  <h4>Attached Photos</h4>
+                  <h4>{t('field_photos')}</h4>
                   <div className="photo-grid-small">
                     {selectedRequest.photoUrls?.map((url, i) => (
                       <img key={i} src={`http://localhost:8080${url}`} alt={`Issue ${i+1}`} />
@@ -331,7 +353,7 @@ const HeadmasterWorkRequests = () => {
               </div>
             </div>
             <div className="modal-footer">
-              <button className="cancel-btn" onClick={() => setSelectedRequest(null)}>Close</button>
+              <button className="cancel-btn" onClick={() => setSelectedRequest(null)}>{t('btn_cancel')}</button>
             </div>
           </div>
         </div>
@@ -407,9 +429,5 @@ const HeadmasterWorkRequests = () => {
     </div>
   );
 };
-
-// Internal Lucide-react Icon proxy since I can't import all individually easily
-const Tag = ({ size }) => <span style={{ fontSize: size }}><FileText size={size} /></span>;
-const Minus = ({ size }) => <div style={{ width: size, height: 2, background: 'currentColor' }} />;
 
 export default HeadmasterWorkRequests;

@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import LoginPage from './components/auth/LoginPage';
+import HomePage from './components/home/HomePage';
 import DashboardLayout from './components/dashboard/DashboardLayout';
 import AdminDashboardHome from './components/dashboard/AdminDashboardHome';
 import UserManagement from './components/dashboard/UserManagement';
@@ -24,7 +25,9 @@ import ClerkInventory from './components/dashboard/ClerkInventory';
 import ClerkQuotations from './components/dashboard/ClerkQuotations';
 import ClerkStockMovements from './components/dashboard/ClerkStockMovements';
 import ClerkLowStockAlerts from './components/dashboard/ClerkLowStockAlerts';
+import AdminFundRequests from './components/dashboard/AdminFundRequests';
 import SachivDashboard from './components/dashboard/SachivDashboard';
+import SachivWorkMonitoring from './components/dashboard/SachivWorkMonitoring';
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user, loading } = useAuth();
@@ -62,6 +65,7 @@ function App() {
                     <Route path="schools" element={<SchoolManagement />} />
                     <Route path="work-monitoring" element={<AdminWorkMonitoring />} />
                     <Route path="work-requests" element={<AdminWorkRequests />} />
+                    <Route path="fund-requests" element={<AdminFundRequests />} />
                     <Route path="blockers" element={<BlockerManagement />} />
                     <Route path="analytics" element={<BlockerAnalytics />} />
                     <Route path="alerts" element={<Alerts />} />
@@ -84,7 +88,7 @@ function App() {
                 <DashboardLayout>
                   <Routes>
                     <Route path="dashboard" element={<SachivDashboard />} />
-                    <Route path="works" element={<div>Works Monitoring</div>} />
+                    <Route path="works" element={<SachivWorkMonitoring />} />
                     <Route path="blockers" element={<BlockerManagement />} />
                     <Route path="analytics" element={<BlockerAnalytics />} />
                     <Route path="alerts" element={<Alerts />} />
@@ -145,7 +149,7 @@ function App() {
             } 
           />
 
-          <Route path="/" element={<Navigate to="/login" />} />
+          <Route path="/" element={<HomePage />} />
         </Routes>
       </Router>
     </AuthProvider>
