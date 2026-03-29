@@ -28,6 +28,7 @@ import ClerkLowStockAlerts from './components/dashboard/ClerkLowStockAlerts';
 import AdminFundRequests from './components/dashboard/AdminFundRequests';
 import SachivDashboard from './components/dashboard/SachivDashboard';
 import SachivWorkMonitoring from './components/dashboard/SachivWorkMonitoring';
+import ProfileEdit from './components/profile/ProfileEdit';
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user, loading } = useAuth();
@@ -72,6 +73,7 @@ function App() {
                     <Route path="reports" element={<Reports />} />
                     <Route path="communication" element={<Communication />} />
                     <Route path="audit-logs" element={<AuditLogs />} />
+                    <Route path="profile" element={<ProfileEdit />} />
                     <Route path="create-work/:requestId" element={<WorkCreationForm />} />
                     <Route path="*" element={<Navigate to="dashboard" replace />} />
                   </Routes>
@@ -95,7 +97,7 @@ function App() {
                     <Route path="verification" element={<div>Work Verification</div>} />
                     <Route path="reports" element={<Reports />} />
                     <Route path="communication" element={<Communication />} />
-                    <Route path="profile" element={<div>Profile</div>} />
+                    <Route path="profile" element={<ProfileEdit />} />
                     <Route path="*" element={<Navigate to="dashboard" replace />} />
                   </Routes>
                 </DashboardLayout>
@@ -117,7 +119,7 @@ function App() {
                     <Route path="alerts" element={<Alerts />} />
                     <Route path="reports" element={<Reports />} />
                     <Route path="communication" element={<Communication />} />
-                    <Route path="profile" element={<div>Profile</div>} />
+                    <Route path="profile" element={<ProfileEdit />} />
                     <Route path="*" element={<Navigate to="dashboard" replace />} />
                   </Routes>
                 </DashboardLayout>
@@ -141,7 +143,7 @@ function App() {
                     <Route path="alerts" element={<Alerts />} />
                     <Route path="stock-movements" element={<ClerkStockMovements />} />
                     <Route path="low-stock-alerts" element={<ClerkLowStockAlerts />} />
-                    <Route path="profile" element={<div>Profile</div>} />
+                    <Route path="profile" element={<ProfileEdit />} />
                     <Route path="*" element={<Navigate to="dashboard" replace />} />
                   </Routes>
                 </DashboardLayout>

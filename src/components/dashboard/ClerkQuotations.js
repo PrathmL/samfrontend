@@ -263,30 +263,28 @@ const ClerkQuotations = () => {
             </div>
           </div>
         ))}
-        {requests.length === 0 && !loading && (
-          <div className="empty-state">
+            <div className="empty-state">
             {activeTab === 'pending' ? (
               <>
                 <CheckCircle2 size={48} color="#10b981" />
-                <h3>All Clear!</h3>
-                <p>No work requests are pending quotations.</p>
+                <h3>{t('all_clear')}</h3>
+                <p>{t('empty_alerts_desc')}</p>
               </>
             ) : (
               <>
                 <History size={48} color="#94a3b8" />
-                <h3>No History</h3>
+                <h3>{t('no_history')}</h3>
                 <p>You haven't prepared any quotations yet.</p>
               </>
             )}
           </div>
-        )}
       </div>
 
       {isModalOpen && (
         <div className="modal-overlay">
           <div className="modal modal-lg">
             <div className="modal-header">
-              <h2>{viewMode ? 'Quotation Details' : t('btn_prepare_quote')}</h2>
+              <h2>{viewMode ? t('label_quotation_details') : t('btn_prepare_quote')}</h2>
               <button className="close-btn" onClick={() => setIsModalOpen(false)}><X size={24} /></button>
             </div>
             <form onSubmit={viewMode ? (e) => e.preventDefault() : handleSubmitQuotation}>
@@ -299,7 +297,7 @@ const ClerkQuotations = () => {
                     
                     {/* Added Photo Gallery for Clerk */}
                     <div className="request-photos-section">
-                      <h5>{t('Initial Photos')}</h5>
+                      <h5>{t('initial_photos')}</h5>
                       <div className="photo-grid-clerk">
                         {selectedRequest?.photoUrls?.map((photo, i) => (
                           <div key={i} className="photo-item-clerk">
@@ -473,7 +471,7 @@ const ClerkQuotations = () => {
               </div>
               <div className="modal-footer">
                 <button type="button" className="cancel-btn" onClick={() => setIsModalOpen(false)}>
-                  {viewMode ? 'Close' : t('btn_cancel')}
+                  {viewMode ? t('btn_close') : t('btn_cancel')}
                 </button>
                 {!viewMode && (
                   <button type="submit" className="submit-btn" disabled={loading}>

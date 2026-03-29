@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 import { 
   Check, X, Eye, Clock, AlertTriangle, 
   Search, IndianRupee, Building2, Calendar, FileText
 } from 'lucide-react';
 
 const AdminFundRequests = () => {
+  const { t } = useTranslation();
   const [quotations, setQuotations] = useState([]);
   const [selectedQuotation, setSelectedQuotation] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -71,8 +73,8 @@ const AdminFundRequests = () => {
   return (
     <div className="fund-requests-container">
       <div className="page-header">
-        <h1>Inventory Fund Requests</h1>
-        <p>Review and approve requests for material replenishment funds</p>
+        <h1>{t('title_fund_requests')}</h1>
+        <p>{t('msg_fund_requests_description')}</p>
       </div>
 
       {success && <div className="alert success">{success}</div>}
@@ -82,12 +84,12 @@ const AdminFundRequests = () => {
         <table className="requests-table">
           <thead>
             <tr>
-              <th>ID</th>
-              <th>School</th>
-              <th>Amount Requested</th>
-              <th>Status</th>
-              <th>Submitted At</th>
-              <th>Actions</th>
+              <th>{t('th_id')}</th>
+              <th>{t('field_school')}</th>
+              <th>{t('th_amount_requested')}</th>
+              <th>{t('field_status')}</th>
+              <th>{t('th_submitted_at')}</th>
+              <th>{t('field_actions')}</th>
             </tr>
           </thead>
           <tbody>
@@ -109,7 +111,7 @@ const AdminFundRequests = () => {
                 <td>{new Date(q.submittedAt).toLocaleDateString()}</td>
                 <td>
                   <button className="view-btn" onClick={() => { setSelectedQuotation(q); setIsModalOpen(true); }}>
-                    <Eye size={16} /> Review
+                    <Eye size={16} /> {t('btn_review')}
                   </button>
                 </td>
               </tr>
@@ -117,7 +119,7 @@ const AdminFundRequests = () => {
           </tbody>
         </table>
         {quotations.length === 0 && !loading && (
-          <div className="empty-state">No pending fund requests found.</div>
+          <div className="empty-state">{t('msg_no_fund_requests')}</div>
         )}
       </div>
 
@@ -125,19 +127,19 @@ const AdminFundRequests = () => {
         <div className="modal-overlay">
           <div className="modal modal-lg">
             <div className="modal-header">
-              <h2>Review Fund Request: #Q-{selectedQuotation.id}</h2>
+              <h2>{t('title_review_fund_request')}: #Q-{selectedQuotation.id}</h2>
               <button className="close-btn" onClick={() => setIsModalOpen(false)}><X size={24} /></button>
             </div>
             <div className="modal-content">
               <div className="details-section">
-                <h3>Items Requested</h3>
+                <h3>{t('label_items_requested')}</h3>
                 <table className="items-table-mini">
                   <thead>
                     <tr>
-                      <th>Material ID</th>
-                      <th>Quantity</th>
-                      <th>Unit Price</th>
-                      <th>Total</th>
+                      <th>{t('th_material_id')}</th>
+                      <th>{t('field_quantity')}</th>
+                      <th>{t('field_unit_price')}</th>
+                      <th>{t('field_total')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -154,19 +156,19 @@ const AdminFundRequests = () => {
               </div>
 
               <div className="details-section mt-4">
-                <h3>Request Summary</h3>
+                <h3>{t('label_request_summary')}</h3>
                 <div className="summary-box">
-                  <p><strong>Total Material Cost:</strong> ₹{selectedQuotation.materialCost?.toLocaleString()}</p>
-                  <p><strong>Justification:</strong> {selectedQuotation.materialDetails || 'No justification provided'}</p>
+                  <p><strong>{t('label_material_cost')}:</strong> ₹{selectedQuotation.materialCost?.toLocaleString()}</p>
+                  <p><strong>{t('label_justification')}:</strong> {selectedQuotation.materialDetails || 'No justification provided'}</p>
                 </div>
               </div>
             </div>
             <div className="modal-footer">
-              <button className="cancel-btn" onClick={() => setIsModalOpen(false)}>Close</button>
+              <button className="cancel-btn" onClick={() => setIsModalOpen(false)}>{t('btn_close')}</button>
               {selectedQuotation.status === 'PENDING' && (
                 <>
-                  <button className="reject-btn" onClick={() => handleReject(selectedQuotation.id)}>Reject</button>
-                  <button className="approve-btn" onClick={() => handleApprove(selectedQuotation.id)}>Approve & Grant Funds</button>
+                  <button className="reject-btn" onClick={() => handleReject(selectedQuotation.id)}>{t('btn_reject')}</button>
+                  <button className="approve-btn" onClick={() => handleApprove(selectedQuotation.id)}>{t('btn_approve_funds')}</button>
                 </>
               )}
             </div>

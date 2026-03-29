@@ -81,7 +81,7 @@ const AdminWorkRequests = () => {
     <div className="work-requests-admin">
       <div className="module-header">
         <h1>{t('title_work_requests')}</h1>
-        <p>Review and process infrastructure development proposals from schools</p>
+        <p>{t('msg_work_requests_description')}</p>
       </div>
 
       <div className="filter-section">
@@ -97,12 +97,12 @@ const AdminWorkRequests = () => {
         <div className="status-filter-box">
           <Filter size={18} />
           <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
-            <option value="ALL">All Status</option>
-            <option value="PENDING_QUOTATION">Pending Quotation</option>
-            <option value="PENDING_APPROVAL">Pending Approval</option>
-            <option value="APPROVED">Approved</option>
-            <option value="REJECTED">Rejected</option>
-            <option value="WORK_CREATED">Work Created</option>
+            <option value="ALL">{t('opt_all_status')}</option>
+            <option value="PENDING_QUOTATION">{t('opt_pending_quotation')}</option>
+            <option value="PENDING_APPROVAL">{t('opt_pending_approval')}</option>
+            <option value="APPROVED">{t('opt_approved')}</option>
+            <option value="REJECTED">{t('opt_rejected')}</option>
+            <option value="WORK_CREATED">{t('opt_work_created')}</option>
           </select>
         </div>
       </div>
@@ -146,7 +146,7 @@ const AdminWorkRequests = () => {
               </tr>
             )) : (
               <tr>
-                <td colSpan="6" className="empty-row">No work requests found</td>
+                <td colSpan="6" className="empty-row">{t('msg_no_requests')}</td>
               </tr>
             )}
           </tbody>
@@ -203,7 +203,7 @@ const AdminWorkRequests = () => {
                   {selectedRequest.quotation && (
                     <div className="quotation-summary-box">
                       <div className="box-header">
-                        <h4>Quotation Details (From Clerk)</h4>
+                        <h4>{t('label_quotation_details')}</h4>
                         <span className="total-badge">₹{selectedRequest.quotation.grandTotal?.toLocaleString()}</span>
                       </div>
                       <div className="quote-metrics">
@@ -216,13 +216,13 @@ const AdminWorkRequests = () => {
                           <span>₹{selectedRequest.quotation.laborCost?.toLocaleString()}</span>
                         </div>
                         <div className="metric">
-                          <label>Other Costs</label>
+                          <label>{t('label_other_costs')}</label>
                           <span>₹{selectedRequest.quotation.additionalCosts?.toLocaleString()}</span>
                         </div>
                       </div>
                       {selectedRequest.quotation.materialDetails && (
                         <div className="material-notes">
-                          <label>Material Details:</label>
+                          <label>{t('label_material_details')}:</label>
                           <p>{selectedRequest.quotation.materialDetails}</p>
                         </div>
                       )}

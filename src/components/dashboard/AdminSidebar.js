@@ -14,7 +14,8 @@ import {
   FileText,
   Bell,
   MessageSquare,
-  IndianRupee
+  IndianRupee,
+  User
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
@@ -34,6 +35,7 @@ const AdminSidebar = () => {
     { name: t('menu_reports'), path: '/admin/reports', icon: FileText },
     { name: t('menu_communication'), path: '/admin/communication', icon: MessageSquare },
     { name: t('menu_audit_logs'), path: '/admin/audit-logs', icon: Settings },
+    { name: t('profile'), path: '/admin/profile', icon: User },
   ];
 
   return (

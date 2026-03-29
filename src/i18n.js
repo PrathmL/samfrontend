@@ -226,7 +226,107 @@ const resources = {
       "msg_quote_success": "Quotation submitted!",
       "msg_quote_fail": "Submission failed",
       "msg_loading_logs": "Loading logs...",
-      "msg_no_logs": "No logs found"
+      "msg_no_logs": "No logs found",
+
+      // Dashboard Pages
+      "dash_overview": "Dashboard Overview",
+      "dash_welcome": "Welcome",
+      "dash_total_works": "Total Works",
+      "dash_in_progress": "In Progress",
+      "dash_completed": "Completed",
+      "dash_total_funds": "Total Funds",
+      "dash_active_schools": "Active Schools",
+      "dash_pending_requests": "Pending Requests",
+      "dash_quick_actions": "Quick Actions",
+      "dash_quick_analytics": "Quick Analytics",
+      "dash_view_all": "View All",
+      "dash_budget_utilization": "Budget Utilization",
+      "dash_recent_activity": "Recent Activity",
+
+      // Blocker Analytics
+      "msg_loading_analytics": "Loading analytics...",
+      "msg_no_analytics": "No analytics data available",
+      "dash_priority_active": "Active by Priority",
+      "dash_blockers_taluka": "Blockers by Taluka",
+      "dash_avg_resolution": "Average Resolution Time",
+      "dash_days": "Days",
+      "dash_avg_desc": "Average",
+      "dash_common_types": "Most Common Types",
+
+      // Clerk Dashboard
+      "dash_inventory_dashboard": "Inventory Dashboard",
+      "dash_total_materials": "Total Materials",
+      "dash_low_stock_items": "Low Stock Items",
+      "dash_inventory_value": "Inventory Value",
+
+      // Profile & Authentication  
+      "personal_information": "Personal Information",
+      "new_password": "New Password",
+      "confirm_password": "Confirm Password",
+      "security": "Security",
+      "saving": "Saving...",
+      "manage_profile_desc": "Manage your profile and account settings",
+      "welcome_back": "Welcome Back",
+      "sign_in": "Sign In",
+
+      // Blocker Management
+      "label_duplicate_of": "Duplicate of",
+      "field_work_code": "Work Code",
+
+      // Work Monitoring
+      "title_work_monitoring": "Work Monitoring",
+
+      // Additional Missing Strings
+      "msg_invalid_credentials": "Invalid credentials",
+      "msg_login_description": "Enter your credentials to access the management portal",
+      "btn_forgot_password": "Forgot Password",
+      "msg_authorized_only": "Authorized Personnel Only",
+      "msg_need_help": "Need help?",
+      "btn_contact_admin": "Contact Admin",
+      "msg_no_requests": "No work requests found",
+      "label_quotation_details": "Quotation Details",
+      "label_other_costs": "Other Costs",
+      "label_material_details": "Material Details",
+      "label_current_status": "Current Status",
+      "placeholder_remarks": "Enter approval remarks or rejection reason...",
+      "title_fund_requests": "Inventory Fund Requests",
+      "msg_fund_requests_description": "Review and approve requests for material replenishment funds",
+      "th_id": "ID",
+      "th_submitted_at": "Submitted At",
+      "th_amount_requested": "Amount Requested",
+      "label_school_id": "School ID",
+      "msg_no_fund_requests": "No pending fund requests found.",
+      "title_review_fund_request": "Review Fund Request",
+      "label_items_requested": "Items Requested",
+      "th_material_id": "Material ID",
+      "label_request_summary": "Request Summary",
+      "label_material_cost": "Total Material Cost",
+      "label_justification": "Justification",
+      "btn_close": "Close",
+      "all_clear": "All Clear!",
+      "no_history": "No History",
+      "opt_select_category": "Select Category",
+      "unit_pieces": "pieces",
+      "unit_kg": "kg",
+      "unit_bags": "bags",
+      "initial_photos": "Initial Photos",
+      "no_initial_photos": "No initial photos available",
+      "status_pending_approval": "Pending Approval",
+      "status_work_created": "Work Created",
+      "footer_copyright": "© 2026 E-Samruddha Shala Project. All rights reserved.",
+      "footer_link_privacy": "Privacy Policy",
+      "footer_link_terms": "Terms of Service",
+
+      // Status Filter Options
+      "opt_all_status": "All Status",
+      "opt_pending_quotation": "Pending Quotation",
+      "opt_pending_approval": "Pending Approval",
+      "opt_approved": "Approved",
+      "opt_rejected": "Rejected",
+      "opt_work_created": "Work Created",
+      "msg_work_requests_description": "Review and process infrastructure development proposals from schools",
+      "label_estimated_total": "Estimated Total",
+      "label_rejection_reason": "Rejection Reason"
     }
   },
   mr: {
@@ -452,7 +552,107 @@ const resources = {
       "msg_quote_success": "दरपत्रक सादर केले!",
       "msg_quote_fail": "सादर करणे अयशस्वी",
       "msg_loading_logs": "लॉग्स लोड होत आहेत...",
-      "msg_no_logs": "कोणतेही लॉग्स सापडले नाहीत"
+      "msg_no_logs": "कोणतेही लॉग्स सापडले नाहीत",
+
+      // Dashboard Pages
+      "dash_overview": "डॅशबोर्ड अवलोकन",
+      "dash_welcome": "स्वागत आहे",
+      "dash_total_works": "एकूण कामे",
+      "dash_in_progress": "प्रगतीपथावर",
+      "dash_completed": "पूर्ण",
+      "dash_total_funds": "एकूण निधी",
+      "dash_active_schools": "सक्रिय शाळा",
+      "dash_pending_requests": "लंबित विनंत्या",
+      "dash_quick_actions": "द्रुत कृती",
+      "dash_quick_analytics": "द्रुत विश्लेषण",
+      "dash_view_all": "सर्व पहा",
+      "dash_budget_utilization": "बजेट वापर",
+      "dash_recent_activity": "अलीकडील क्रियाकलाप",
+
+      // Blocker Analytics
+      "msg_loading_analytics": "विश्लेषण लोड होत आहे...",
+      "msg_no_analytics": "कोणताही विश्लेषण डेटा उपलब्ध नाही",
+      "dash_priority_active": "प्राधान्यानुसार सक्रिय",
+      "dash_blockers_taluka": "तालुकानुसार अडथळे",
+      "dash_avg_resolution": "सरासरी समाधान वेळ",
+      "dash_days": "दिवस",
+      "dash_avg_desc": "सरासरी",
+      "dash_common_types": "सर्वात सामान्य प्रकार",
+
+      // Clerk Dashboard
+      "dash_inventory_dashboard": "साठा डॅशबोर्ड",
+      "dash_total_materials": "एकूण साहित्य",
+      "dash_low_stock_items": "कमी साठा वस्तू",
+      "dash_inventory_value": "साठा मूल्य",
+
+      // Profile & Authentication  
+      "personal_information": "व्यक्तिगत माहिती",
+      "new_password": "नवीन पासवर्ड",
+      "confirm_password": "पासवर्डची पुष्टी करा",
+      "security": "सुरक्षा",
+      "saving": "जतन होत आहे...",
+      "manage_profile_desc": "आपली प्रोफाइल आणि खाता सेटिंग्स व्यवस्थापित करा",
+      "welcome_back": "परत स्वागत आहे",
+      "sign_in": "साईन इन करा",
+
+      // Blocker Management
+      "label_duplicate_of": "याचे डुप्लिकेट",
+      "field_work_code": "कामाचा कोड",
+
+      // Work Monitoring
+      "title_work_monitoring": "कामकाज देखरेख",
+
+      // Additional Missing Strings
+      "msg_invalid_credentials": "अमान्य क्रेडेंशियल्स",
+      "msg_login_description": "व्यवस्थापन पोर्टलमध्ये प्रवेश करण्यासाठी आपले क्रेडेंशियल्स प्रविष्ट करा",
+      "btn_forgot_password": "पासवर्ड विस्मरण केले?",
+      "msg_authorized_only": "केवळ अधिकृत कर्मचारी",
+      "msg_need_help": "मदतीची गरज आहे?",
+      "btn_contact_admin": "प्रशासकाशी संपर्क साधा",
+      "msg_no_requests": "कामाच्या विनंत्या सापडल्या नाहीत",
+      "label_quotation_details": "दरपत्रक तपशील",
+      "label_other_costs": "इतर खर्च",
+      "label_material_details": "साहित्याचे तपशील",
+      "label_current_status": "वर्तमान स्थिती",
+      "placeholder_remarks": "मंजुरीची टिप्पणी किंवा नकारण्याचे कारण प्रविष्ट करा...",
+      "title_fund_requests": "साठा निधी विनंत्या",
+      "msg_fund_requests_description": "साहित्य पूर्ण करण्यासाठी निधीच्या विनंत्या तपासा आणि मंजूर करा",
+      "th_id": "ID",
+      "th_submitted_at": "सादर केल्याची तारीख",
+      "th_amount_requested": "विनंती केलेली रक्कम",
+      "label_school_id": "शाळा ID",
+      "msg_no_fund_requests": "कोणत्याही लंबित निधी विनंत्या सापडल्या नाहीत.",
+      "title_review_fund_request": "निधी विनंती तपासा",
+      "label_items_requested": "विनंती केलेल्या वस्तू",
+      "th_material_id": "साहित्य ID",
+      "label_request_summary": "विनंती सारांश",
+      "label_material_cost": "एकूण साहित्य खर्च",
+      "label_justification": "न्याय",
+      "btn_close": "बंद करा",
+      "all_clear": "सर्व ठीक आहे!",
+      "no_history": "कोणताही इतिहास नाही",
+      "opt_select_category": "वर्ग निवडा",
+      "unit_pieces": "तुकडे",
+      "unit_kg": "किलो",
+      "unit_bags": "बॅग्स",
+      "initial_photos": "प्रारंभिक फोटो",
+      "no_initial_photos": "प्रारंभिक फोटो उपलब्ध नाहीत",
+      "status_pending_approval": "मंजुरीची प्रतीक्षा",
+      "status_work_created": "काम तयार केले",
+      "footer_copyright": "© 2026 ई-समृद्ध शाळा प्रकल्प. सर्व हक्क राखीव.",
+      "footer_link_privacy": "गोपनीयता धोरण",
+      "footer_link_terms": "सेवा अटी",
+
+      // Status Filter Options
+      "opt_all_status": "सर्व स्थिती",
+      "opt_pending_quotation": "दरपत्रक प्रलंबित",
+      "opt_pending_approval": "मंजुरीची प्रतीक्षा",
+      "opt_approved": "मंजूर",
+      "opt_rejected": "नाकारलेले",
+      "opt_work_created": "काम तयार केले",
+      "msg_work_requests_description": "शाळांच्या पायाभूत सुविधांच्या विकास प्रस्तावांची तपासणी करा आणि प्रक्रिया करा",
+      "label_estimated_total": "अनुमानित एकूण",
+      "label_rejection_reason": "नाकारण्याचे कारण"
     }
   }
 };

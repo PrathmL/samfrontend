@@ -417,17 +417,17 @@ const HeadmasterWorkRequests = () => {
 
                   {selectedRequest.rejectionReason && (
                     <div className="info-section rejection">
-                      <h4>Rejection Reason</h4>
+                      <h4>{t('label_rejection_reason')}</h4>
                       <p>{selectedRequest.rejectionReason}</p>
                     </div>
                   )}
 
                   {selectedRequest.quotation && (
                     <div className="info-section quotation-box">
-                      <h4>Quotation Details</h4>
+                      <h4>{t('label_quotation_details')}</h4>
                       <div className="quote-grid">
                         <div className="quote-item">
-                          <label>Estimated Total</label>
+                          <label>{t('label_estimated_total')}</label>
                           <span>₹{selectedRequest.quotation.grandTotal?.toLocaleString()}</span>
                         </div>
                         <div className="quote-item">

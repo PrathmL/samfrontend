@@ -153,7 +153,7 @@ const AdminWorkMonitoring = () => {
               </div>
               <button className="close-x" onClick={() => setIsModalOpen(false)}><X size={24} /></button>
             </div>
-            <div className="modal-content overflow-y-auto" style={{ maxHeight: '80vh' }}>
+            <div className="modal-content" style={{ maxHeight: '80vh', overflowY: 'auto' }}>
               <div className="work-details-layout">
                 <div className="details-info-main">
                   <div className="info-grid-3">
@@ -191,7 +191,7 @@ const AdminWorkMonitoring = () => {
                         </div>
                       ))}
                       {(!selectedWork.photoUrls || selectedWork.photoUrls.length === 0) && (
-                        <p className="no-data-msg">No initial photos available</p>
+                        <p className="no-data-msg">{t('no_initial_photos')}</p>
                       )}
                     </div>
                   </div>
