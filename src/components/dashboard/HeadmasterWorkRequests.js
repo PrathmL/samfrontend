@@ -66,6 +66,7 @@ const HeadmasterWorkRequests = () => {
     data.append('priority', formData.priority);
     data.append('schoolId', user.schoolId);
     data.append('createdById', user.id);
+    data.append('expectedTimeline', formData.expectedTimeline);
     
     photos.forEach(photo => {
       data.append('photos', photo);

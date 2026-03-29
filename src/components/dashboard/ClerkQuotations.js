@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { 
   FileText, Search, X, CheckCircle2, 
-  ChevronRight, IndianRupee, Clock, Plus, Trash2
+  ChevronRight, IndianRupee, Clock, Plus, Trash2, Calendar
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useTranslation } from 'react-i18next';
@@ -161,10 +161,14 @@ const ClerkQuotations = () => {
               <span className="req-id">#{req.id}</span>
               <span className={`priority-badge ${req.priority?.toLowerCase()}`}>{req.priority}</span>
             </div>
+            <div className="req-type-badge">{req.type} / {req.category}</div>
             <h3>{req.title}</h3>
             <p className="req-desc">{req.description?.substring(0, 120)}...</p>
             <div className="req-meta">
               <div className="meta-item"><Clock size={14} /> {new Date(req.createdAt).toLocaleDateString()}</div>
+              {req.expectedTimeline && (
+                <div className="meta-item timeline"><Calendar size={14} /> {req.expectedTimeline}</div>
+              )}
             </div>
             <button className="prepare-btn" onClick={() => handlePrepareQuote(req)}>
               {t('btn_prepare_quote')} <ChevronRight size={16} />
