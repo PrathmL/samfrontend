@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { 
   FileText, Search, X, CheckCircle2, 
-  ChevronRight, IndianRupee, Clock, Plus, Trash2, Calendar, Tag, Eye, History, ClipboardList, AlertCircle, XCircle
+  ChevronRight, IndianRupee, Clock, Plus, Trash2, Calendar, Tag, Eye, History, ClipboardList, AlertCircle, XCircle, MapPin
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useTranslation } from 'react-i18next';
