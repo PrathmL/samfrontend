@@ -296,6 +296,24 @@ const ClerkQuotations = () => {
                     <label>{t('label_for')}:</label>
                     <h4>{selectedRequest?.title}</h4>
                     <p>{selectedRequest?.description}</p>
+                    
+                    {/* Added Photo Gallery for Clerk */}
+                    <div className="request-photos-section">
+                      <h5>{t('Initial Photos')}</h5>
+                      <div className="photo-grid-clerk">
+                        {selectedRequest?.photoUrls?.map((photo, i) => (
+                          <div key={i} className="photo-item-clerk">
+                            <img src={`http://localhost:8080${photo.url}`} alt="Request" />
+                            {photo.latitude && photo.longitude && (
+                              <div className="geotag-overlay">
+                                <MapPin size={12} />
+                                <span>{photo.latitude.toFixed(4)}, {photo.longitude.toFixed(4)}</span>
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
                   </div>
                   <div className="summary-side">
                     <div className="summary-item">
@@ -526,6 +544,15 @@ const ClerkQuotations = () => {
         .summary-main label { font-size: 0.75rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; }
         .summary-main h4 { margin: 0.25rem 0 0.5rem 0; color: #1e293b; font-size: 1.2rem; }
         .summary-main p { margin: 0; font-size: 0.95rem; color: #64748b; line-height: 1.5; }
+        
+        /* Photo Gallery for Clerk */
+        .request-photos-section { margin-top: 1.5rem; }
+        .request-photos-section h5 { margin: 0 0 0.75rem 0; font-size: 0.8rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; }
+        .photo-grid-clerk { display: flex; gap: 0.75rem; overflow-x: auto; padding-bottom: 0.5rem; }
+        .photo-item-clerk { flex: 0 0 120px; height: 90px; border-radius: 0.5rem; overflow: hidden; border: 1px solid #e2e8f0; position: relative; }
+        .photo-item-clerk img { width: 100%; height: 100%; object-fit: cover; }
+        .geotag-overlay { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.6); color: white; padding: 0.15rem 0.35rem; font-size: 0.55rem; display: flex; align-items: center; gap: 0.2rem; }
+
         .summary-side { display: flex; flex-direction: column; gap: 0.75rem; min-width: 200px; padding-left: 2rem; border-left: 1px solid #e2e8f0; }
         .summary-item { display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; font-weight: 600; color: #475569; }
         .summary-item svg { color: #0ea5e9; }

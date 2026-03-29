@@ -189,9 +189,15 @@ const SachivWorkMonitoring = () => {
                   <div className="section-box">
                     <h4>Initial Work Request Photos</h4>
                     <div className="photo-gallery-horizontal">
-                      {selectedWork.photoUrls?.map((url, i) => (
+                      {selectedWork.photoUrls?.map((photo, i) => (
                         <div key={i} className="gallery-photo-item">
-                          <img src={`http://localhost:8080${url}`} alt="Site" />
+                          <img src={`http://localhost:8080${photo.url}`} alt="Site" />
+                          {(photo.latitude && photo.longitude) && (
+                            <div className="photo-geotag">
+                              <MapPin size={10} />
+                              <span>{photo.latitude.toFixed(4)}, {photo.longitude.toFixed(4)}</span>
+                            </div>
+                          )}
                         </div>
                       ))}
                       {(!selectedWork.photoUrls || selectedWork.photoUrls.length === 0) && (
@@ -212,8 +218,22 @@ const SachivWorkMonitoring = () => {
                           </div>
                           <p className="update-remarks">{update.remarks}</p>
                           <div className="update-photos-grid">
-                            {update.photoUrls?.map((purl, pi) => (
-                              <img key={pi} src={`http://localhost:8080${purl}`} alt="Progress" />
+                            {update.photoUrls?.map((photo, pi) => (
+                              <div key={pi} className="progress-photo-wrapper">
+                                <img src={`http://localhost:8080${photo.url}`} alt="Progress" />
+                                {(photo.latitude && photo.longitude) && (
+                                  <div className="photo-geotag">
+                                    <MapPin size={10} />
+                                    <span>{photo.latitude.toFixed(4)}, {photo.longitude.toFixed(4)}</span>
+                                  </div>
+                                )}
+                                {photo.geoLocation && !photo.latitude && (
+                                  <div className="photo-geotag">
+                                    <MapPin size={10} />
+                                    <span>{photo.geoLocation}</span>
+                                  </div>
+                                )}
+                              </div>
                             ))}
                           </div>
                         </div>
@@ -320,6 +340,11 @@ const SachivWorkMonitoring = () => {
         .photo-gallery-horizontal { display: flex; gap: 1rem; overflow-x: auto; padding-bottom: 1rem; }
         .gallery-photo-item { flex: 0 0 200px; height: 140px; border-radius: 0.75rem; overflow: hidden; border: 1px solid #e2e8f0; }
         .gallery-photo-item img { width: 100%; height: 100%; object-fit: cover; }
+        
+        .gallery-photo-item { position: relative; }
+        .photo-geotag { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.6); color: white; padding: 0.2rem 0.5rem; font-size: 0.65rem; display: flex; align-items: center; gap: 0.25rem; }
+        .progress-photo-wrapper { position: relative; border-radius: 0.5rem; overflow: hidden; height: 100px; }
+        .progress-photo-wrapper img { width: 100%; height: 100%; object-fit: cover; }
 
         .updates-timeline { display: flex; flex-direction: column; gap: 1.5rem; }
         .update-item-card { border-left: 3px solid #0ea5e9; padding-left: 1.5rem; position: relative; }
