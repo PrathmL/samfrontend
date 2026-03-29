@@ -220,11 +220,28 @@ const HeadmasterActiveWorks = () => {
     setItemUsage({});
   };
 
+  const handleMarkComplete = async (workId) => {
+    if (!window.confirm("Are you sure this work is 100% complete and ready for Sachiv verification?")) return;
+    
+    setLoading(true);
+    try {
+      await axios.post(`http://localhost:8080/api/works/${workId}/mark-complete`, {});
+      setSuccess('Work submitted for final verification!');
+      fetchWorks();
+      setTimeout(() => setSuccess(''), 3000);
+    } catch (err) {
+      setError(err.response?.data?.error || 'Failed to mark work as complete.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const getStatusColor = (status) => {
     switch (status) {
       case 'ACTIVE': return '#0ea5e9';
       case 'IN_PROGRESS': return '#3b82f6';
       case 'ON_HOLD': return '#f59e0b';
+      case 'PENDING_CLOSURE': return '#6366f1';
       case 'COMPLETED': return '#10b981';
       default: return '#64748b';
     }
@@ -274,9 +291,15 @@ const HeadmasterActiveWorks = () => {
                 </div>
 
                 <div className="work-actions-row">
-                  <button className="update-btn" onClick={() => handleUpdateClick(work)}>
-                    <RefreshCw size={16} /> {t('btn_update_progress')}
-                  </button>
+                  {work.progressPercentage === 100 && work.status !== 'PENDING_CLOSURE' && work.status !== 'COMPLETED' ? (
+                    <button className="complete-btn" onClick={() => handleMarkComplete(work.id)}>
+                      <CheckCircle2 size={16} /> Mark as Complete
+                    </button>
+                  ) : (
+                    <button className="update-btn" onClick={() => handleUpdateClick(work)} disabled={work.status === 'PENDING_CLOSURE' || work.status === 'COMPLETED'}>
+                      <RefreshCw size={16} /> {t('btn_update_progress')}
+                    </button>
+                  )}
                   <button className="view-btn-sm" onClick={() => handleViewDetails(work)}>
                     {t('btn_view')}
                   </button>
@@ -465,6 +488,8 @@ const HeadmasterActiveWorks = () => {
         .progress-bar-fill { height: 100%; background: #0ea5e9; }
         .work-actions-row { display: flex; gap: 0.75rem; margin-top: 1.5rem; }
         .update-btn { flex: 1; padding: 0.6rem; background: #1e293b; color: white; border: none; border-radius: 0.5rem; cursor: pointer; }
+        .complete-btn { flex: 1; padding: 0.6rem; background: #10b981; color: white; border: none; border-radius: 0.5rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.5rem; font-weight: 600; }
+        .complete-btn:hover { background: #059669; }
         .view-btn-sm { padding: 0.6rem 1rem; border: 1px solid #d1d5db; border-radius: 0.5rem; cursor: pointer; }
 
         .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 2000; padding: 2rem; }

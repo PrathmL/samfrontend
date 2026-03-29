@@ -28,6 +28,7 @@ import ClerkLowStockAlerts from './components/dashboard/ClerkLowStockAlerts';
 import AdminFundRequests from './components/dashboard/AdminFundRequests';
 import SachivDashboard from './components/dashboard/SachivDashboard';
 import SachivWorkMonitoring from './components/dashboard/SachivWorkMonitoring';
+import SachivWorkVerification from './components/dashboard/SachivWorkVerification';
 import ProfileEdit from './components/profile/ProfileEdit';
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
@@ -94,7 +95,7 @@ function App() {
                     <Route path="blockers" element={<BlockerManagement />} />
                     <Route path="analytics" element={<BlockerAnalytics />} />
                     <Route path="alerts" element={<Alerts />} />
-                    <Route path="verification" element={<div>Work Verification</div>} />
+                    <Route path="verification" element={<SachivWorkVerification />} />
                     <Route path="reports" element={<Reports />} />
                     <Route path="communication" element={<Communication />} />
                     <Route path="profile" element={<ProfileEdit />} />

@@ -110,7 +110,11 @@ const HomePage = () => {
           </div>
           <div className="hero-illustration">
             <div className="illustration-bg"></div>
-            <img src="https://img.freepik.com/free-vector/school-building-concept-illustration_114360-8433.jpg" alt="School Illustration" />
+            <img 
+              src="https://images.pexels.com/photos/35254692/pexels-photo-35254692.jpeg" 
+              alt="School Building" 
+              style={{ borderRadius: '1.5rem', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.2)' }}
+            />
           </div>
         </div>
         <div className="hero-waves">
