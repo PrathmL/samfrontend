@@ -297,7 +297,7 @@ const SachivWorkVerification = () => {
         .empty-icon { width: 80px; height: 80px; background: #f1f5f9; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; color: #cbd5e1; }
         .empty-verification h3 { color: #475569; margin-bottom: 0.5rem; }
 
-        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 2000; padding: 2rem; }
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 2rem; }
         .modal { background: white; border-radius: 1.5rem; overflow: hidden; display: flex; flex-direction: column; width: 100%; max-width: 800px; max-height: 90vh; }
         .modal-header { padding: 1.5rem 2rem; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; background: #f8fafc; }
         .modal-content { padding: 2rem; overflow-y: auto; flex-grow: 1; }

@@ -103,18 +103,25 @@ const SchoolManagement = () => {
     e.preventDefault();
     if (isViewMode) return;
     try {
+      const payload = {
+        ...formData,
+        talukaId: formData.talukaId === '' ? null : Number(formData.talukaId)
+      };
+
       if (isEditMode) {
-        await axios.put(`http://localhost:8080/api/schools/${selectedSchool.id}`, formData);
+        await axios.put(`http://localhost:8080/api/schools/${selectedSchool.id}`, payload);
         showToast('School updated successfully', 'success');
       } else {
-        await axios.post('http://localhost:8080/api/schools', formData);
+        await axios.post('http://localhost:8080/api/schools', payload);
         showToast('School created successfully', 'success');
       }
       setIsModalOpen(false);
       fetchSchools();
       resetForm();
     } catch (err) {
-      showErrorAlert('Error', `Failed to ${isEditMode ? 'update' : 'create'} school`);
+      console.error('Submit error:', err);
+      const errorMessage = err.response?.data?.error || `Failed to ${isEditMode ? 'update' : 'create'} school`;
+      showErrorAlert('Error', errorMessage);
     }
   };
 

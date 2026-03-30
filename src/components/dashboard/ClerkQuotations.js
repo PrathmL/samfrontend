@@ -530,7 +530,7 @@ const ClerkQuotations = () => {
         .view-btn-small:hover { background: #e2e8f0; color: #1e293b; }
 
         /* Modal Styles */
-        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(4px); display: flex; justify-content: center; align-items: center; z-index: 2000; }
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(4px); display: flex; justify-content: center; align-items: center; z-index: 1000; }
         .modal { background: white; border-radius: 1.25rem; width: 100%; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
         .modal-lg { max-width: 950px; }
         .modal-header { padding: 1.5rem 2rem; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; }

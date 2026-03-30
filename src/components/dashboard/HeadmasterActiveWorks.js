@@ -502,7 +502,7 @@ const HeadmasterActiveWorks = () => {
         .complete-btn:hover { background: #059669; }
         .view-btn-sm { padding: 0.6rem 1rem; border: 1px solid #d1d5db; border-radius: 0.5rem; cursor: pointer; }
 
-        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 2000; padding: 2rem; }
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 2rem; }
         .modal { background: white; border-radius: 1.5rem; overflow: hidden; display: flex; flex-direction: column; width: 100%; }
         .modal-lg { max-width: 800px; width: 90%; max-height: 90vh; }
         .modal-xl { max-width: 1200px; width: 95%; max-height: 95vh; }

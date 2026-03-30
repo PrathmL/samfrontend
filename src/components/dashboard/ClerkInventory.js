@@ -75,18 +75,25 @@ const ClerkInventory = () => {
 
     setLoading(true);
     try {
+      const payload = {
+        ...formData,
+        categoryId: formData.categoryId === '' ? null : Number(formData.categoryId)
+      };
+
       if (editingMaterial) {
-        await axios.put(`http://localhost:8080/api/inventory/materials/${editingMaterial.id}`, formData);
+        await axios.put(`http://localhost:8080/api/inventory/materials/${editingMaterial.id}`, payload);
         showToast('Material updated successfully', 'success');
       } else {
-        await axios.post('http://localhost:8080/api/inventory/materials', formData);
+        await axios.post('http://localhost:8080/api/inventory/materials', payload);
         showToast('Material created successfully', 'success');
       }
       setIsModalOpen(false);
       resetForm();
       fetchMaterials();
     } catch (err) {
-      showErrorAlert('Error', 'Failed to save material');
+      console.error('Submit error:', err);
+      const errorMessage = err.response?.data?.error || 'Failed to save material';
+      showErrorAlert('Error', errorMessage);
     } finally {
       setLoading(false);
     }

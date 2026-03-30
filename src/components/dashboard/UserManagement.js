@@ -28,7 +28,7 @@ const UserManagement = () => {
     role: 'CLERK',
     schoolId: '',
     talukaId: '',
-    active: true
+    status: 'Active'
   });
 
   useEffect(() => {
@@ -78,7 +78,7 @@ const UserManagement = () => {
       role: user.role || 'CLERK',
       schoolId: user.schoolId || '',
       talukaId: user.talukaId || '',
-      active: user.active ?? true
+      status: user.status || 'Active'
     });
     setIsModalOpen(true);
   };
@@ -99,18 +99,26 @@ const UserManagement = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      const payload = {
+        ...formData,
+        schoolId: formData.schoolId === '' ? null : Number(formData.schoolId),
+        talukaId: formData.talukaId === '' ? null : Number(formData.talukaId)
+      };
+
       if (isEditMode) {
-        await axios.put(`http://localhost:8080/api/admin/users/${selectedUser.id}`, formData);
+        await axios.put(`http://localhost:8080/api/admin/users/${selectedUser.id}`, payload);
         showToast('User updated successfully', 'success');
       } else {
-        await axios.post('http://localhost:8080/api/admin/users', formData);
+        await axios.post('http://localhost:8080/api/admin/users', payload);
         showToast('User created successfully', 'success');
       }
       setIsModalOpen(false);
       fetchUsers();
       resetForm();
     } catch (err) {
-      showErrorAlert('Error', `Failed to ${isEditMode ? 'update' : 'create'} user`);
+      console.error('Submit error:', err);
+      const errorMessage = err.response?.data?.error || `Failed to ${isEditMode ? 'update' : 'create'} user`;
+      showErrorAlert('Error', errorMessage);
     }
   };
 
@@ -118,7 +126,7 @@ const UserManagement = () => {
     setFormData({
       name: '', email: '', mobileNumber: '',
       password: '', role: 'CLERK', schoolId: '',
-      talukaId: '', active: true
+      talukaId: '', status: 'Active'
     });
     setIsEditMode(false);
     setSelectedUser(null);
@@ -195,8 +203,8 @@ const UserManagement = () => {
                 </td>
                 <td>{user.mobileNumber}</td>
                 <td>
-                  <span className={`status-badge ${user.active ? 'active' : 'inactive'}`}>
-                    {user.active ? t('status_active') : t('status_inactive')}
+                  <span className={`status-badge ${user.status?.toLowerCase() === 'active' ? 'active' : 'inactive'}`}>
+                    {user.status === 'Active' ? t('status_active') : t('status_inactive')}
                   </span>
                 </td>
                 <td>
@@ -285,9 +293,9 @@ const UserManagement = () => {
                   {isEditMode && (
                     <div className="form-group">
                       <label>{t('field_status')}</label>
-                      <select value={formData.active} onChange={e => setFormData({...formData, active: e.target.value === 'true'})}>
-                        <option value="true">Active</option>
-                        <option value="false">Inactive</option>
+                      <select value={formData.status} onChange={e => setFormData({...formData, status: e.target.value})}>
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
                       </select>
                     </div>
                   )}
