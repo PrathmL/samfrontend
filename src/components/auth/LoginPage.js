@@ -3,17 +3,17 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { 
   School, Lock, Phone, Eye, EyeOff, 
-  AlertCircle, ArrowRight 
+  ArrowRight 
 } from 'lucide-react';
 import MainLayout from '../common/MainLayout';
 import { useTranslation } from 'react-i18next';
+import { showErrorAlert } from '../../utils/sweetAlertUtils';
 
 const LoginPage = () => {
   const { t } = useTranslation();
   const [mobileNumber, setMobileNumber] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   
   const { login } = useAuth();
@@ -21,7 +21,6 @@ const LoginPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
     setLoading(true);
 
     try {
@@ -30,7 +29,7 @@ const LoginPage = () => {
       const rolePath = user.role.toLowerCase();
       navigate(`/${rolePath}/dashboard`);
     } catch (err) {
-      setError(err.response?.data?.error || 'Invalid credentials');
+      showErrorAlert('Login Failed', err.response?.data?.error || 'Invalid credentials');
     } finally {
       setLoading(false);
     }
@@ -47,13 +46,6 @@ const LoginPage = () => {
             <h1>{t('welcome_back')}</h1>
             <p>Enter your credentials to access the management portal</p>
           </div>
-
-          {error && (
-            <div className="error-alert">
-              <AlertCircle size={18} />
-              <span>{error}</span>
-            </div>
-          )}
 
           <form onSubmit={handleSubmit} className="login-form">
             <div className="form-group">

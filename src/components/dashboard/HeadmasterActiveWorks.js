@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useTranslation } from 'react-i18next';
+import { showErrorAlert, showWarningAlert, showConfirmAlert, showToast } from '../../utils/sweetAlertUtils';
 
 const HeadmasterActiveWorks = () => {
   const { user } = useAuth();
@@ -17,8 +18,6 @@ const HeadmasterActiveWorks = () => {
   const [selectedWork, setSelectedWork] = useState(null);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
-  const [success, setSuccess] = useState('');
-  const [error, setError] = useState('');
 
   // Camera State
   const [isCameraOpen, setIsCameraOpen] = useState(false);
@@ -151,7 +150,7 @@ const HeadmasterActiveWorks = () => {
           stopCamera();
         }, 'image/jpeg', 0.85);
       }, (err) => {
-        alert("Location is required for geotagged photos.");
+        showWarningAlert('Location Required', 'Location is required for geotagged photos. Please enable GPS.');
       });
     }
   };
@@ -164,9 +163,18 @@ const HeadmasterActiveWorks = () => {
   const handleProgressSubmit = async (e) => {
     e.preventDefault();
     if (updatePhotos.length === 0) {
-      setError('At least one geotagged photo is required.');
+      showErrorAlert('Error', 'At least one geotagged photo is required.');
       return;
     }
+
+    const isConfirmed = await showConfirmAlert(
+      'Confirm Progress Update',
+      'Are you sure you want to submit this progress update?',
+      'Yes, Submit',
+      'Cancel'
+    );
+
+    if (!isConfirmed) return;
 
     setLoading(true);
     const data = new FormData();
@@ -201,13 +209,12 @@ const HeadmasterActiveWorks = () => {
       await axios.post('http://localhost:8080/api/works/progress', data, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
-      setSuccess('Progress updated successfully!');
+      showToast('Progress updated successfully!', 'success');
       setIsUpdateModalOpen(false);
       resetUpdateForm();
       fetchWorks();
-      setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
-      setError('Failed to update progress.');
+      showErrorAlert('Error', 'Failed to update progress.');
     } finally {
       setLoading(false);
     }
@@ -221,18 +228,24 @@ const HeadmasterActiveWorks = () => {
   };
 
   const handleMarkComplete = async (workId) => {
-    if (!window.confirm("Are you sure this work is 100% complete and ready for Sachiv verification?")) return;
+    const isConfirmed = await showConfirmAlert(
+      'Mark Work Complete',
+      'Are you sure this work is 100% complete and ready for Sachiv verification?',
+      'Yes, Complete',
+      'Cancel'
+    );
     
-    setLoading(true);
-    try {
-      await axios.post(`http://localhost:8080/api/works/${workId}/mark-complete`, {});
-      setSuccess('Work submitted for final verification!');
-      fetchWorks();
-      setTimeout(() => setSuccess(''), 3000);
-    } catch (err) {
-      setError(err.response?.data?.error || 'Failed to mark work as complete.');
-    } finally {
-      setLoading(false);
+    if (isConfirmed) {
+      setLoading(true);
+      try {
+        await axios.post(`http://localhost:8080/api/works/${workId}/mark-complete`, {});
+        showToast('Work submitted for final verification!', 'success');
+        fetchWorks();
+      } catch (err) {
+        showErrorAlert('Error', err.response?.data?.error || 'Failed to mark work as complete.');
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -255,9 +268,6 @@ const HeadmasterActiveWorks = () => {
           <p>Monitor and update ongoing school projects</p>
         </div>
       </div>
-
-      {success && <div className="alert success">{success}</div>}
-      {error && <div className="alert error">{error}</div>}
 
       <div className="works-list">
         {loading && works.length === 0 ? (

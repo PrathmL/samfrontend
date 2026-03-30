@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useTranslation } from 'react-i18next';
+import { showWarningAlert, showErrorAlert, showToast, showConfirmAlert } from '../../utils/sweetAlertUtils';
 
 const HeadmasterWorkRequests = () => {
   const { user } = useAuth();
@@ -15,8 +16,6 @@ const HeadmasterWorkRequests = () => {
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState(null);
-  const [success, setSuccess] = useState('');
-  const [error, setError] = useState('');
 
   // Camera State
   const [isCameraOpen, setIsCameraOpen] = useState(false);
@@ -103,11 +102,11 @@ const HeadmasterWorkRequests = () => {
           stopCamera();
         }, 'image/jpeg', 0.85);
       }, (err) => {
-        alert("Location is required for geotagged photos. Please enable GPS.");
+        showWarningAlert('Location Required', 'Location is required for geotagged photos. Please enable GPS.');
         console.error(err);
       });
     } else {
-      alert("Geolocation is not supported by your browser.");
+      showErrorAlert('Geolocation Not Supported', 'Geolocation is not supported by your browser.');
     }
   };
 
@@ -119,12 +118,20 @@ const HeadmasterWorkRequests = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (photos.length === 0) {
-      setError('At least one geotagged photo is required.');
+      showErrorAlert('Photos Required', 'At least one geotagged photo is required.');
       return;
     }
 
+    const isConfirmed = await showConfirmAlert(
+      'Confirm Work Request',
+      'Are you sure you want to submit this work request?',
+      'Yes, Submit',
+      'Cancel'
+    );
+
+    if (!isConfirmed) return;
+
     setLoading(true);
-    setError('');
 
     const data = new FormData();
     data.append('title', formData.title);
@@ -148,13 +155,12 @@ const HeadmasterWorkRequests = () => {
       await axios.post('http://localhost:8080/api/work-requests', data, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
-      setSuccess('Work request submitted successfully!');
+      showToast('Work request submitted successfully!', 'success');
       setIsModalOpen(false);
       resetForm();
       fetchRequests();
-      setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
-      setError('Failed to submit work request. Please try again.');
+      showErrorAlert('Error', 'Failed to submit work request. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -216,9 +222,6 @@ const HeadmasterWorkRequests = () => {
           <Plus size={20} /> {t('btn_create_request')}
         </button>
       </div>
-
-      {success && <div className="alert success">{success}</div>}
-      {error && <div className="alert error">{error}</div>}
 
       <div className="requests-list">
         {loading ? (

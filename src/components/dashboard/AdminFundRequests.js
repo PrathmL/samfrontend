@@ -5,6 +5,7 @@ import {
   Check, X, Eye, Clock, AlertTriangle, 
   Search, IndianRupee, Building2, Calendar, FileText
 } from 'lucide-react';
+import { showApprovalAlert, showInputAlert, showToast, showErrorAlert } from '../../utils/sweetAlertUtils';
 
 const AdminFundRequests = () => {
   const { t } = useTranslation();
@@ -12,8 +13,6 @@ const AdminFundRequests = () => {
   const [selectedQuotation, setSelectedQuotation] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
@@ -29,23 +28,23 @@ const AdminFundRequests = () => {
       setQuotations(fundReqs);
     } catch (err) {
       console.error('Error fetching fund requests:', err);
-      setError('Failed to fetch fund requests');
+      showErrorAlert('Error', 'Failed to fetch fund requests');
     } finally {
       setLoading(false);
     }
   };
 
   const handleApprove = async (id) => {
-    if (window.confirm('Are you sure you want to approve this fund request?')) {
+    const isConfirmed = await showApprovalAlert('fund request');
+    if (isConfirmed) {
       setLoading(true);
       try {
         await axios.put(`http://localhost:8080/api/quotations/${id}/approve`, { remarks: 'Approved by Admin' });
-        setSuccess('Fund request approved successfully');
+        showToast('Fund request approved successfully', 'success');
         setIsModalOpen(false);
         fetchFundRequests();
-        setTimeout(() => setSuccess(''), 3000);
       } catch (err) {
-        setError('Failed to approve request');
+        showErrorAlert('Error', 'Failed to approve request');
       } finally {
         setLoading(false);
       }
@@ -53,20 +52,19 @@ const AdminFundRequests = () => {
   };
 
   const handleReject = async (id) => {
-    const reason = window.prompt('Enter rejection reason:');
-    if (reason === null) return;
-
-    setLoading(true);
-    try {
-      await axios.put(`http://localhost:8080/api/quotations/${id}/reject`, { remarks: reason });
-      setSuccess('Fund request rejected');
-      setIsModalOpen(false);
-      fetchFundRequests();
-      setTimeout(() => setSuccess(''), 3000);
-    } catch (err) {
-      setError('Failed to reject request');
-    } finally {
-      setLoading(false);
+    const result = await showInputAlert('Reject Fund Request', 'Rejection Reason', 'Enter your reason for rejection...', true);
+    if (result.isConfirmed && result.value) {
+      setLoading(true);
+      try {
+        await axios.put(`http://localhost:8080/api/quotations/${id}/reject`, { remarks: result.value });
+        showToast('Fund request rejected', 'success');
+        setIsModalOpen(false);
+        fetchFundRequests();
+      } catch (err) {
+        showErrorAlert('Error', 'Failed to reject request');
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -76,9 +74,6 @@ const AdminFundRequests = () => {
         <h1>{t('title_fund_requests')}</h1>
         <p>{t('msg_fund_requests_description')}</p>
       </div>
-
-      {success && <div className="alert success">{success}</div>}
-      {error && <div className="alert error">{error}</div>}
 
       <div className="table-container">
         <table className="requests-table">

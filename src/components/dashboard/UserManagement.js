@@ -6,6 +6,7 @@ import {
   CheckCircle, XCircle, Filter, X
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { showDeleteAlert, showErrorAlert, showToast } from '../../utils/sweetAlertUtils';
 
 const UserManagement = () => {
   const { t } = useTranslation();
@@ -83,12 +84,14 @@ const UserManagement = () => {
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm('Are you sure you want to delete this user?')) {
+    const isConfirmed = await showDeleteAlert('this user');
+    if (isConfirmed) {
       try {
         await axios.delete(`http://localhost:8080/api/admin/users/${id}`);
+        showToast('User deleted successfully', 'success');
         fetchUsers();
       } catch (err) {
-        alert('Failed to delete user');
+        showErrorAlert('Error', 'Failed to delete user');
       }
     }
   };
@@ -98,14 +101,16 @@ const UserManagement = () => {
     try {
       if (isEditMode) {
         await axios.put(`http://localhost:8080/api/admin/users/${selectedUser.id}`, formData);
+        showToast('User updated successfully', 'success');
       } else {
         await axios.post('http://localhost:8080/api/admin/users', formData);
+        showToast('User created successfully', 'success');
       }
       setIsModalOpen(false);
       fetchUsers();
       resetForm();
     } catch (err) {
-      alert(`Failed to ${isEditMode ? 'update' : 'create'} user`);
+      showErrorAlert('Error', `Failed to ${isEditMode ? 'update' : 'create'} user`);
     }
   };
 

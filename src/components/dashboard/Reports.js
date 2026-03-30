@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useTranslation } from 'react-i18next';
+import { showErrorAlert } from '../../utils/sweetAlertUtils';
 
 const Reports = () => {
   const { user } = useAuth();
@@ -78,7 +79,7 @@ const Reports = () => {
       window.open(url, '_blank');
     } catch (err) {
       console.error('Error downloading report:', err);
-      alert('Failed to generate report. Please try again.');
+      showErrorAlert('Error', 'Failed to generate report. Please try again.');
     }
   };
 

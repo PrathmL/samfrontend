@@ -10,13 +10,13 @@ import {
   IndianRupee, PieChart, Landmark
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { showToast, showErrorAlert, showSuccessAlert, showConfirmAlert } from '../../utils/sweetAlertUtils';
 
 const WorkVerification = ({ work, onComplete, onCancel }) => {
   const { user } = useAuth();
   const { t } = useTranslation();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
   
   // Step 1: Inspection
   const [inspection, setInspection] = useState({
@@ -70,6 +70,13 @@ const WorkVerification = ({ work, onComplete, onCancel }) => {
   };
 
   const handleSaveInspection = async () => {
+    const isConfirmed = await showConfirmAlert(
+      'Save Inspection?',
+      'Are you sure you want to save these inspection details and proceed?'
+    );
+    
+    if (!isConfirmed) return;
+
     try {
       setLoading(true);
       // Ensure date is in LocalDateTime format (ISO string or append time)
@@ -82,7 +89,7 @@ const WorkVerification = ({ work, onComplete, onCancel }) => {
       await axios.post(`http://localhost:8080/api/works/verification/${work.id}/inspection`, payload);
       setStep(2);
     } catch (err) {
-      setError('Failed to save inspection details.');
+      showErrorAlert('Error', 'Failed to save inspection details.');
     } finally {
       setLoading(false);
     }
@@ -94,8 +101,9 @@ const WorkVerification = ({ work, onComplete, onCancel }) => {
       const res = await axios.post(`http://localhost:8080/api/works/verification/${work.id}/punch-list`, newPunchItem);
       setPunchList([...punchList, res.data]);
       setNewPunchItem({ description: '', location: '', severity: 'Minor', dueDate: '' });
+      showToast('Punch item added', 'success');
     } catch (err) {
-      setError('Failed to add punch list item.');
+      showErrorAlert('Error', 'Failed to add punch list item.');
     }
   };
 
@@ -106,8 +114,9 @@ const WorkVerification = ({ work, onComplete, onCancel }) => {
         photoAfter: ''
       });
       setPunchList(punchList.map(item => item.id === id ? { ...item, status: 'Resolved' } : item));
+      showToast('Item resolved', 'success');
     } catch (err) {
-      setError('Failed to resolve item.');
+      showErrorAlert('Error', 'Failed to resolve item.');
     }
   };
 
@@ -118,7 +127,6 @@ const WorkVerification = ({ work, onComplete, onCancel }) => {
   const handleUploadPhotos = async () => {
     if (selectedFiles.length === 0) return;
     setUploadingPhotos(true);
-    setError('');
 
     const formData = new FormData();
     selectedFiles.forEach(file => formData.append('photos', file));
@@ -142,8 +150,9 @@ const WorkVerification = ({ work, onComplete, onCancel }) => {
       const res = await axios.post(`http://localhost:8080/api/works/verification/${work.id}/photos`, formData);
       setVerificationPhotos([...verificationPhotos, ...res.data]);
       setSelectedFiles([]);
+      showSuccessAlert('Success', 'Photos uploaded successfully');
     } catch (err) {
-      setError('Failed to upload photos.');
+      showErrorAlert('Error', 'Failed to upload photos.');
     } finally {
       setUploadingPhotos(false);
     }
@@ -152,21 +161,29 @@ const WorkVerification = ({ work, onComplete, onCancel }) => {
   const handleFinalize = async () => {
     const openItems = punchList.filter(i => i.status === 'Open');
     if (openItems.length > 0) {
-      setError(`Cannot finalize. ${openItems.length} punch list items are still open.`);
+      showErrorAlert('Cannot Finalize', `Cannot finalize. ${openItems.length} punch list items are still open.`);
       return;
     }
 
     if (verificationPhotos.length < 2) {
-      setError('At least 2 mandatory inspection photos are required.');
+      showErrorAlert('Photos Required', 'At least 2 mandatory inspection photos are required.');
       return;
     }
+
+    const isConfirmed = await showConfirmAlert(
+      'Finalize Work Closure?',
+      'Are you sure you want to finalize the work closure? This action is permanent.'
+    );
+
+    if (!isConfirmed) return;
 
     try {
       setLoading(true);
       await axios.post(`http://localhost:8080/api/works/verification/${work.id}/finalize`, certificate);
+      showSuccessAlert('Success', 'Work finalized and closed successfully');
       onComplete();
     } catch (err) {
-      setError(err.response?.data?.error || 'Failed to finalize work closure.');
+      showErrorAlert('Error', err.response?.data?.error || 'Failed to finalize work closure.');
     } finally {
       setLoading(false);
     }
@@ -203,8 +220,6 @@ const WorkVerification = ({ work, onComplete, onCancel }) => {
       {renderStepIndicator()}
 
       <div className="step-content">
-        {error && <div className="error-alert"><AlertTriangle size={18} /> {error}</div>}
-
         {step === 1 && (
           <div className="inspection-form animate-in">
             <h3>Step 1: Site Inspection</h3>

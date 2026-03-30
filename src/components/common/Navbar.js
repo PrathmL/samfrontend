@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { School, ChevronRight, LogOut, User, Globe, ChevronDown } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useTranslation } from 'react-i18next';
+import { showConfirmAlert } from '../../utils/sweetAlertUtils';
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -10,6 +11,19 @@ const Navbar = () => {
   const { user, logout } = useAuth();
   const { t, i18n } = useTranslation();
   const [langDropdownOpen, setLangDropdownOpen] = useState(false);
+
+  const handleLogout = async () => {
+    const isConfirmed = await showConfirmAlert(
+      'Logout',
+      'Are you sure you want to log out?',
+      'Yes, Logout',
+      'Cancel'
+    );
+    if (isConfirmed) {
+      logout();
+      navigate('/');
+    }
+  };
 
   const isDashboard = location.pathname.includes('/admin') || 
                       location.pathname.includes('/sachiv') || 
@@ -67,7 +81,7 @@ const Navbar = () => {
                   <span className="user-role-nav">{user.role}</span>
                 </div>
               </div>
-              <button className="logout-nav-btn" onClick={() => { logout(); navigate('/'); }}>
+              <button className="logout-nav-btn" onClick={handleLogout}>
                 <LogOut size={18} />
               </button>
             </div>

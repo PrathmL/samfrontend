@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Check, X, FileText, Eye, Briefcase, AlertTriangle, Search, Filter, Clock, CheckCircle, XCircle, ChevronRight, IndianRupee, MapPin, Tag, Calendar } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { showErrorAlert, showWarningAlert, showToast, showApprovalAlert, showConfirmAlert } from '../../utils/sweetAlertUtils';
 
 const AdminWorkRequests = () => {
   const { t } = useTranslation();
@@ -35,28 +36,30 @@ const AdminWorkRequests = () => {
   const handleApprove = async (id) => {
     try {
       await axios.post(`http://localhost:8080/api/work-requests/${id}/approve`, { remarks });
+      showToast('Work request approved successfully', 'success');
       setIsModalOpen(false);
       fetchRequests();
       // Redirect to create official work
       navigate(`/admin/create-work/${id}`);
     } catch (err) {
       console.error('Approval error:', err);
-      alert('Failed to approve request. Please check if the backend is running.');
+      showErrorAlert('Error', 'Failed to approve request. Please check if the backend is running.');
     }
   };
 
   const handleReject = async (id) => {
     if (!remarks) {
-      alert('Please provide a reason for rejection in the remarks field.');
+      showWarningAlert('Remarks Required', 'Please provide a reason for rejection in the remarks field.');
       return;
     }
     try {
       await axios.post(`http://localhost:8080/api/work-requests/${id}/reject`, { reason: remarks });
+      showToast('Work request rejected', 'success');
       setIsModalOpen(false);
       fetchRequests();
     } catch (err) {
       console.error('Rejection error:', err);
-      alert('Failed to reject request');
+      showErrorAlert('Error', 'Failed to reject request');
     }
   };
 

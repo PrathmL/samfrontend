@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Plus, Edit2, Trash2, X, Check } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { showDeleteAlert, showToast, showErrorAlert } from '../../utils/sweetAlertUtils';
 
 const TalukaManagement = () => {
   const { t } = useTranslation();
@@ -33,8 +34,10 @@ const TalukaManagement = () => {
     try {
       if (editingTaluka) {
         await axios.put(`http://localhost:8080/api/talukas/${editingTaluka.id}`, formData);
+        showToast('Taluka updated successfully', 'success');
       } else {
         await axios.post('http://localhost:8080/api/talukas', formData);
+        showToast('Taluka created successfully', 'success');
       }
       setIsModalOpen(false);
       setEditingTaluka(null);
@@ -42,6 +45,7 @@ const TalukaManagement = () => {
       fetchTalukas();
     } catch (error) {
       console.error('Error saving taluka:', error);
+      showErrorAlert('Error', 'Failed to save taluka');
     }
   };
 
@@ -57,12 +61,15 @@ const TalukaManagement = () => {
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm(t('confirm_delete_taluka'))) {
+    const isConfirmed = await showDeleteAlert('this taluka');
+    if (isConfirmed) {
       try {
         await axios.delete(`http://localhost:8080/api/talukas/${id}`);
+        showToast('Taluka deleted successfully', 'success');
         fetchTalukas();
       } catch (error) {
         console.error('Error deleting taluka:', error);
+        showErrorAlert('Error', 'Failed to delete taluka');
       }
     }
   };

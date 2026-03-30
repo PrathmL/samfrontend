@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Plus, Trash2, Check, ArrowRight, ArrowLeft, X, AlertTriangle } from 'lucide-react';
+import { showToast, showErrorAlert, showSuccessAlert, showConfirmAlert } from '../../utils/sweetAlertUtils';
 
 const WorkCreationForm = () => {
   const { requestId } = useParams();
@@ -10,8 +11,6 @@ const WorkCreationForm = () => {
   const [request, setRequest] = useState(null);
   const [quotation, setQuotation] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
 
   const [workData, setWorkData] = useState({
     workCode: '',
@@ -67,11 +66,11 @@ const WorkCreationForm = () => {
         setFundSources([{ sourceName: 'Government Grant', amount: quotationData.grandTotal }]);
       } catch (err) {
         console.error('No quotation found:', err);
-        setError('Quotation not found for this request');
+        showErrorAlert('Error', 'Quotation not found for this request');
       }
     } catch (err) {
       console.error('Error fetching request:', err);
-      setError('Failed to fetch work request details');
+      showErrorAlert('Error', 'Failed to fetch work request details');
     } finally {
       setLoading(false);
     }
@@ -81,16 +80,23 @@ const WorkCreationForm = () => {
     // Validate total weightage
     const totalWeight = stages.reduce((sum, s) => sum + Number(s.weightage), 0);
     if (totalWeight !== 100) {
-      setError(`Total stage weightage must be 100%. Current total: ${totalWeight}%`);
+      showErrorAlert('Validation Error', `Total stage weightage must be 100%. Current total: ${totalWeight}%`);
       return;
     }
     
     // Validate total fund allocation
     const totalAllocated = fundSources.reduce((sum, f) => sum + Number(f.amount), 0);
     if (Math.abs(totalAllocated - Number(workData.sanctionedAmount)) > 0.01) {
-      setError(`Total allocated funds (₹${totalAllocated}) must equal sanctioned amount (₹${workData.sanctionedAmount})`);
+      showErrorAlert('Validation Error', `Total allocated funds (₹${totalAllocated.toLocaleString()}) must equal sanctioned amount (₹${Number(workData.sanctionedAmount).toLocaleString()})`);
       return;
     }
+
+    const isConfirmed = await showConfirmAlert(
+      'Create Work?',
+      'Are you sure you want to create this work from the request?'
+    );
+
+    if (!isConfirmed) return;
     
     setLoading(true);
     try {
@@ -113,13 +119,13 @@ const WorkCreationForm = () => {
         }))
       };
       
-      const response = await axios.post('http://localhost:8080/api/works/create-from-request', payload);
-      setSuccess('Work created successfully!');
+      await axios.post('http://localhost:8080/api/works/create-from-request', payload);
+      showSuccessAlert('Success', 'Work created successfully!');
       setTimeout(() => {
         navigate('/admin/work-requests');
       }, 2000);
     } catch (err) {
-      setError(err.response?.data?.error || 'Failed to create work');
+      showErrorAlert('Error', err.response?.data?.error || 'Failed to create work');
     } finally {
       setLoading(false);
     }
@@ -166,14 +172,6 @@ const WorkCreationForm = () => {
         <h1>Create Work from Request</h1>
         <p>Request: {request?.title} | ID: #{requestId}</p>
       </div>
-
-      {error && (
-        <div className="error-message">
-          <AlertTriangle size={18} />
-          <span>{error}</span>
-          <button onClick={() => setError('')}><X size={16} /></button>
-        </div>
-      )}
 
       <div className="form-card">
         {/* Basic Details Section */}

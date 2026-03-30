@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useTranslation } from 'react-i18next';
+import { showErrorAlert } from '../../utils/sweetAlertUtils';
 import WorkVerification from './WorkVerification';
 
 const SachivWorkVerification = () => {
@@ -61,7 +62,7 @@ const SachivWorkVerification = () => {
       setSelectedWork(work);
       setShowCertModal(true);
     } catch (err) {
-      alert('Certificate not found or failed to load.');
+      showErrorAlert('Error', 'Certificate not found or failed to load.');
     } finally {
       setLoading(false);
     }

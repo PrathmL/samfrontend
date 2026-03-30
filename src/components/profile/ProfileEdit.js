@@ -3,6 +3,7 @@ import axios from 'axios';
 import { User, Mail, Phone, Lock, Save, AlertCircle, CheckCircle } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useTranslation } from 'react-i18next';
+import { showErrorAlert, showWarningAlert, showToast } from '../../utils/sweetAlertUtils';
 
 const ProfileEdit = () => {
   const { user, login } = useAuth();
@@ -15,8 +16,6 @@ const ProfileEdit = () => {
     confirmPassword: ''
   });
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState('');
-  const [error, setError] = useState('');
 
   useEffect(() => {
     if (user) {
@@ -32,20 +31,17 @@ const ProfileEdit = () => {
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-    setError('');
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (formData.password && formData.password !== formData.confirmPassword) {
-      setError(t('Passwords do not match'));
+      showWarningAlert('Password Mismatch', 'Passwords do not match');
       return;
     }
 
     setLoading(true);
-    setSuccess('');
-    setError('');
 
     try {
       const payload = {
@@ -63,15 +59,11 @@ const ProfileEdit = () => {
       // Update the user context with the new data
       const updatedUser = { ...user, ...res.data };
       localStorage.setItem('user', JSON.stringify(updatedUser));
-      // Trigger context update (assuming login function can handle this or we might need a separate updateUser function)
-      // Since our AuthContext uses localStorage in a useEffect, a simple reload or a custom update function is needed.
-      // Let's assume login(updatedUser) works if it just sets the state.
-      // Based on previous grep, login sets the state and localStorage.
       
-      setSuccess(t('Profile updated successfully'));
+      showToast('Profile updated successfully', 'success');
       setFormData(prev => ({ ...prev, password: '', confirmPassword: '' }));
     } catch (err) {
-      setError(err.response?.data?.error || t('Failed to update profile'));
+      showErrorAlert('Error', err.response?.data?.error || 'Failed to update profile');
     } finally {
       setLoading(false);
     }
@@ -94,9 +86,6 @@ const ProfileEdit = () => {
             <span className="profile-role-badge">{user?.role}</span>
           </div>
         </div>
-
-        {success && <div className="alert success"><CheckCircle size={18} /> {success}</div>}
-        {error && <div className="alert error"><AlertCircle size={18} /> {error}</div>}
 
         <form onSubmit={handleSubmit} className="profile-form">
           <div className="form-section">

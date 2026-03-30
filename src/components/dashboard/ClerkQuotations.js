@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useTranslation } from 'react-i18next';
+import { showToast, showErrorAlert, showSuccessAlert, showConfirmAlert } from '../../utils/sweetAlertUtils';
 
 const ClerkQuotations = () => {
   const { user } = useAuth();
@@ -17,8 +18,6 @@ const ClerkQuotations = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [viewMode, setViewMode] = useState(false); // false for prepare, true for view
   const [activeTab, setActiveTab] = useState('pending'); // 'pending' or 'history'
-  const [success, setSuccess] = useState('');
-  const [error, setError] = useState('');
 
   const [formData, setFormData] = useState({
     materialCost: 0,
@@ -135,6 +134,14 @@ const ClerkQuotations = () => {
 
   const handleSubmitQuotation = async (e) => {
     e.preventDefault();
+    
+    const isConfirmed = await showConfirmAlert(
+      t('confirm_submit_quote_title') || 'Submit Quotation?',
+      t('confirm_submit_quote_text') || 'Are you sure you want to submit this quotation?'
+    );
+    
+    if (!isConfirmed) return;
+
     setLoading(true);
     try {
       const payload = {
@@ -150,13 +157,12 @@ const ClerkQuotations = () => {
 
       await axios.post('http://localhost:8080/api/quotations', payload);
       
-      setSuccess(t('msg_quote_success'));
+      showSuccessAlert(t('success_quote_title') || 'Success', t('msg_quote_success'));
       setIsModalOpen(false);
       resetForm();
       fetchWorkRequests();
-      setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
-      setError(t('msg_quote_fail'));
+      showErrorAlert('Error', t('msg_quote_fail'));
     } finally {
       setLoading(false);
     }
@@ -213,9 +219,6 @@ const ClerkQuotations = () => {
           <span>Quotation History</span>
         </button>
       </div>
-
-      {success && <div className="alert success">{success}</div>}
-      {error && <div className="alert error">{error}</div>}
 
       <div className="requests-grid">
         {requests.map(req => (

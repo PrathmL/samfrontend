@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useTranslation } from 'react-i18next';
+import { showDeleteAlert, showToast, showErrorAlert, showSuccessAlert, showConfirmAlert } from '../../utils/sweetAlertUtils';
 
 const Communication = () => {
   const { user } = useAuth();
@@ -24,8 +25,6 @@ const Communication = () => {
   const [history, setHistory] = useState([]); // Sent history
   const [receivedMessages, setReceivedMessages] = useState([]); // Inbox
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState('');
-  const [error, setError] = useState('');
 
   const [formData, setFormData] = useState({
     title: '',
@@ -131,8 +130,15 @@ const Communication = () => {
 
   const handleSend = async (e) => {
     e.preventDefault();
+    
+    const isConfirmed = await showConfirmAlert(
+      t('confirm_send_title') || 'Send Notification?',
+      t('confirm_send_text') || 'This will send the notification to the selected recipients.'
+    );
+    
+    if (!isConfirmed) return;
+
     setLoading(true);
-    setError('');
     
     try {
       const payload = {
@@ -147,7 +153,7 @@ const Communication = () => {
 
       await axios.post('http://localhost:8080/api/communications', payload);
       
-      setSuccess('Notification sent successfully!');
+      showSuccessAlert(t('success_send_title') || 'Success', t('success_send_text') || 'Notification sent successfully!');
       setFormData({
         ...formData,
         title: '',
@@ -155,21 +161,24 @@ const Communication = () => {
         schoolId: ''
       });
       fetchHistory();
-      setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
-      setError('Failed to send notification. Please try again.');
+      showErrorAlert(t('error_send_title') || 'Error', t('error_send_text') || 'Failed to send notification. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this message?')) return;
-    try {
-      await axios.delete(`http://localhost:8080/api/communications/${id}`);
-      fetchHistory();
-    } catch (err) {
-      console.error('Error deleting message:', err);
+    const isConfirmed = await showDeleteAlert('this message');
+    if (isConfirmed) {
+      try {
+        await axios.delete(`http://localhost:8080/api/communications/${id}`);
+        showToast('Message deleted successfully', 'success');
+        fetchHistory();
+      } catch (err) {
+        console.error('Error deleting message:', err);
+        showErrorAlert('Error', 'Failed to delete message');
+      }
     }
   };
 
@@ -252,9 +261,6 @@ const Communication = () => {
           <div className="send-layout">
             <div className="send-main">
               <form onSubmit={handleSend} className="comm-form">
-                {success && <div className="comm-alert success">{success}</div>}
-                {error && <div className="comm-alert error">{error}</div>}
-
                 <div className="form-group">
                   <label>Recipient Scope</label>
                   <div className="mode-toggle">

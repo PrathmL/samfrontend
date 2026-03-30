@@ -7,6 +7,7 @@ import {
   GraduationCap
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { showDeleteAlert, showErrorAlert, showToast } from '../../utils/sweetAlertUtils';
 
 const SchoolManagement = () => {
   const { t } = useTranslation();
@@ -86,12 +87,14 @@ const SchoolManagement = () => {
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm('Are you sure you want to delete this school?')) {
+    const isConfirmed = await showDeleteAlert('this school');
+    if (isConfirmed) {
       try {
         await axios.delete(`http://localhost:8080/api/schools/${id}`);
+        showToast('School deleted successfully', 'success');
         fetchSchools();
       } catch (err) {
-        alert('Failed to delete school');
+        showErrorAlert('Error', 'Failed to delete school');
       }
     }
   };
@@ -102,14 +105,16 @@ const SchoolManagement = () => {
     try {
       if (isEditMode) {
         await axios.put(`http://localhost:8080/api/schools/${selectedSchool.id}`, formData);
+        showToast('School updated successfully', 'success');
       } else {
         await axios.post('http://localhost:8080/api/schools', formData);
+        showToast('School created successfully', 'success');
       }
       setIsModalOpen(false);
       fetchSchools();
       resetForm();
     } catch (err) {
-      alert(`Failed to ${isEditMode ? 'update' : 'create'} school`);
+      showErrorAlert('Error', `Failed to ${isEditMode ? 'update' : 'create'} school`);
     }
   };
 

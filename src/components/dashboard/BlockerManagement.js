@@ -7,16 +7,16 @@ import {
   MessageSquare, ChevronRight, AlertCircle, Trash2, Link as LinkIcon, Briefcase
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { showToast, showErrorAlert, showConfirmAlert } from '../../utils/sweetAlertUtils';
 
 const BlockerManagement = () => {
   const { user } = useAuth();
   const { t } = useTranslation();
   const [blockers, setBlockers] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
   
   // Filters
+  // ... rest of state
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [priorityFilter, setPriorityFilter] = useState('ALL');
@@ -33,6 +33,7 @@ const BlockerManagement = () => {
   const [isRequestInfoModalOpen, setIsRequestInfoModalOpen] = useState(false);
 
   // Form States
+  // ... rest of forms
   const [reportFormData, setReportFormData] = useState({
     workId: '',
     title: '',
@@ -79,7 +80,7 @@ const BlockerManagement = () => {
       setBlockers(res.data || []);
     } catch (err) {
       console.error('Error fetching blockers:', err);
-      setError('Failed to fetch blockers');
+      showErrorAlert('Error', 'Failed to fetch blockers');
     } finally {
       setLoading(false);
     }
@@ -113,6 +114,9 @@ const BlockerManagement = () => {
 
   const handleReportBlocker = async (e) => {
     e.preventDefault();
+    const isConfirmed = await showConfirmAlert('Report Blocker', 'Are you sure you want to report this blocker?');
+    if (!isConfirmed) return;
+    
     setLoading(true);
     try {
       await axios.post('http://localhost:8080/api/blockers', {
@@ -121,13 +125,12 @@ const BlockerManagement = () => {
         reportedById: user.id,
         reportedByRole: user.role
       });
-      setSuccess('Blocker reported successfully');
+      showToast('Blocker reported successfully', 'success');
       setIsReportModalOpen(false);
       resetReportForm();
       fetchBlockers();
-      setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
-      setError('Failed to report blocker');
+      showErrorAlert('Error', 'Failed to report blocker');
     } finally {
       setLoading(false);
     }
@@ -135,6 +138,9 @@ const BlockerManagement = () => {
 
   const handleAssignBlocker = async (e) => {
     e.preventDefault();
+    const isConfirmed = await showConfirmAlert('Assign Blocker', 'Assign this blocker to the selected personnel?');
+    if (!isConfirmed) return;
+
     setLoading(true);
     try {
       await axios.put(`http://localhost:8080/api/blockers/${selectedBlocker.id}/assign`, {
@@ -145,12 +151,11 @@ const BlockerManagement = () => {
         assignedByRole: user.role,
         notes: assignFormData.notes
       });
-      setSuccess('Blocker assigned successfully');
+      showToast('Blocker assigned successfully', 'success');
       setIsAssignModalOpen(false);
       fetchBlockers();
-      setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
-      setError('Failed to assign blocker');
+      showErrorAlert('Error', 'Failed to assign blocker');
     } finally {
       setLoading(false);
     }
@@ -158,6 +163,9 @@ const BlockerManagement = () => {
 
   const handleResolveBlocker = async (e) => {
     e.preventDefault();
+    const isConfirmed = await showConfirmAlert('Resolve Blocker', 'Mark this blocker as resolved?');
+    if (!isConfirmed) return;
+
     setLoading(true);
     try {
       await axios.put(`http://localhost:8080/api/blockers/${selectedBlocker.id}/resolve`, {
@@ -165,12 +173,11 @@ const BlockerManagement = () => {
         resolvedById: user.id,
         resolvedByRole: user.role
       });
-      setSuccess('Blocker resolved successfully');
+      showToast('Blocker resolved successfully', 'success');
       setIsResolveModalOpen(false);
       fetchBlockers();
-      setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
-      setError('Failed to resolve blocker');
+      showErrorAlert('Error', 'Failed to resolve blocker');
     } finally {
       setLoading(false);
     }
@@ -178,6 +185,9 @@ const BlockerManagement = () => {
 
   const handleEscalateBlocker = async (e) => {
     e.preventDefault();
+    const isConfirmed = await showConfirmAlert('Escalate Blocker', 'Are you sure you want to escalate this blocker to Admin?');
+    if (!isConfirmed) return;
+
     setLoading(true);
     try {
       await axios.put(`http://localhost:8080/api/blockers/${selectedBlocker.id}/escalate`, {
@@ -187,12 +197,11 @@ const BlockerManagement = () => {
         escalatedById: user.id,
         escalatedByRole: user.role
       });
-      setSuccess('Blocker escalated to Admin');
+      showToast('Blocker escalated to Admin', 'success');
       setIsEscalateModalOpen(false);
       fetchBlockers();
-      setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
-      setError('Failed to escalate blocker');
+      showErrorAlert('Error', 'Failed to escalate blocker');
     } finally {
       setLoading(false);
     }
@@ -207,13 +216,12 @@ const BlockerManagement = () => {
         requestedById: user.id,
         requestedByRole: user.role
       });
-      setSuccess('Information requested');
+      showToast('Information requested', 'success');
       setIsRequestInfoModalOpen(false);
       setResolveFormData({ resolutionNotes: '' });
       fetchBlockers();
-      setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
-      setError('Failed to request info');
+      showErrorAlert('Error', 'Failed to request info');
     } finally {
       setLoading(false);
     }
@@ -227,13 +235,12 @@ const BlockerManagement = () => {
         updatedById: user.id,
         updatedByRole: user.role
       });
-      setSuccess('Priority updated');
+      showToast('Priority updated', 'success');
       const updated = await axios.get(`http://localhost:8080/api/blockers/${selectedBlocker.id}`);
       setSelectedBlocker(updated.data);
       fetchBlockers();
-      setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
-      setError('Failed to update priority');
+      showErrorAlert('Error', 'Failed to update priority');
     } finally {
       setLoading(false);
     }
@@ -241,6 +248,9 @@ const BlockerManagement = () => {
 
   const handleMarkDuplicate = async (e) => {
     e.preventDefault();
+    const isConfirmed = await showConfirmAlert('Mark as Duplicate', 'Are you sure this is a duplicate blocker?');
+    if (!isConfirmed) return;
+
     setLoading(true);
     try {
       await axios.put(`http://localhost:8080/api/blockers/${selectedBlocker.id}/duplicate`, {
@@ -248,12 +258,11 @@ const BlockerManagement = () => {
         updatedById: user.id,
         updatedByRole: user.role
       });
-      setSuccess('Marked as duplicate');
+      showToast('Marked as duplicate', 'success');
       setIsDuplicateModalOpen(false);
       fetchBlockers();
-      setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
-      setError('Failed to mark as duplicate');
+      showErrorAlert('Error', 'Failed to mark as duplicate');
     } finally {
       setLoading(false);
     }
@@ -273,10 +282,9 @@ const BlockerManagement = () => {
       setCommentText('');
       const updated = await axios.get(`http://localhost:8080/api/blockers/${selectedBlocker.id}`);
       setSelectedBlocker(updated.data);
-      setSuccess('Comment added');
-      setTimeout(() => setSuccess(''), 3000);
+      showToast('Comment added', 'success');
     } catch (err) {
-      setError('Failed to add comment');
+      showErrorAlert('Error', 'Failed to add comment');
     } finally {
       setLoading(false);
     }

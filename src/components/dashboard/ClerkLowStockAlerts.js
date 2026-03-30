@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
 import { AlertTriangle, RefreshCw, CheckCircle, Package, X, Plus, Trash2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { showToast, showErrorAlert, showConfirmAlert } from '../../utils/sweetAlertUtils';
 
 const ClerkLowStockAlerts = () => {
   const { user } = useAuth();
@@ -9,8 +11,6 @@ const ClerkLowStockAlerts = () => {
   const [materials, setMaterials] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [success, setSuccess] = useState('');
-  const [error, setError] = useState('');
 
   const [quotationItems, setQuotationItems] = useState([]);
   const [formData, setFormData] = useState({
@@ -90,6 +90,14 @@ const ClerkLowStockAlerts = () => {
 
   const handleSubmitQuotation = async (e) => {
     e.preventDefault();
+
+    const isConfirmed = await showConfirmAlert(
+      'Submit Fund Request?',
+      'Are you sure you want to submit this replenishment fund request?'
+    );
+
+    if (!isConfirmed) return;
+
     setLoading(true);
     try {
       const payload = {
@@ -103,12 +111,12 @@ const ClerkLowStockAlerts = () => {
 
       await axios.post('http://localhost:8080/api/quotations', payload);
       
-      setSuccess('Fund request quotation submitted successfully');
+      showToast('Fund request quotation submitted successfully', 'success');
       setIsModalOpen(false);
       setQuotationItems([]);
-      setTimeout(() => setSuccess(''), 3000);
+      fetchAlerts();
     } catch (err) {
-      setError('Failed to submit fund request');
+      showErrorAlert('Error', 'Failed to submit fund request');
     } finally {
       setLoading(false);
     }
@@ -120,9 +128,6 @@ const ClerkLowStockAlerts = () => {
         <h1>Low Stock Alerts</h1>
         <p>Materials that have fallen below the required minimum threshold</p>
       </div>
-
-      {success && <div className="alert success">{success}</div>}
-      {error && <div className="alert error">{error}</div>}
 
       <div className="alerts-list">
         {alerts.map(item => (
@@ -289,7 +294,6 @@ const ClerkLowStockAlerts = () => {
         
         .submit-btn { padding: 0.6rem 1.5rem; background: #10b981; color: white; border: none; border-radius: 0.4rem; cursor: pointer; font-weight: 600; }
         .cancel-btn { padding: 0.6rem 1.5rem; background: #f1f5f9; color: #475569; border: none; border-radius: 0.4rem; cursor: pointer; font-weight: 600; }
-        .alert.success { background: #dcfce7; color: #16a34a; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem; }
         .overflow-y-auto { overflow-y: auto; }
       `}</style>
     </div>

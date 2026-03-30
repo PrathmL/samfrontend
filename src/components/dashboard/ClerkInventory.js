@@ -5,6 +5,8 @@ import {
   Search, X, Save, AlertTriangle
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { useTranslation } from 'react-i18next';
+import { showToast, showErrorAlert, showSuccessAlert, showConfirmAlert } from '../../utils/sweetAlertUtils';
 
 const ClerkInventory = () => {
   const { user } = useAuth();
@@ -14,8 +16,6 @@ const ClerkInventory = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isStockModalOpen, setIsStockModalOpen] = useState(false);
   const [editingMaterial, setEditingMaterial] = useState(null);
-  const [success, setSuccess] = useState('');
-  const [error, setError] = useState('');
 
   const [formData, setFormData] = useState({
     name: '',
@@ -65,21 +65,28 @@ const ClerkInventory = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const isConfirmed = await showConfirmAlert(
+      editingMaterial ? 'Update Material?' : 'Add Material?',
+      editingMaterial ? 'Are you sure you want to update this material?' : 'Are you sure you want to add this new material?'
+    );
+
+    if (!isConfirmed) return;
+
     setLoading(true);
     try {
       if (editingMaterial) {
         await axios.put(`http://localhost:8080/api/inventory/materials/${editingMaterial.id}`, formData);
-        setSuccess('Material updated successfully');
+        showToast('Material updated successfully', 'success');
       } else {
         await axios.post('http://localhost:8080/api/inventory/materials', formData);
-        setSuccess('Material created successfully');
+        showToast('Material created successfully', 'success');
       }
       setIsModalOpen(false);
       resetForm();
       fetchMaterials();
-      setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
-      setError('Failed to save material');
+      showErrorAlert('Error', 'Failed to save material');
     } finally {
       setLoading(false);
     }
@@ -87,6 +94,14 @@ const ClerkInventory = () => {
 
   const handleUpdateStock = async (e) => {
     e.preventDefault();
+
+    const isConfirmed = await showConfirmAlert(
+      'Update Stock?',
+      `Are you sure you want to update the stock for this material?`
+    );
+
+    if (!isConfirmed) return;
+
     setLoading(true);
     try {
       await axios.post('http://localhost:8080/api/inventory/stock/update', {
@@ -95,12 +110,11 @@ const ClerkInventory = () => {
         performedById: user.id,
         performedByRole: 'CLERK'
       });
-      setSuccess('Stock updated successfully');
+      showSuccessAlert('Success', 'Stock updated successfully');
       setIsStockModalOpen(false);
       fetchMaterials();
-      setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
-      setError('Failed to update stock');
+      showErrorAlert('Error', 'Failed to update stock');
     } finally {
       setLoading(false);
     }
@@ -131,9 +145,6 @@ const ClerkInventory = () => {
           <Plus size={20} /> Add Material
         </button>
       </div>
-
-      {success && <div className="alert success">{success}</div>}
-      {error && <div className="alert error">{error}</div>}
 
       <div className="materials-table-container">
         <table className="materials-table">
