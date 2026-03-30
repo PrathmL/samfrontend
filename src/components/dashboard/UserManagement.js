@@ -14,6 +14,8 @@ const UserManagement = () => {
   const [talukas, setTalukas] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedRole, setSelectedRole] = useState('ALL');
   
@@ -64,15 +66,46 @@ const UserManagement = () => {
     }
   };
 
+  const handleEdit = (user) => {
+    setSelectedUser(user);
+    setIsEditMode(true);
+    setFormData({
+      name: user.name || '',
+      email: user.email || '',
+      mobileNumber: user.mobileNumber || '',
+      password: '', // Keep empty for security, handle specially in backend or only if provided
+      role: user.role || 'CLERK',
+      schoolId: user.schoolId || '',
+      talukaId: user.talukaId || '',
+      active: user.active ?? true
+    });
+    setIsModalOpen(true);
+  };
+
+  const handleDelete = async (id) => {
+    if (window.confirm('Are you sure you want to delete this user?')) {
+      try {
+        await axios.delete(`http://localhost:8080/api/admin/users/${id}`);
+        fetchUsers();
+      } catch (err) {
+        alert('Failed to delete user');
+      }
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:8080/api/admin/users', formData);
+      if (isEditMode) {
+        await axios.put(`http://localhost:8080/api/admin/users/${selectedUser.id}`, formData);
+      } else {
+        await axios.post('http://localhost:8080/api/admin/users', formData);
+      }
       setIsModalOpen(false);
       fetchUsers();
       resetForm();
     } catch (err) {
-      alert('Failed to save user');
+      alert(`Failed to ${isEditMode ? 'update' : 'create'} user`);
     }
   };
 
@@ -82,6 +115,8 @@ const UserManagement = () => {
       password: '', role: 'CLERK', schoolId: '',
       talukaId: '', active: true
     });
+    setIsEditMode(false);
+    setSelectedUser(null);
   };
 
   const filteredUsers = users.filter(user => {
@@ -98,7 +133,7 @@ const UserManagement = () => {
           <h1>{t('title_user_mgmt')}</h1>
           <p>Create and manage portal access for different stakeholders</p>
         </div>
-        <button className="add-btn" onClick={() => setIsModalOpen(true)}>
+        <button className="add-btn" onClick={() => { resetForm(); setIsModalOpen(true); }}>
           <UserPlus size={20} /> {t('btn_add_user')}
         </button>
       </div>
@@ -161,8 +196,8 @@ const UserManagement = () => {
                 </td>
                 <td>
                   <div className="action-btns">
-                    <button className="edit-btn-icon"><Edit2 size={16} /></button>
-                    <button className="delete-btn-icon"><Trash2 size={16} /></button>
+                    <button className="edit-btn-icon" onClick={() => handleEdit(user)}><Edit2 size={16} /></button>
+                    <button className="delete-btn-icon" onClick={() => handleDelete(user.id)}><Trash2 size={16} /></button>
                   </div>
                 </td>
               </tr>
@@ -175,7 +210,7 @@ const UserManagement = () => {
         <div className="modal-overlay">
           <div className="modal">
             <div className="modal-header">
-              <h2>{t('btn_add_user')}</h2>
+              <h2>{isEditMode ? t('btn_edit') : t('btn_add_user')}</h2>
               <button onClick={() => setIsModalOpen(false)}><X size={24} /></button>
             </div>
             <form onSubmit={handleSubmit}>
@@ -239,8 +274,18 @@ const UserManagement = () => {
 
                   <div className="form-group">
                     <label>{t('field_password')}</label>
-                    <input type="password" required value={formData.password} onChange={e => setFormData({...formData, password: e.target.value})} />
+                    <input type="password" required={!isEditMode} value={formData.password} onChange={e => setFormData({...formData, password: e.target.value})} placeholder={isEditMode ? 'Leave blank to keep same' : ''} />
                   </div>
+                  
+                  {isEditMode && (
+                    <div className="form-group">
+                      <label>{t('field_status')}</label>
+                      <select value={formData.active} onChange={e => setFormData({...formData, active: e.target.value === 'true'})}>
+                        <option value="true">Active</option>
+                        <option value="false">Inactive</option>
+                      </select>
+                    </div>
+                  )}
                 </div>
               </div>
               <div className="modal-footer">

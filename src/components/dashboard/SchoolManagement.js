@@ -14,6 +14,9 @@ const SchoolManagement = () => {
   const [talukas, setTalukas] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [isViewMode, setIsViewMode] = useState(false);
+  const [selectedSchool, setSelectedSchool] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedTaluka, setSelectedRole] = useState('ALL');
   
@@ -52,15 +55,61 @@ const SchoolManagement = () => {
     }
   };
 
+  const handleEdit = (school) => {
+    setSelectedSchool(school);
+    setIsEditMode(true);
+    setIsViewMode(false);
+    setFormData({
+      name: school.name || '',
+      code: school.code || '',
+      talukaId: school.talukaId || '',
+      address: school.address || '',
+      contactNumber: school.contactNumber || '',
+      status: school.status || 'Active'
+    });
+    setIsModalOpen(true);
+  };
+
+  const handleViewDetails = (school) => {
+    setSelectedSchool(school);
+    setIsEditMode(false);
+    setIsViewMode(true);
+    setFormData({
+      name: school.name || '',
+      code: school.code || '',
+      talukaId: school.talukaId || '',
+      address: school.address || '',
+      contactNumber: school.contactNumber || '',
+      status: school.status || 'Active'
+    });
+    setIsModalOpen(true);
+  };
+
+  const handleDelete = async (id) => {
+    if (window.confirm('Are you sure you want to delete this school?')) {
+      try {
+        await axios.delete(`http://localhost:8080/api/schools/${id}`);
+        fetchSchools();
+      } catch (err) {
+        alert('Failed to delete school');
+      }
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (isViewMode) return;
     try {
-      await axios.post('http://localhost:8080/api/schools', formData);
+      if (isEditMode) {
+        await axios.put(`http://localhost:8080/api/schools/${selectedSchool.id}`, formData);
+      } else {
+        await axios.post('http://localhost:8080/api/schools', formData);
+      }
       setIsModalOpen(false);
       fetchSchools();
       resetForm();
     } catch (err) {
-      alert('Failed to save school');
+      alert(`Failed to ${isEditMode ? 'update' : 'create'} school`);
     }
   };
 
@@ -69,6 +118,9 @@ const SchoolManagement = () => {
       name: '', code: '', talukaId: '',
       address: '', contactNumber: '', status: 'Active'
     });
+    setIsEditMode(false);
+    setIsViewMode(false);
+    setSelectedSchool(null);
   };
 
   const getTalukaName = (id) => {
@@ -83,7 +135,7 @@ const SchoolManagement = () => {
           <h1>{t('title_school_mgmt')}</h1>
           <p>Register and manage educational institutions under your jurisdiction</p>
         </div>
-        <button className="add-btn" onClick={() => setIsModalOpen(true)}>
+        <button className="add-btn" onClick={() => { resetForm(); setIsModalOpen(true); }}>
           <Plus size={20} /> {t('btn_add_school')}
         </button>
       </div>
@@ -127,8 +179,9 @@ const SchoolManagement = () => {
             </div>
 
             <div className="school-card-footer">
-              <button className="edit-btn">{t('btn_edit')}</button>
-              <button className="details-btn">{t('btn_view')}</button>
+              <button className="edit-btn" onClick={() => handleEdit(school)}>{t('btn_edit')}</button>
+              <button className="delete-btn-card" onClick={() => handleDelete(school.id)}><Trash2 size={16} /></button>
+              <button className="details-btn" onClick={() => handleViewDetails(school)}>{t('btn_view')}</button>
             </div>
           </div>
         ))}
@@ -138,7 +191,7 @@ const SchoolManagement = () => {
         <div className="modal-overlay">
           <div className="modal">
             <div className="modal-header">
-              <h2>{t('btn_add_school')}</h2>
+              <h2>{isViewMode ? t('btn_view') : (isEditMode ? t('btn_edit') : t('btn_add_school'))}</h2>
               <button onClick={() => setIsModalOpen(false)}><X size={24} /></button>
             </div>
             <form onSubmit={handleSubmit}>
@@ -146,15 +199,15 @@ const SchoolManagement = () => {
                 <div className="form-grid-single">
                   <div className="form-group">
                     <label>{t('field_name')}</label>
-                    <input type="text" required value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
+                    <input type="text" required readOnly={isViewMode} value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
                   </div>
                   <div className="form-group">
                     <label>School Code</label>
-                    <input type="text" required value={formData.code} onChange={e => setFormData({...formData, code: e.target.value})} />
+                    <input type="text" required readOnly={isViewMode} value={formData.code} onChange={e => setFormData({...formData, code: e.target.value})} />
                   </div>
                   <div className="form-group">
                     <label>{t('field_taluka')}</label>
-                    <select required value={formData.talukaId} onChange={e => setFormData({...formData, talukaId: e.target.value})}>
+                    <select required disabled={isViewMode} value={formData.talukaId} onChange={e => setFormData({...formData, talukaId: e.target.value})}>
                       <option value="">Select Taluka</option>
                       {talukas.map(t => (
                         <option key={t.id} value={t.id}>{t.name}</option>
@@ -163,13 +216,22 @@ const SchoolManagement = () => {
                   </div>
                   <div className="form-group">
                     <label>{t('field_address')}</label>
-                    <textarea value={formData.address} onChange={e => setFormData({...formData, address: e.target.value})} />
+                    <textarea readOnly={isViewMode} value={formData.address} onChange={e => setFormData({...formData, address: e.target.value})} />
                   </div>
+                  {(isEditMode || isViewMode) && (
+                    <div className="form-group">
+                      <label>{t('field_status')}</label>
+                      <select disabled={isViewMode} value={formData.status} onChange={e => setFormData({...formData, status: e.target.value})}>
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
+                      </select>
+                    </div>
+                  )}
                 </div>
               </div>
               <div className="modal-footer">
-                <button type="button" className="cancel-btn" onClick={() => setIsModalOpen(false)}>{t('btn_cancel')}</button>
-                <button type="submit" className="save-btn">{t('btn_save')}</button>
+                <button type="button" className="cancel-btn" onClick={() => setIsModalOpen(false)}>{isViewMode ? t('btn_close') : t('btn_cancel')}</button>
+                {!isViewMode && <button type="submit" className="save-btn">{t('btn_save')}</button>}
               </div>
             </form>
           </div>
@@ -207,9 +269,12 @@ const SchoolManagement = () => {
         .school-meta { display: flex; flex-direction: column; gap: 0.5rem; }
         .meta-row { display: flex; align-items: center; gap: 0.5rem; color: #64748b; font-size: 0.85rem; }
 
-        .school-card-footer { padding: 1rem 1.25rem; background: #f8fafc; border-top: 1px solid #f1f5f9; display: flex; gap: 1rem; }
-        .edit-btn { flex: 1; padding: 0.5rem; background: white; border: 1px solid #e2e8f0; border-radius: 0.5rem; font-size: 0.85rem; font-weight: 600; cursor: pointer; }
-        .details-btn { flex: 1; padding: 0.5rem; background: #1e293b; color: white; border: none; border-radius: 0.5rem; font-size: 0.85rem; font-weight: 600; cursor: pointer; }
+        .school-card-footer { padding: 1rem 1.25rem; background: #f8fafc; border-top: 1px solid #f1f5f9; display: flex; gap: 0.5rem; }
+        .edit-btn { flex: 2; padding: 0.5rem; background: white; border: 1px solid #e2e8f0; border-radius: 0.5rem; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        .edit-btn:hover { border-color: #0ea5e9; color: #0ea5e9; }
+        .delete-btn-card { flex: 1; display: flex; align-items: center; justify-content: center; background: white; border: 1px solid #e2e8f0; border-radius: 0.5rem; cursor: pointer; transition: all 0.2s; color: #64748b; }
+        .delete-btn-card:hover { border-color: #ef4444; color: #ef4444; }
+        .details-btn { flex: 2; padding: 0.5rem; background: #1e293b; color: white; border: none; border-radius: 0.5rem; font-size: 0.85rem; font-weight: 600; cursor: pointer; }
 
         .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1100; }
         .modal { background: white; border-radius: 1.5rem; width: 100%; max-width: 500px; overflow: hidden; }

@@ -536,6 +536,7 @@ const ClerkQuotations = () => {
         .close-btn:hover { background: #f1f5f9; color: #1e293b; }
 
         .modal-content { padding: 2rem; }
+        .overflow-y-auto { overflow-y: auto; }
         
         .req-summary-enhanced { background: #f8fafc; padding: 1.5rem; border-radius: 1rem; border: 1px solid #e2e8f0; display: flex; justify-content: space-between; margin-bottom: 2rem; }
         .summary-main { flex: 1; }
@@ -562,7 +563,7 @@ const ClerkQuotations = () => {
         .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; }
         .section-header h3 { font-size: 1.1rem; color: #1e293b; margin: 0; font-weight: 700; }
         
-        .table-wrapper { border: 1px solid #e2e8f0; border-radius: 0.75rem; overflow: hidden; }
+        .table-wrapper { border: 1px solid #e2e8f0; border-radius: 0.75rem; overflow-x: auto; }
         .items-table { width: 100%; border-collapse: collapse; }
         .items-table th { background: #f8fafc; text-align: left; padding: 1rem; font-size: 0.8rem; font-weight: 700; color: #64748b; text-transform: uppercase; border-bottom: 1px solid #e2e8f0; }
         .items-table td { padding: 1rem; border-bottom: 1px solid #f1f5f9; color: #1e293b; font-weight: 600; }

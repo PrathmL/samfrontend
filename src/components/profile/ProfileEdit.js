@@ -108,8 +108,8 @@ const ProfileEdit = () => {
                   type="text" 
                   name="name"
                   value={formData.name}
-                  onChange={handleChange}
-                  required
+                  readOnly
+                  className="read-only-input"
                 />
               </div>
               <div className="form-group">
@@ -118,7 +118,8 @@ const ProfileEdit = () => {
                   type="email" 
                   name="email"
                   value={formData.email}
-                  onChange={handleChange}
+                  readOnly
+                  className="read-only-input"
                 />
               </div>
               <div className="form-group">
@@ -127,8 +128,8 @@ const ProfileEdit = () => {
                   type="text" 
                   name="mobileNumber"
                   value={formData.mobileNumber}
-                  onChange={handleChange}
-                  required
+                  readOnly
+                  className="read-only-input"
                 />
               </div>
             </div>
@@ -191,6 +192,8 @@ const ProfileEdit = () => {
         .form-group label { display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; font-weight: 700; color: #475569; }
         .form-group input { padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 0.5rem; outline: none; transition: all 0.2s; font-size: 0.95rem; }
         .form-group input:focus { border-color: #0ea5e9; box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1); }
+        .form-group input.read-only-input { background-color: #f1f5f9; color: #64748b; cursor: not-allowed; border-color: #e2e8f0; }
+        .form-group input.read-only-input:focus { border-color: #e2e8f0; box-shadow: none; }
 
         .form-actions { margin-top: 2rem; display: flex; justify-content: flex-end; }
         .save-btn { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 2rem; background: #0ea5e9; color: white; border: none; border-radius: 0.75rem; font-weight: 700; cursor: pointer; transition: all 0.2s; }
