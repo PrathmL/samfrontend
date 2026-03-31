@@ -441,9 +441,15 @@ const HeadmasterActiveWorks = () => {
                   <div className="section-box">
                     <h4>Initial Site Photos</h4>
                     <div className="photo-gallery-horizontal">
-                      {selectedWork.photoUrls?.map((url, i) => (
+                      {selectedWork.photoUrls?.map((photo, i) => (
                         <div key={i} className="gallery-photo-item">
-                          <img src={`http://localhost:8080${url}`} alt="Site" />
+                          <img src={`http://localhost:8080${photo.url}`} alt="Site" />
+                          {photo.latitude && photo.longitude && (
+                            <div className="photo-geotag">
+                              <MapPin size={10} />
+                              <span>{photo.latitude.toFixed(4)}, {photo.longitude.toFixed(4)}</span>
+                            </div>
+                          )}
                         </div>
                       ))}
                     </div>
@@ -460,8 +466,16 @@ const HeadmasterActiveWorks = () => {
                           </div>
                           <p className="update-remarks">{update.remarks}</p>
                           <div className="update-photos-grid">
-                            {update.photoUrls?.map((purl, pi) => (
-                              <img key={pi} src={`http://localhost:8080${purl}`} alt="Progress" />
+                            {update.photoUrls?.map((photo, pi) => (
+                              <div key={pi} className="progress-photo-wrapper">
+                                <img src={`http://localhost:8080${photo.url}`} alt="Progress" />
+                                {photo.geoLocation && (
+                                  <div className="photo-geotag">
+                                    <MapPin size={10} />
+                                    <span>{photo.geoLocation}</span>
+                                  </div>
+                                )}
+                              </div>
                             ))}
                           </div>
                         </div>

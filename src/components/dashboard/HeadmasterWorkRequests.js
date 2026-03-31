@@ -449,8 +449,16 @@ const HeadmasterWorkRequests = () => {
                 <div className="details-photos">
                   <h4>{t('field_photos')}</h4>
                   <div className="photo-grid-small">
-                    {selectedRequest.photoUrls?.map((url, i) => (
-                      <img key={i} src={`http://localhost:8080${url}`} alt={`Issue ${i+1}`} />
+                    {selectedRequest.photoUrls?.map((photo, i) => (
+                      <div key={i} className="photo-item-wrapper">
+                        <img src={`http://localhost:8080${photo.url}`} alt={`Issue ${i+1}`} />
+                        {photo.latitude && photo.longitude && (
+                          <div className="geotag-tag">
+                            <MapPin size={10} />
+                            <span>{photo.latitude.toFixed(4)}, {photo.longitude.toFixed(4)}</span>
+                          </div>
+                        )}
+                      </div>
                     ))}
                     {(!selectedRequest.photoUrls || selectedRequest.photoUrls.length === 0) && (
                       <p className="no-photos">No photos attached</p>

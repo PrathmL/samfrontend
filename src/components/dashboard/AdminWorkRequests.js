@@ -192,9 +192,15 @@ const AdminWorkRequests = () => {
                   <div className="photos-section">
                     <h4>{t('field_photos')}</h4>
                     <div className="photo-grid-scroll">
-                      {selectedRequest.photoUrls?.map((url, i) => (
+                      {selectedRequest.photoUrls?.map((photo, i) => (
                         <div key={i} className="photo-item">
-                          <img src={`http://localhost:8080${url}`} alt={`Evidence ${i+1}`} />
+                          <img src={`http://localhost:8080${photo.url}`} alt={`Evidence ${i+1}`} />
+                          {photo.latitude && photo.longitude && (
+                            <div className="geotag-overlay">
+                              <MapPin size={10} />
+                              <span>{photo.latitude.toFixed(4)}, {photo.longitude.toFixed(4)}</span>
+                            </div>
+                          )}
                         </div>
                       ))}
                       {(!selectedRequest.photoUrls || selectedRequest.photoUrls.length === 0) && (
