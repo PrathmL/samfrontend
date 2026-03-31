@@ -24,7 +24,6 @@ const LoginPage = () => {
     setLoading(true);
 
     try {
-      // Send mobileNumber and password to the login function
       const user = await login(mobileNumber, password);
       const rolePath = user.role.toLowerCase();
       navigate(`/${rolePath}/dashboard`);
@@ -41,7 +40,7 @@ const LoginPage = () => {
         <div className="login-card">
           <div className="login-header">
             <div className="logo-box">
-              <School size={32} color="#0ea5e9" />
+              <School size={32} color="#1e3a8a" />
             </div>
             <h1>{t('welcome_back')}</h1>
             <p>Enter your credentials to access the management portal</p>
@@ -111,13 +110,19 @@ const LoginPage = () => {
         </div>
 
         <style>{`
+          * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+          }
+
           .login-page-container {
             min-height: calc(100vh - 70px);
             display: flex;
             align-items: center;
             justify-content: center;
-            background: #f8fafc;
-            padding: 2rem;
+            background: #f1f5f9;
+            padding: 1.5rem;
           }
 
           .login-card {
@@ -125,52 +130,39 @@ const LoginPage = () => {
             width: 100%;
             max-width: 440px;
             padding: 2.5rem;
-            border-radius: 1.5rem;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
             border: 1px solid #e2e8f0;
           }
 
           .login-header {
             text-align: center;
-            margin-bottom: 2.5rem;
+            margin-bottom: 2rem;
           }
 
           .logo-box {
             width: 64px;
             height: 64px;
-            background: #f0f9ff;
-            border-radius: 1rem;
+            background: #eff6ff;
+            border-radius: 0.75rem;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 1.5rem;
-            border: 1px solid #bae6fd;
+            margin: 0 auto 1.25rem;
+            border: 1px solid #bfdbfe;
           }
 
           .login-header h1 {
             font-size: 1.75rem;
-            font-weight: 800;
+            font-weight: 600;
             color: #0f172a;
             margin-bottom: 0.5rem;
+            letter-spacing: -0.01em;
           }
 
           .login-header p {
-            color: #64748b;
-            font-size: 0.95rem;
-          }
-
-          .error-alert {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            padding: 1rem;
-            background: #fff1f2;
-            border: 1px solid #fecdd3;
-            border-radius: 0.75rem;
-            color: #e11d48;
-            margin-bottom: 1.5rem;
-            font-size: 0.9rem;
-            font-weight: 500;
+            color: #475569;
+            font-size: 0.875rem;
           }
 
           .form-group {
@@ -185,11 +177,21 @@ const LoginPage = () => {
           }
 
           .form-group label {
-            display: block;
             font-size: 0.875rem;
-            font-weight: 600;
-            color: #334155;
-            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #1e293b;
+          }
+
+          .forgot-link {
+            font-size: 0.75rem;
+            color: #1e3a8a;
+            text-decoration: none;
+            font-weight: 500;
+          }
+
+          .forgot-link:hover {
+            text-decoration: underline;
+            color: #1e40af;
           }
 
           .input-wrapper {
@@ -200,36 +202,42 @@ const LoginPage = () => {
 
           .input-icon {
             position: absolute;
-            left: 1rem;
-            color: #94a3b8;
+            left: 0.75rem;
+            color: #64748b;
+            pointer-events: none;
           }
 
           .input-wrapper input {
             width: 100%;
-            padding: 0.75rem 1rem 0.75rem 3rem;
+            padding: 0.625rem 0.75rem 0.625rem 2.5rem;
             background: #ffffff;
-            border: 1px solid #d1d5db;
-            border-radius: 0.75rem;
-            font-size: 1rem;
-            transition: all 0.2s;
+            border: 1px solid #cbd5e1;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            transition: all 0.15s ease;
             outline: none;
+            color: #0f172a;
           }
 
           .input-wrapper input:focus {
-            border-color: #0ea5e9;
-            box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.1);
+            border-color: #1e3a8a;
+            box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1);
           }
 
           .toggle-password {
             position: absolute;
-            right: 1rem;
+            right: 0.75rem;
             background: none;
             border: none;
-            color: #94a3b8;
+            color: #64748b;
             cursor: pointer;
             padding: 0;
             display: flex;
             align-items: center;
+          }
+
+          .toggle-password:hover {
+            color: #1e3a8a;
           }
 
           .submit-btn {
@@ -237,56 +245,89 @@ const LoginPage = () => {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 0.75rem;
-            padding: 0.875rem;
-            background: #0ea5e9;
+            gap: 0.5rem;
+            padding: 0.625rem 1rem;
+            background: #1e3a8a;
             color: white;
             border: none;
-            border-radius: 0.75rem;
-            font-weight: 700;
-            font-size: 1rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            font-size: 0.875rem;
             cursor: pointer;
-            transition: all 0.2s;
-            margin-top: 1rem;
+            transition: background 0.15s ease;
+            margin-top: 0.5rem;
           }
 
           .submit-btn:hover {
-            background: #0284c7;
-            transform: translateY(-1px);
+            background: #1e40af;
           }
 
           .submit-btn:disabled {
-            opacity: 0.7;
+            opacity: 0.6;
             cursor: not-allowed;
           }
 
           .login-footer {
-            margin-top: 2.5rem;
+            margin-top: 2rem;
             text-align: center;
-            border-top: 1px solid #f1f5f9;
+            border-top: 1px solid #e2e8f0;
             padding-top: 1.5rem;
           }
 
           .login-footer p {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             text-transform: uppercase;
             letter-spacing: 0.05em;
-            color: #94a3b8;
-            font-weight: 700;
+            color: #64748b;
+            font-weight: 600;
             margin-bottom: 0.5rem;
           }
 
+          .help-links {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            font-size: 0.75rem;
+            color: #475569;
+          }
+
+          .help-links a {
+            color: #1e3a8a;
+            text-decoration: none;
+            font-weight: 500;
+          }
+
+          .help-links a:hover {
+            text-decoration: underline;
+          }
+
           .spinner {
-            width: 20px;
-            height: 20px;
+            width: 16px;
+            height: 16px;
             border: 2px solid rgba(255,255,255,0.3);
             border-top-color: white;
             border-radius: 50%;
-            animation: spin 0.8s linear infinite;
+            animation: spin 0.6s linear infinite;
           }
 
           @keyframes spin {
             to { transform: rotate(360deg); }
+          }
+
+          /* Responsive */
+          @media (max-width: 640px) {
+            .login-card {
+              padding: 1.5rem;
+              max-width: 100%;
+            }
+            .login-header h1 {
+              font-size: 1.5rem;
+            }
+            .logo-box {
+              width: 56px;
+              height: 56px;
+            }
           }
         `}</style>
       </div>
