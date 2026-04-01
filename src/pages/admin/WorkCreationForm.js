@@ -168,512 +168,496 @@ const WorkCreationForm = () => {
 
   return (
     <div className="work-creation-container">
-      <div className="form-header">
-        <h1>Create Work from Request</h1>
-        <p>Request: {request?.title} | ID: #{requestId}</p>
+      <div className="page-header">
+        <div className="header-text">
+          <h1>Create Work from Request</h1>
+          <p>Official project creation for Request: <strong>{request?.title}</strong> | Request ID: #{requestId}</p>
+        </div>
+        <button className="back-btn" onClick={() => navigate('/admin/work-requests')}>
+          <ArrowLeft size={18} /> Back to Requests
+        </button>
       </div>
 
-      <div className="form-card">
-        {/* Basic Details Section */}
-        <div className="form-section">
-          <h2>1. Basic Work Details</h2>
-          <div className="form-grid">
-            <div className="form-group">
-              <label>Work Code *</label>
-              <input
-                type="text"
-                value={workData.workCode}
-                onChange={(e) => setWorkData({...workData, workCode: e.target.value})}
-                placeholder="Auto-generated"
-                required
-              />
+      <div className="form-main-layout">
+        <div className="form-sections-column">
+          {/* Section 1: Basic Details */}
+          <div className="form-section-card">
+            <div className="section-header">
+              <div className="section-number">1</div>
+              <h2>Basic Work Details</h2>
             </div>
-            <div className="form-group">
-              <label>Work Title *</label>
-              <input
-                type="text"
-                value={workData.title}
-                onChange={(e) => setWorkData({...workData, title: e.target.value})}
-                required
-              />
-            </div>
-            <div className="form-group full-width">
-              <label>Description</label>
-              <textarea
-                value={workData.description}
-                onChange={(e) => setWorkData({...workData, description: e.target.value})}
-                rows="3"
-              />
-            </div>
-            <div className="form-group">
-              <label>Work Type</label>
-              <input type="text" value={workData.type} readOnly disabled />
-            </div>
-            <div className="form-group">
-              <label>Sanctioned Amount (₹) *</label>
-              <input
-                type="number"
-                step="0.01"
-                value={workData.sanctionedAmount}
-                onChange={(e) => setWorkData({...workData, sanctionedAmount: e.target.value})}
-                required
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Stages Section */}
-        <div className="form-section">
-          <div className="section-header">
-            <h2>2. Project Stages</h2>
-            <button type="button" className="add-btn" onClick={addStage}>
-              <Plus size={18} /> Add Stage
-            </button>
-          </div>
-          
-          <div className="stages-container">
-            {stages.map((stage, index) => (
-              <div key={index} className="stage-card">
-                <div className="stage-header">
-                  <h3>Stage {index + 1}</h3>
-                  {stages.length > 1 && (
-                    <button type="button" className="remove-btn" onClick={() => removeStage(index)}>
-                      <Trash2 size={16} />
-                    </button>
-                  )}
+            <div className="section-content">
+              <div className="form-grid">
+                <div className="form-group">
+                  <label>Work Code</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    value={workData.workCode}
+                    onChange={(e) => setWorkData({...workData, workCode: e.target.value})}
+                    placeholder="WRK-YYYY-XXXX"
+                    required
+                  />
+                  <small className="form-help">Unique identification code for this project.</small>
                 </div>
-                <div className="stage-fields">
-                  <div className="form-group">
-                    <label>Stage Name</label>
-                    <input
-                      type="text"
-                      value={stage.name}
-                      onChange={(e) => updateStage(index, 'name', e.target.value)}
-                      placeholder="e.g., Foundation Work"
-                      required
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>Weightage (%)</label>
-                    <input
-                      type="number"
-                      value={stage.weightage}
-                      onChange={(e) => updateStage(index, 'weightage', e.target.value)}
-                      placeholder="e.g., 20"
-                      required
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>Est. Duration (Days)</label>
-                    <input
-                      type="number"
-                      value={stage.estimatedDurationDays}
-                      onChange={(e) => updateStage(index, 'estimatedDurationDays', e.target.value)}
-                      placeholder="e.g., 15"
-                    />
-                  </div>
-                  <div className="form-group full-width">
-                    <label>Description</label>
-                    <textarea
-                      value={stage.description}
-                      onChange={(e) => updateStage(index, 'description', e.target.value)}
-                      rows="2"
-                      placeholder="Describe what this stage includes"
-                    />
-                  </div>
+                <div className="form-group">
+                  <label>Work Title</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    value={workData.title}
+                    onChange={(e) => setWorkData({...workData, title: e.target.value})}
+                    required
+                  />
+                </div>
+                <div className="form-group full-width">
+                  <label>Description</label>
+                  <textarea
+                    className="form-control"
+                    value={workData.description}
+                    onChange={(e) => setWorkData({...workData, description: e.target.value})}
+                    rows="3"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Work Type</label>
+                  <div className="readonly-value">{workData.type}</div>
+                </div>
+                <div className="form-group">
+                  <label>Sanctioned Amount (₹)</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    className="form-control amount-input"
+                    value={workData.sanctionedAmount}
+                    onChange={(e) => setWorkData({...workData, sanctionedAmount: e.target.value})}
+                    required
+                  />
                 </div>
               </div>
-            ))}
+            </div>
           </div>
-          
-          <div className={`total-indicator ${totalWeightage === 100 ? 'valid' : 'invalid'}`}>
-            Total Weightage: {totalWeightage}% {totalWeightage !== 100 && '(Must equal 100%)'}
+
+          {/* Section 2: Project Stages */}
+          <div className="form-section-card">
+            <div className="section-header">
+              <div className="section-number">2</div>
+              <h2>Project Execution Stages</h2>
+              <button type="button" className="add-btn-sm" onClick={addStage}>
+                <Plus size={16} /> Add Stage
+              </button>
+            </div>
+            <div className="section-content">
+              <div className="stages-list">
+                {stages.map((stage, index) => (
+                  <div key={index} className="stage-item-row">
+                    <div className="stage-index">{index + 1}</div>
+                    <div className="stage-fields-grid">
+                      <div className="form-group">
+                        <label>Stage Name</label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          value={stage.name}
+                          onChange={(e) => updateStage(index, 'name', e.target.value)}
+                          placeholder="e.g., Foundation"
+                          required
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label>Weightage (%)</label>
+                        <input
+                          type="number"
+                          className="form-control"
+                          value={stage.weightage}
+                          onChange={(e) => updateStage(index, 'weightage', e.target.value)}
+                          required
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label>Duration (Days)</label>
+                        <input
+                          type="number"
+                          className="form-control"
+                          value={stage.estimatedDurationDays}
+                          onChange={(e) => updateStage(index, 'estimatedDurationDays', e.target.value)}
+                        />
+                      </div>
+                      <div className="form-group full-width">
+                        <label>Description</label>
+                        <input
+                          className="form-control"
+                          value={stage.description}
+                          onChange={(e) => updateStage(index, 'description', e.target.value)}
+                          placeholder="Brief description of this stage's scope"
+                        />
+                      </div>
+                    </div>
+                    {stages.length > 1 && (
+                      <button type="button" className="remove-row-btn" onClick={() => removeStage(index)}>
+                        <X size={18} />
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+              <div className={`validation-summary ${totalWeightage === 100 ? 'valid' : 'invalid'}`}>
+                <span>Total Weightage Allocation:</span>
+                <strong>{totalWeightage}%</strong>
+                {totalWeightage !== 100 && <span className="error-hint">(Must equal 100%)</span>}
+              </div>
+            </div>
+          </div>
+
+          {/* Section 3: Fund Allocation */}
+          <div className="form-section-card">
+            <div className="section-header">
+              <div className="section-number">3</div>
+              <h2>Financial Resource Allocation</h2>
+              <button type="button" className="add-btn-sm" onClick={addFundSource}>
+                <Plus size={16} /> Add Source
+              </button>
+            </div>
+            <div className="section-content">
+              <div className="fund-sources-list">
+                {fundSources.map((source, index) => (
+                  <div key={index} className="fund-source-item">
+                    <div className="form-group">
+                      <label>Source Name</label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        value={source.sourceName}
+                        onChange={(e) => updateFundSource(index, 'sourceName', e.target.value)}
+                        placeholder="e.g., Government Grant"
+                        required
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Amount (₹)</label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        className="form-control amount-input"
+                        value={source.amount}
+                        onChange={(e) => updateFundSource(index, 'amount', e.target.value)}
+                        required
+                      />
+                    </div>
+                    {fundSources.length > 1 && (
+                      <button type="button" className="remove-row-btn-inline" onClick={() => removeFundSource(index)}>
+                        <Trash2 size={16} />
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+              <div className={`validation-summary ${Math.abs(totalAllocated - workData.sanctionedAmount) < 0.01 ? 'valid' : 'invalid'}`}>
+                <span>Total Budget Allocation:</span>
+                <strong>₹{totalAllocated.toLocaleString()} / ₹{parseFloat(workData.sanctionedAmount || 0).toLocaleString()}</strong>
+                {Math.abs(totalAllocated - workData.sanctionedAmount) >= 0.01 && <span className="error-hint">(Must equal sanctioned amount)</span>}
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Fund Allocation Section */}
-        <div className="form-section">
-          <div className="section-header">
-            <h2>3. Fund Allocation</h2>
-            <button type="button" className="add-btn" onClick={addFundSource}>
-              <Plus size={18} /> Add Source
-            </button>
-          </div>
-          
-          <div className="fund-sources-container">
-            {fundSources.map((source, index) => (
-              <div key={index} className="fund-source-card">
-                <div className="fund-source-header">
-                  <h3>Source {index + 1}</h3>
-                  {fundSources.length > 1 && (
-                    <button type="button" className="remove-btn" onClick={() => removeFundSource(index)}>
-                      <Trash2 size={16} />
-                    </button>
-                  )}
+        {/* Right Column: Review & Submission */}
+        <div className="form-sidebar-column">
+          <div className="sidebar-sticky-box">
+            <div className="summary-card">
+              <h3>Submission Review</h3>
+              <div className="summary-details">
+                <div className="summary-row">
+                  <span>Project ID</span>
+                  <strong>{workData.workCode || 'Not Set'}</strong>
                 </div>
-                <div className="fund-source-fields">
-                  <div className="form-group">
-                    <label>Source Name</label>
-                    <input
-                      type="text"
-                      value={source.sourceName}
-                      onChange={(e) => updateFundSource(index, 'sourceName', e.target.value)}
-                      placeholder="e.g., Government Grant, School Fund"
-                      required
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>Amount (₹)</label>
-                    <input
-                      type="number"
-                      step="0.01"
-                      value={source.amount}
-                      onChange={(e) => updateFundSource(index, 'amount', e.target.value)}
-                      required
-                    />
-                  </div>
+                <div className="summary-row">
+                  <span>Total Budget</span>
+                  <strong>₹{parseFloat(workData.sanctionedAmount || 0).toLocaleString()}</strong>
+                </div>
+                <div className="summary-row">
+                  <span>Execution Stages</span>
+                  <strong>{stages.length} Stages</strong>
                 </div>
               </div>
-            ))}
-          </div>
-          
-          <div className={`total-indicator ${Math.abs(totalAllocated - workData.sanctionedAmount) < 0.01 ? 'valid' : 'invalid'}`}>
-            Total Allocated: ₹{totalAllocated.toLocaleString()} / ₹{workData.sanctionedAmount?.toLocaleString()}
-            {Math.abs(totalAllocated - workData.sanctionedAmount) >= 0.01 && ' (Must equal sanctioned amount)'}
-          </div>
-        </div>
+              
+              <div className="submission-actions">
+                <button 
+                  type="button" 
+                  className="btn-create-final" 
+                  onClick={handleCreateWork} 
+                  disabled={loading || totalWeightage !== 100 || Math.abs(totalAllocated - workData.sanctionedAmount) >= 0.01}
+                >
+                  {loading ? 'Processing...' : 'Create Official Work'}
+                  <Check size={18} />
+                </button>
+                <button type="button" className="btn-cancel-flat" onClick={() => navigate('/admin/work-requests')}>
+                  Discard Changes
+                </button>
+              </div>
+            </div>
 
-        {/* Review Section */}
-        <div className="form-section">
-          <h2>4. Review & Create</h2>
-          <div className="review-card">
-            <h3>Work Summary</h3>
-            <div className="review-grid">
-              <div><strong>Work Code:</strong> {workData.workCode}</div>
-              <div><strong>Title:</strong> {workData.title}</div>
-              <div><strong>Type:</strong> {workData.type}</div>
-              <div><strong>Sanctioned Amount:</strong> ₹{workData.sanctionedAmount?.toLocaleString()}</div>
-            </div>
-            
-            <h3>Stages ({stages.length})</h3>
-            <div className="review-stages">
-              {stages.map((stage, i) => (
-                <div key={i} className="review-stage">
-                  <span><strong>{stage.name}</strong> - {stage.weightage}%</span>
-                  <span>{stage.estimatedDurationDays} days</span>
-                </div>
-              ))}
-            </div>
-            
-            <h3>Fund Sources</h3>
-            <div className="review-funds">
-              {fundSources.map((source, i) => (
-                <div key={i} className="review-fund">
-                  <span>{source.sourceName}</span>
-                  <span>₹{source.amount?.toLocaleString()}</span>
-                </div>
-              ))}
+            <div className="help-box">
+              <div className="help-icon"><AlertTriangle size={20} /></div>
+              <div className="help-content">
+                <h4>Guidelines</h4>
+                <ul>
+                  <li>Ensure the Work Code follows official formatting.</li>
+                  <li>Stage weightage must exactly total 100%.</li>
+                  <li>Funding sources must cover the entire sanctioned budget.</li>
+                </ul>
+              </div>
             </div>
           </div>
-        </div>
-
-        <div className="form-actions">
-          <button type="button" className="cancel-btn" onClick={() => navigate('/admin/work-requests')}>
-            Cancel
-          </button>
-          <button type="button" className="submit-btn" onClick={handleCreateWork} disabled={loading}>
-            {loading ? 'Creating...' : 'Create Work'}
-          </button>
         </div>
       </div>
 
       <style>{`
         .work-creation-container {
-          max-width: 1000px;
-          margin: 0 auto;
-          padding: 2rem;
-        }
-        
-        .form-header {
-          margin-bottom: 2rem;
-        }
-        
-        .form-header h1 {
-          margin: 0 0 0.5rem 0;
+          display: flex;
+          flex-direction: column;
+          gap: 2rem;
+          padding-bottom: 3rem;
           color: #1e293b;
         }
-        
-        .form-header p {
-          margin: 0;
-          color: #64748b;
+
+        .page-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+          border-bottom: 1px solid #e2e8f0;
+          padding-bottom: 1.5rem;
+          margin-bottom: 0.5rem;
         }
-        
-        .error-message {
+
+        .header-text h1 { font-size: 1.75rem; font-weight: 800; margin: 0; color: #0f172a; }
+        .header-text p { color: #64748b; margin: 0.5rem 0 0; font-size: 0.95rem; }
+
+        .back-btn {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          padding: 0.6rem 1rem;
+          background: white;
+          border: 1px solid #e2e8f0;
+          border-radius: 0.5rem;
+          font-weight: 600;
+          color: #475569;
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+
+        .back-btn:hover { background: #f8fafc; border-color: #cbd5e1; }
+
+        .form-main-layout {
+          display: grid;
+          grid-template-columns: 1fr 340px;
+          gap: 2rem;
+          align-items: flex-start;
+        }
+
+        .form-sections-column {
+          display: flex;
+          flex-direction: column;
+          gap: 1.5rem;
+        }
+
+        .form-section-card {
+          background: white;
+          border-radius: 1rem;
+          border: 1px solid #e2e8f0;
+          overflow: hidden;
+          box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .section-header {
+          padding: 1.25rem 1.5rem;
+          background: #f8fafc;
+          border-bottom: 1px solid #e2e8f0;
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+        }
+
+        .section-number {
+          width: 28px;
+          height: 28px;
+          background: #1e293b;
+          color: white;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 0.85rem;
+          font-weight: 700;
+        }
+
+        .section-header h2 { margin: 0; font-size: 1.1rem; font-weight: 700; flex: 1; color: #1e293b; }
+
+        .section-content { padding: 1.5rem; }
+
+        .form-grid {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 1.25rem;
+        }
+
+        .form-group { display: flex; flex-direction: column; gap: 0.4rem; }
+        .form-group.full-width { grid-column: span 2; }
+        .form-group label { font-size: 0.85rem; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.025em; }
+
+        .form-control {
+          padding: 0.75rem 1rem;
+          border: 1px solid #d1d5db;
+          border-radius: 0.6rem;
+          font-size: 0.95rem;
+          transition: border-color 0.2s, box-shadow 0.2s;
+          outline: none;
+        }
+
+        .form-control:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+        .readonly-value { padding: 0.75rem 1rem; background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 0.6rem; font-weight: 600; color: #1e293b; }
+        .amount-input { font-weight: 700; color: #0ea5e9; }
+        .form-help { font-size: 0.75rem; color: #94a3b8; margin-top: 0.25rem; }
+
+        /* Stages & Funds Rows */
+        .stages-list, .fund-sources-list { display: flex; flex-direction: column; gap: 1rem; }
+
+        .stage-item-row {
+          display: grid;
+          grid-template-columns: 32px 1fr 40px;
+          gap: 1rem;
+          background: #f8fafc;
+          padding: 1rem;
+          border-radius: 0.75rem;
+          border: 1px solid #f1f5f9;
+          align-items: flex-start;
+        }
+
+        .stage-index {
+          width: 32px;
+          height: 32px;
+          background: #e2e8f0;
+          color: #475569;
+          border-radius: 0.5rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: 700;
+        }
+
+        .stage-fields-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 1rem; }
+
+        .fund-source-item {
+          display: grid;
+          grid-template-columns: 1fr 1fr 40px;
+          gap: 1.25rem;
+          align-items: flex-end;
+          background: #f8fafc;
+          padding: 1.25rem;
+          border-radius: 0.75rem;
+          border: 1px solid #f1f5f9;
+        }
+
+        .remove-row-btn, .remove-row-btn-inline {
+          padding: 0.5rem;
+          background: white;
+          border: 1px solid #fee2e2;
+          color: #ef4444;
+          border-radius: 0.5rem;
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+
+        .remove-row-btn:hover, .remove-row-btn-inline:hover { background: #fee2e2; color: #dc2626; }
+        .add-btn-sm { display: flex; align-items: center; gap: 0.4rem; padding: 0.5rem 0.85rem; background: white; border: 1px solid #e2e8f0; border-radius: 0.5rem; font-size: 0.85rem; font-weight: 700; color: #0ea5e9; cursor: pointer; transition: all 0.2s; }
+        .add-btn-sm:hover { background: #f0f9ff; border-color: #0ea5e9; }
+
+        .validation-summary {
+          margin-top: 1.5rem;
+          padding: 1rem;
+          border-radius: 0.75rem;
           display: flex;
           align-items: center;
           gap: 0.75rem;
-          padding: 0.75rem 1rem;
-          background-color: #fee2e2;
-          color: #dc2626;
-          border-radius: 0.5rem;
-          margin-bottom: 1rem;
+          font-size: 0.95rem;
         }
-        
-        .error-message button {
-          margin-left: auto;
-          background: none;
-          border: none;
-          cursor: pointer;
-          color: inherit;
-        }
-        
-        .form-card {
-          background: white;
+
+        .validation-summary.valid { background: #f0fdf4; color: #15803d; border: 1px solid #dcfce7; }
+        .validation-summary.invalid { background: #fff1f2; color: #be123c; border: 1px solid #ffe4e6; }
+        .error-hint { font-size: 0.85rem; font-weight: 600; }
+
+        /* Sidebar Styles */
+        .sidebar-sticky-box { position: sticky; top: 1.5rem; display: flex; flex-direction: column; gap: 1.5rem; }
+
+        .summary-card {
+          background: #1e293b;
+          color: white;
           border-radius: 1rem;
-          box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
-          overflow: hidden;
-        }
-        
-        .form-section {
-          padding: 2rem;
-          border-bottom: 1px solid #e2e8f0;
-        }
-        
-        .form-section:last-child {
-          border-bottom: none;
-        }
-        
-        .form-section h2 {
-          margin: 0 0 1.5rem 0;
-          font-size: 1.25rem;
-          color: #0f172a;
-        }
-        
-        .section-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 1.5rem;
-        }
-        
-        .section-header h2 {
-          margin: 0;
-        }
-        
-        .form-grid {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 1.5rem;
-        }
-        
-        .form-group {
-          display: flex;
-          flex-direction: column;
-          gap: 0.5rem;
-        }
-        
-        .form-group.full-width {
-          grid-column: span 2;
-        }
-        
-        .form-group label {
-          font-weight: 600;
-          color: #334155;
-          font-size: 0.875rem;
-        }
-        
-        .form-group input,
-        .form-group textarea,
-        .form-group select {
-          padding: 0.75rem;
-          border: 1px solid #d1d5db;
-          border-radius: 0.5rem;
-          font-size: 0.9rem;
-          font-family: inherit;
-        }
-        
-        .form-group input:focus,
-        .form-group textarea:focus,
-        .form-group select:focus {
-          outline: none;
-          border-color: #0ea5e9;
-          ring: 2px solid #0ea5e9;
-        }
-        
-        .form-group input:disabled {
-          background-color: #f1f5f9;
-          cursor: not-allowed;
-        }
-        
-        .stages-container,
-        .fund-sources-container {
-          display: flex;
-          flex-direction: column;
-          gap: 1rem;
-        }
-        
-        .stage-card,
-        .fund-source-card {
-          background-color: #f8fafc;
-          border: 1px solid #e2e8f0;
-          border-radius: 0.75rem;
-          padding: 1rem;
-        }
-        
-        .stage-header,
-        .fund-source-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 1rem;
-          padding-bottom: 0.5rem;
-          border-bottom: 1px solid #e2e8f0;
-        }
-        
-        .stage-header h3,
-        .fund-source-header h3 {
-          margin: 0;
-          font-size: 1rem;
-          color: #0f172a;
-        }
-        
-        .stage-fields,
-        .fund-source-fields {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 1rem;
-        }
-        
-        .add-btn {
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-          padding: 0.5rem 1rem;
-          background-color: #f1f5f9;
-          border: 1px solid #e2e8f0;
-          border-radius: 0.5rem;
-          color: #0ea5e9;
-          cursor: pointer;
-          font-size: 0.875rem;
-          font-weight: 600;
-        }
-        
-        .add-btn:hover {
-          background-color: #e0f2fe;
-          border-color: #0ea5e9;
-        }
-        
-        .remove-btn {
-          background: none;
-          border: none;
-          color: #ef4444;
-          cursor: pointer;
-          padding: 0.25rem;
-        }
-        
-        .remove-btn:hover {
-          color: #dc2626;
-        }
-        
-        .total-indicator {
-          margin-top: 1rem;
-          padding: 0.75rem;
-          border-radius: 0.5rem;
-          text-align: right;
-          font-weight: 600;
-        }
-        
-        .total-indicator.valid {
-          background-color: #dcfce7;
-          color: #166534;
-        }
-        
-        .total-indicator.invalid {
-          background-color: #fee2e2;
-          color: #991b1b;
-        }
-        
-        .review-card {
-          background-color: #f8fafc;
-          border: 1px solid #e2e8f0;
-          border-radius: 0.75rem;
           padding: 1.5rem;
+          box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
         }
+
+        .summary-card h3 { font-size: 1.1rem; font-weight: 700; margin: 0 0 1.25rem 0; color: #f8fafc; }
+        .summary-details { display: flex; flex-direction: column; gap: 0.85rem; margin-bottom: 1.5rem; }
+        .summary-row { display: flex; justify-content: space-between; font-size: 0.9rem; padding-bottom: 0.85rem; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .summary-row span { color: #94a3b8; }
+        .summary-row strong { color: white; }
+
+        .submission-actions { display: flex; flex-direction: column; gap: 0.75rem; }
         
-        .review-card h3 {
-          margin: 0 0 1rem 0;
-          font-size: 1rem;
-          color: #0f172a;
-        }
-        
-        .review-grid {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 1rem;
-          margin-bottom: 1.5rem;
-          padding-bottom: 1rem;
-          border-bottom: 1px solid #e2e8f0;
-        }
-        
-        .review-stages,
-        .review-funds {
-          margin-bottom: 1.5rem;
-        }
-        
-        .review-stage,
-        .review-fund {
+        .btn-create-final {
           display: flex;
-          justify-content: space-between;
-          padding: 0.5rem 0;
-          border-bottom: 1px solid #e2e8f0;
-        }
-        
-        .review-stage:last-child,
-        .review-fund:last-child {
-          border-bottom: none;
-        }
-        
-        .form-actions {
-          display: flex;
-          justify-content: flex-end;
-          gap: 1rem;
-          padding: 1.5rem 2rem;
-          background-color: #f8fafc;
-          border-top: 1px solid #e2e8f0;
-        }
-        
-        .cancel-btn {
-          padding: 0.75rem 1.5rem;
-          border: 1px solid #d1d5db;
-          border-radius: 0.5rem;
-          background: white;
-          cursor: pointer;
-          font-weight: 600;
-        }
-        
-        .submit-btn {
-          padding: 0.75rem 1.5rem;
-          border: none;
-          border-radius: 0.5rem;
+          align-items: center;
+          justify-content: center;
+          gap: 0.75rem;
+          padding: 1rem;
           background: #0ea5e9;
           color: white;
+          border: none;
+          border-radius: 0.75rem;
+          font-weight: 700;
+          font-size: 1rem;
           cursor: pointer;
+          transition: all 0.2s;
+        }
+
+        .btn-create-final:hover:not(:disabled) { background: #0284c7; transform: translateY(-2px); }
+        .btn-create-final:disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(1); }
+
+        .btn-cancel-flat {
+          padding: 0.75rem;
+          background: transparent;
+          border: none;
+          color: #94a3b8;
           font-weight: 600;
+          cursor: pointer;
+          font-size: 0.9rem;
         }
-        
-        .submit-btn:hover {
-          background: #0284c7;
+        .btn-cancel-flat:hover { color: #f8fafc; }
+
+        .help-box {
+          background: #fefce8;
+          border: 1px solid #fef08a;
+          border-radius: 1rem;
+          padding: 1.25rem;
+          display: flex;
+          gap: 1rem;
         }
-        
-        .submit-btn:disabled {
-          background: #93c5fd;
-          cursor: not-allowed;
+
+        .help-icon { color: #eab308; }
+        .help-content h4 { margin: 0 0 0.5rem 0; font-size: 0.9rem; font-weight: 700; color: #854d0e; }
+        .help-content ul { margin: 0; padding-left: 1.25rem; font-size: 0.8rem; color: #713f12; line-height: 1.5; }
+
+        @media (max-width: 1024px) {
+          .form-main-layout { grid-template-columns: 1fr; }
+          .form-sidebar-column { order: -1; }
+          .sidebar-sticky-box { position: static; }
         }
-        
-        .loading {
-          text-align: center;
-          padding: 3rem;
-          color: #64748b;
+
+        @media (max-width: 768px) {
+          .form-grid, .stage-fields-grid, .fund-source-item { grid-template-columns: 1fr; }
+          .page-header { flex-direction: column; gap: 1rem; }
         }
       `}</style>
     </div>

@@ -4,7 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import { 
   Briefcase, Clock, CheckCircle2, IndianRupee, Building2, 
   Users, AlertTriangle, ClipboardList, BarChart3, TrendingUp,
-  ArrowRight, FileText, Activity, Zap, Calendar, Layers
+  ArrowRight, FileText, Activity, Zap, Calendar, Layers, ChevronRight
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -131,513 +131,422 @@ const AdminDashboardHome = () => {
 
   return (
     <div className="admin-dashboard-home">
-      {/* Hero Section */}
-      <div className="hero-section">
-        <div className="hero-content">
-          <div className="hero-text">
-            <h1>{t('dash_overview')}</h1>
-            <p>{t('dash_welcome')}, {user?.name}</p>
-          </div>
-          <div className="hero-stats">
-            <div className="hero-stat">
-              <div className="hero-stat-icon"><Briefcase size={20} /></div>
-              <div>
-                <strong>{stats.totalWorks}</strong>
-                <span>Total Works</span>
-              </div>
-            </div>
-            <div className="hero-stat">
-              <div className="hero-stat-icon"><Clock size={20} /></div>
-              <div>
-                <strong>{stats.worksInProgress}</strong>
-                <span>In Progress</span>
-              </div>
-            </div>
-            <div className="hero-stat">
-              <div className="hero-stat-icon"><CheckCircle2 size={20} /></div>
-              <div>
-                <strong>{stats.completedWorks}</strong>
-                <span>Completed</span>
-              </div>
-            </div>
+      {/* Header Section */}
+      <div className="dashboard-header">
+        <div className="header-text">
+          <h1>{t('dash_overview')}</h1>
+          <p>{t('dash_welcome')}, {user?.name}</p>
+        </div>
+        <div className="header-actions">
+          <div className="date-display">
+            <Calendar size={16} />
+            <span>{new Date().toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
           </div>
         </div>
       </div>
 
-      {/* Stats Grid */}
+      {/* Primary Stats Grid */}
       <div className="stats-grid">
+        <div className="stat-card primary">
+          <div className="stat-content">
+            <p className="stat-label">Total Allocated Funds</p>
+            <h3 className="stat-value">{formatCurrency(stats.totalFunds)}</h3>
+            <div className="stat-subtext">
+              <TrendingUp size={14} />
+              <span>Across all talukas</span>
+            </div>
+          </div>
+          <div className="stat-icon-bg"><IndianRupee size={48} /></div>
+        </div>
         <div className="stat-card">
-          <div className="stat-icon purple"><IndianRupee size={24} /></div>
+          <div className="stat-icon blue"><Briefcase size={24} /></div>
           <div className="stat-info">
-            <h3>{formatCurrency(stats.totalFunds)}</h3>
-            <p>{t('dash_total_funds')}</p>
+            <p className="stat-label">Total Works</p>
+            <h3 className="stat-value">{stats.totalWorks}</h3>
           </div>
         </div>
         <div className="stat-card">
-          <div className="stat-icon blue"><Building2 size={24} /></div>
+          <div className="stat-icon orange"><Clock size={24} /></div>
           <div className="stat-info">
-            <h3>{stats.activeSchools}</h3>
-            <p>{t('dash_active_schools')}</p>
+            <p className="stat-label">In Progress</p>
+            <h3 className="stat-value">{stats.worksInProgress}</h3>
           </div>
         </div>
         <div className="stat-card">
-          <div className="stat-icon orange"><AlertTriangle size={24} /></div>
+          <div className="stat-icon green"><CheckCircle2 size={24} /></div>
           <div className="stat-info">
-            <h3>{stats.pendingRequests}</h3>
-            <p>{t('dash_pending_requests')}</p>
-          </div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-icon green"><Users size={24} /></div>
-          <div className="stat-info">
-            <h3>{stats.totalUsers}</h3>
-            <p>Total Users</p>
+            <p className="stat-label">Completed</p>
+            <h3 className="stat-value">{stats.completedWorks}</h3>
           </div>
         </div>
       </div>
 
-      {/* Quick Actions */}
-      <div className="quick-actions-section">
-        <h3><Zap size={20} /> {t('dash_quick_actions')}</h3>
-        <div className="actions-grid-home">
-          <button className="action-btn-home" onClick={() => navigate('/admin/users')}>
-            <Users size={18} /> {t('menu_users')}
-          </button>
-          <button className="action-btn-home" onClick={() => navigate('/admin/work-requests')}>
-            <ClipboardList size={18} /> {t('menu_work_requests')}
-          </button>
-          <button className="action-btn-home" onClick={() => navigate('/admin/blockers')}>
-            <AlertTriangle size={18} /> {t('menu_blockers')}
-          </button>
-          <button className="action-btn-home" onClick={() => navigate('/admin/analytics')}>
-            <BarChart3 size={18} /> {t('menu_analytics')}
-          </button>
-          <button className="action-btn-home" onClick={() => navigate('/admin/reports')}>
-            <FileText size={18} /> {t('menu_reports')}
-          </button>
-        </div>
-      </div>
+      <div className="dashboard-main-grid">
+        {/* Left Column: Analytics & Quick Actions */}
+        <div className="grid-left-col">
+          {/* Quick Actions */}
+          <div className="section-card quick-actions-card">
+            <div className="card-header">
+              <h3><Zap size={18} /> {t('dash_quick_actions')}</h3>
+            </div>
+            <div className="actions-grid-home">
+              <button className="action-btn-home" onClick={() => navigate('/admin/users')}>
+                <Users size={18} /> {t('menu_users')}
+              </button>
+              <button className="action-btn-home" onClick={() => navigate('/admin/work-requests')}>
+                <ClipboardList size={18} /> {t('menu_work_requests')}
+              </button>
+              <button className="action-btn-home" onClick={() => navigate('/admin/blockers')}>
+                <AlertTriangle size={18} /> {t('menu_blockers')}
+              </button>
+              <button className="action-btn-home" onClick={() => navigate('/admin/analytics')}>
+                <BarChart3 size={18} /> {t('menu_analytics')}
+              </button>
+            </div>
+          </div>
 
-      {/* Analytics Section */}
-      <div className="analytics-section">
-        <div className="section-header">
-          <h3><TrendingUp size={20} /> {t('dash_quick_analytics')}</h3>
-          <button className="view-all-btn" onClick={() => navigate('/admin/analytics')}>
-            {t('dash_view_all')} <ArrowRight size={16} />
-          </button>
-        </div>
-        <div className="analytics-grid">
-          <div className="analytics-card">
-            <div className="card-title">
-              <Activity size={18} />
-              <h4>{t('dash_status_distribution')}</h4>
+          {/* Budget Utilization */}
+          <div className="section-card">
+            <div className="card-header">
+              <h3><Layers size={18} /> {t('dash_budget_utilization')}</h3>
             </div>
             <div className="chart-container">
-              <ResponsiveContainer width="100%" height={280}>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={budgetData} layout="vertical" margin={{ left: 10, right: 30 }}>
+                  <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="#e2e8f0" />
+                  <XAxis type="number" tickFormatter={(value) => `₹${(value/100000).toFixed(0)}L`} />
+                  <YAxis type="category" dataKey="name" width={80} tick={{ fontSize: 11 }} />
+                  <Tooltip formatter={(value) => formatCurrency(value)} cursor={{fill: '#f8fafc'}} />
+                  <Legend iconType="circle" />
+                  <Bar dataKey="sanctioned" name="Sanctioned" fill="#3b82f6" radius={[0, 4, 4, 0]} barSize={12} />
+                  <Bar dataKey="utilized" name="Utilized" fill="#10b981" radius={[0, 4, 4, 0]} barSize={12} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Column: Recent Activity & Distribution */}
+        <div className="grid-right-col">
+          {/* Status Distribution */}
+          <div className="section-card">
+            <div className="card-header">
+              <h3><Activity size={18} /> {t('dash_status_distribution')}</h3>
+            </div>
+            <div className="chart-container pie-container">
+              <ResponsiveContainer width="100%" height={260}>
                 <PieChart>
                   <Pie
                     data={statusData}
                     cx="50%"
                     cy="50%"
-                    innerRadius={60}
+                    innerRadius={70}
                     outerRadius={90}
-                    paddingAngle={5}
+                    paddingAngle={8}
                     dataKey="value"
-                    label={({name, percent}) => `${name} ${(percent * 100).toFixed(0)}%`}
-                    labelLine={false}
                   >
                     {statusData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
                   <Tooltip formatter={(value) => `${value}`} />
-                  <Legend verticalAlign="bottom" height={36} />
+                  <Legend verticalAlign="bottom" height={36} iconType="circle" />
                 </PieChart>
               </ResponsiveContainer>
             </div>
           </div>
-          <div className="analytics-card">
-            <div className="card-title">
-              <Layers size={18} />
-              <h4>{t('dash_budget_utilization')} (Top 5 Works)</h4>
+
+          {/* Recent Activity */}
+          <div className="section-card recent-activity-card">
+            <div className="card-header">
+              <h3><Clock size={18} /> {t('dash_recent_activity')}</h3>
+              <button className="text-link" onClick={() => navigate('/admin/work-requests')}>View All</button>
             </div>
-            <div className="chart-container">
-              <ResponsiveContainer width="100%" height={280}>
-                <BarChart data={budgetData} layout="vertical" margin={{ left: 20 }}>
-                  <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="#e2e8f0" />
-                  <XAxis type="number" tickFormatter={(value) => `₹${(value/100000).toFixed(0)}L`} />
-                  <YAxis type="category" dataKey="name" width={80} tick={{ fontSize: 10 }} />
-                  <Tooltip formatter={(value) => formatCurrency(value)} />
-                  <Legend />
-                  <Bar dataKey="sanctioned" name="Sanctioned" fill="#ff6b6b" radius={[0, 4, 4, 0]} />
-                  <Bar dataKey="utilized" name="Utilized" fill="#4ecdc4" radius={[0, 4, 4, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
+            <div className="activity-list">
+              {workRequests.slice(0, 4).map(req => (
+                <div key={req.id} className="activity-item">
+                  <div className={`activity-status-dot ${req.status?.toLowerCase()}`}></div>
+                  <div className="activity-info">
+                    <p className="activity-title">{req.title}</p>
+                    <p className="activity-meta">
+                      <span>{req.schoolName}</span>
+                      <span className="dot">•</span>
+                      <span>{new Date(req.createdAt).toLocaleDateString()}</span>
+                    </p>
+                  </div>
+                  <ChevronRight size={16} className="activity-arrow" />
+                </div>
+              ))}
+              {workRequests.length === 0 && <p className="no-data">No recent activity</p>}
             </div>
           </div>
-        </div>
-      </div>
-
-      {/* Recent Activity */}
-      <div className="recent-activities-section">
-        <h3><Clock size={20} /> {t('dash_recent_activity')}</h3>
-        <div className="activity-timeline">
-          {workRequests.slice(0, 5).map(req => (
-            <div key={req.id} className="timeline-item">
-              <div className="timeline-dot" style={{ background: getStatusColor(req.status) }}></div>
-              <div className="timeline-content">
-                <div className="timeline-title">
-                  <strong>{req.title}</strong>
-                  <span className="status-badge" style={{ background: getStatusColor(req.status) }}>
-                    {req.status?.replace('_', ' ')}
-                  </span>
-                </div>
-                <div className="timeline-meta">
-                  <Calendar size={12} />
-                  <small>{new Date(req.createdAt).toLocaleDateString()}</small>
-                </div>
-              </div>
-            </div>
-          ))}
-          {workRequests.length === 0 && <p className="no-activity">No recent activity</p>}
         </div>
       </div>
 
       <style>{`
         .admin-dashboard-home {
-          padding: 0;
-          font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-          background: linear-gradient(135deg, #f5f7fa 0%, #eef2f7 100%);
-        }
-
-        /* Hero Section */
-        .hero-section {
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          border-radius: 1.5rem;
-          padding: 2rem;
-          margin-bottom: 2rem;
-          color: white;
-          box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-        }
-        .hero-content {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          flex-wrap: wrap;
-          gap: 1.5rem;
-        }
-        .hero-text h1 {
-          margin: 0;
-          font-size: 2rem;
-          font-weight: 700;
-          letter-spacing: -0.02em;
-        }
-        .hero-text p {
-          margin: 0.5rem 0 0;
-          opacity: 0.9;
-          font-size: 1rem;
-        }
-        .hero-stats {
-          display: flex;
-          gap: 2rem;
-        }
-        .hero-stat {
-          display: flex;
-          align-items: center;
-          gap: 0.75rem;
-          background: rgba(255,255,255,0.2);
-          backdrop-filter: blur(8px);
-          padding: 0.75rem 1.25rem;
-          border-radius: 1rem;
-        }
-        .hero-stat-icon {
-          background: rgba(255,255,255,0.3);
-          padding: 0.5rem;
-          border-radius: 0.75rem;
-        }
-        .hero-stat div {
           display: flex;
           flex-direction: column;
+          gap: 1.5rem;
+          padding-bottom: 2rem;
+          color: #1e293b;
         }
-        .hero-stat strong {
-          font-size: 1.25rem;
-          font-weight: 700;
+
+        .dashboard-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-end;
+          margin-bottom: 0.5rem;
         }
-        .hero-stat span {
-          font-size: 0.7rem;
-          opacity: 0.8;
+
+        .header-text h1 {
+          font-size: 1.75rem;
+          font-weight: 800;
+          margin: 0;
+          letter-spacing: -0.02em;
+        }
+
+        .header-text p {
+          color: #64748b;
+          margin: 0.25rem 0 0;
+          font-size: 1rem;
+        }
+
+        .date-display {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          padding: 0.5rem 1rem;
+          background: white;
+          border: 1px solid #e2e8f0;
+          border-radius: 0.75rem;
+          font-size: 0.85rem;
+          font-weight: 600;
+          color: #475569;
         }
 
         /* Stats Grid */
         .stats-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-          gap: 1.5rem;
-          margin-bottom: 2rem;
+          grid-template-columns: 2fr 1fr 1fr 1fr;
+          gap: 1.25rem;
         }
+
         .stat-card {
           background: white;
+          padding: 1.25rem;
           border-radius: 1rem;
-          padding: 1.5rem;
+          border: 1px solid #e2e8f0;
           display: flex;
           align-items: center;
           gap: 1rem;
-          box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-          transition: all 0.3s ease;
-          border: 1px solid #e2e8f0;
+          position: relative;
+          overflow: hidden;
+          box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+          transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
+
         .stat-card:hover {
-          transform: translateY(-4px);
-          box-shadow: 0 12px 20px -12px rgba(0, 0, 0, 0.2);
-        }
-        .stat-icon {
-          width: 56px;
-          height: 56px;
-          border-radius: 1rem;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-        .stat-icon.purple { background: linear-gradient(135deg, #667eea20, #764ba220); color: #667eea; }
-        .stat-icon.blue { background: linear-gradient(135deg, #3b82f620, #2563eb20); color: #3b82f6; }
-        .stat-icon.orange { background: linear-gradient(135deg, #f9731620, #ea580c20); color: #f97316; }
-        .stat-icon.green { background: linear-gradient(135deg, #10b98120, #05966920); color: #10b981; }
-        .stat-info h3 {
-          margin: 0;
-          font-size: 1.5rem;
-          font-weight: 800;
-          color: #0f172a;
-        }
-        .stat-info p {
-          margin: 0;
-          color: #64748b;
-          font-size: 0.8rem;
-          font-weight: 500;
-          text-transform: uppercase;
-        }
-
-        /* Quick Actions */
-        .quick-actions-section {
-          background: white;
-          border-radius: 1rem;
-          padding: 1.5rem;
-          margin-bottom: 2rem;
-          border: 1px solid #e2e8f0;
-          box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }
-        .quick-actions-section h3 {
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-          margin: 0 0 1.25rem 0;
-          font-size: 1.1rem;
-          font-weight: 600;
-          color: #0f172a;
-        }
-        .actions-grid-home {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-          gap: 1rem;
-        }
-        .action-btn-home {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 0.5rem;
-          padding: 0.75rem 1rem;
-          background: #f8fafc;
-          border: 1px solid #e2e8f0;
-          border-radius: 0.75rem;
-          font-size: 0.9rem;
-          font-weight: 500;
-          color: #1e293b;
-          cursor: pointer;
-          transition: all 0.2s ease;
-        }
-        .action-btn-home:hover {
-          background: linear-gradient(135deg, #667eea, #764ba2);
-          color: white;
-          border-color: transparent;
           transform: translateY(-2px);
-          box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+          box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05);
         }
 
-        /* Analytics Section */
-        .analytics-section {
-          margin-bottom: 2rem;
-        }
-        .section-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 1rem;
-        }
-        .section-header h3 {
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-          margin: 0;
-          font-size: 1.1rem;
-          font-weight: 600;
-          color: #0f172a;
-        }
-        .view-all-btn {
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-          background: none;
+        .stat-card.primary {
+          background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+          color: white;
           border: none;
-          color: #667eea;
-          font-weight: 600;
-          font-size: 0.9rem;
-          cursor: pointer;
-          transition: color 0.2s;
         }
-        .view-all-btn:hover {
-          color: #764ba2;
+
+        .stat-card.primary .stat-label { color: #94a3b8; }
+        .stat-card.primary .stat-value { color: white; font-size: 1.75rem; }
+        .stat-card.primary .stat-subtext { color: #94a3b8; }
+
+        .stat-icon-bg {
+          position: absolute;
+          right: -10px;
+          bottom: -10px;
+          opacity: 0.1;
+          transform: rotate(-15deg);
         }
-        .analytics-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-          gap: 1.5rem;
-        }
-        .analytics-card {
-          background: white;
-          border-radius: 1rem;
-          padding: 1.5rem;
-          border: 1px solid #e2e8f0;
-          box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-          transition: all 0.2s;
-        }
-        .analytics-card:hover {
-          box-shadow: 0 8px 20px -8px rgba(0,0,0,0.1);
-        }
-        .card-title {
+
+        .stat-icon {
+          width: 48px;
+          height: 48px;
+          border-radius: 0.75rem;
           display: flex;
           align-items: center;
-          gap: 0.5rem;
-          margin-bottom: 1rem;
+          justify-content: center;
+          flex-shrink: 0;
         }
-        .card-title h4 {
-          margin: 0;
-          font-size: 0.85rem;
-          font-weight: 600;
+
+        .stat-icon.blue { background: #eff6ff; color: #3b82f6; }
+        .stat-icon.orange { background: #fff7ed; color: #f97316; }
+        .stat-icon.green { background: #f0fdf4; color: #10b981; }
+
+        .stat-label {
+          font-size: 0.75rem;
+          font-weight: 700;
           text-transform: uppercase;
           letter-spacing: 0.05em;
           color: #64748b;
-        }
-        .chart-container {
-          width: 100%;
-          height: 280px;
+          margin: 0 0 0.25rem 0;
         }
 
-        /* Recent Activity Timeline */
-        .recent-activities-section {
-          background: white;
-          border-radius: 1rem;
-          padding: 1.5rem;
-          border: 1px solid #e2e8f0;
-          box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        .stat-value {
+          font-size: 1.5rem;
+          font-weight: 800;
+          margin: 0;
         }
-        .recent-activities-section h3 {
+
+        .stat-subtext {
           display: flex;
           align-items: center;
-          gap: 0.5rem;
-          margin: 0 0 1.25rem 0;
-          font-size: 1.1rem;
-          font-weight: 600;
-          color: #0f172a;
+          gap: 0.35rem;
+          font-size: 0.75rem;
+          margin-top: 0.5rem;
+          font-weight: 500;
         }
-        .activity-timeline {
+
+        /* Main Grid Layout */
+        .dashboard-main-grid {
+          display: grid;
+          grid-template-columns: 1.5fr 1fr;
+          gap: 1.5rem;
+        }
+
+        .section-card {
+          background: white;
+          border-radius: 1rem;
+          border: 1px solid #e2e8f0;
+          padding: 1.5rem;
           display: flex;
           flex-direction: column;
-          gap: 1rem;
+          gap: 1.25rem;
+          box-shadow: 0 1px 2px rgba(0,0,0,0.05);
         }
-        .timeline-item {
-          display: flex;
-          gap: 1rem;
-          position: relative;
-        }
-        .timeline-dot {
-          width: 12px;
-          height: 12px;
-          border-radius: 50%;
-          margin-top: 0.25rem;
-          flex-shrink: 0;
-        }
-        .timeline-content {
-          flex: 1;
-          padding-bottom: 0.5rem;
-          border-bottom: 1px solid #f1f5f9;
-        }
-        .timeline-title {
+
+        .card-header {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          flex-wrap: wrap;
-          gap: 0.5rem;
-          margin-bottom: 0.25rem;
-        }
-        .status-badge {
-          font-size: 0.7rem;
-          padding: 0.2rem 0.5rem;
-          border-radius: 1rem;
-          color: white;
-          font-weight: 500;
-          text-transform: uppercase;
-        }
-        .timeline-meta {
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-          color: #94a3b8;
-          font-size: 0.7rem;
-        }
-        .no-activity {
-          text-align: center;
-          color: #94a3b8;
-          padding: 2rem;
         }
 
-        /* Responsive */
-        @media (max-width: 768px) {
-          .hero-content {
-            flex-direction: column;
-            align-items: flex-start;
-          }
-          .hero-stats {
-            width: 100%;
-            justify-content: space-between;
-          }
+        .card-header h3 {
+          font-size: 1rem;
+          font-weight: 700;
+          margin: 0;
+          display: flex;
+          align-items: center;
+          gap: 0.6rem;
+          color: #1e293b;
+        }
+
+        .text-link {
+          background: none;
+          border: none;
+          color: #0ea5e9;
+          font-weight: 600;
+          font-size: 0.85rem;
+          cursor: pointer;
+        }
+
+        .grid-left-col, .grid-right-col {
+          display: flex;
+          flex-direction: column;
+          gap: 1.5rem;
+        }
+
+        /* Quick Actions */
+        .actions-grid-home {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 0.75rem;
+        }
+
+        .action-btn-home {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          padding: 1rem;
+          background: #f8fafc;
+          border: 1px solid #f1f5f9;
+          border-radius: 0.75rem;
+          font-weight: 600;
+          color: #475569;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          font-size: 0.9rem;
+        }
+
+        .action-btn-home:hover {
+          background: white;
+          border-color: #0ea5e9;
+          color: #0ea5e9;
+          box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+          transform: translateY(-2px);
+        }
+
+        /* Activity List */
+        .activity-list {
+          display: flex;
+          flex-direction: column;
+        }
+
+        .activity-item {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          padding: 0.85rem 0;
+          border-bottom: 1px solid #f1f5f9;
+          cursor: pointer;
+          transition: padding-left 0.2s ease;
+        }
+
+        .activity-item:last-child { border-bottom: none; }
+        .activity-item:hover { padding-left: 0.5rem; }
+
+        .activity-status-dot {
+          width: 10px;
+          height: 10px;
+          border-radius: 50%;
+          flex-shrink: 0;
+        }
+
+        .activity-status-dot.pending_approval { background: #f59e0b; }
+        .activity-status-dot.approved { background: #10b981; }
+        .activity-status-dot.rejected { background: #ef4444; }
+        .activity-status-dot.in_progress { background: #3b82f6; }
+
+        .activity-info { flex: 1; }
+        .activity-title { font-size: 0.9rem; font-weight: 600; margin: 0; color: #334155; }
+        .activity-meta { font-size: 0.75rem; color: #94a3b8; margin: 0.15rem 0 0; display: flex; align-items: center; gap: 0.4rem; }
+        .dot { font-size: 0.5rem; }
+        .activity-arrow { color: #cbd5e1; }
+
+        /* Responsive Breakpoints */
+        @media (max-width: 1280px) {
           .stats-grid {
-            gap: 1rem;
+            grid-template-columns: repeat(2, 1fr);
           }
-          .stat-card {
-            padding: 1rem;
-          }
-          .stat-icon {
-            width: 48px;
-            height: 48px;
-          }
-          .stat-info h3 {
-            font-size: 1.25rem;
-          }
-          .actions-grid-home {
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-          }
-          .analytics-grid {
+        }
+
+        @media (max-width: 1024px) {
+          .dashboard-main-grid {
             grid-template-columns: 1fr;
           }
         }
-        @media (max-width: 480px) {
-          .hero-text h1 {
-            font-size: 1.5rem;
+
+        @media (max-width: 768px) {
+          .dashboard-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
           }
-          .hero-stat {
-            padding: 0.5rem 0.75rem;
+          .stats-grid {
+            grid-template-columns: 1fr;
           }
-          .hero-stat strong {
-            font-size: 1rem;
+          .actions-grid-home {
+            grid-template-columns: 1fr;
           }
         }
       `}</style>

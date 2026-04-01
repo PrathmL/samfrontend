@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { School, ChevronRight, LogOut, User, Globe, ChevronDown } from 'lucide-react';
+import { School, ChevronRight, LogOut, User, Globe, ChevronDown, Menu } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useTranslation } from 'react-i18next';
 import { showConfirmAlert } from '../../utils/sweetAlertUtils';
 
-const Navbar = () => {
+const Navbar = ({ toggleSidebar }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, logout } = useAuth();
@@ -48,11 +48,18 @@ const Navbar = () => {
   return (
     <nav className={`main-navbar ${isDashboard ? 'dashboard-nav' : ''}`}>
       <div className="nav-container">
-        <div className="nav-brand" onClick={handleBrandClick} style={{ cursor: 'pointer' }}>
-          <School className="brand-icon" />
-          <div className="brand-text">
-            <span className="brand-name">{t('brand_name')}</span>
-            <span className="brand-tagline">{t('brand_tagline')}</span>
+        <div className="nav-left">
+          {isDashboard && (
+            <button className="hamburger-btn" onClick={toggleSidebar}>
+              <Menu size={24} />
+            </button>
+          )}
+          <div className="nav-brand" onClick={handleBrandClick} style={{ cursor: 'pointer' }}>
+            <School className="brand-icon" />
+            <div className="brand-text">
+              <span className="brand-name">{t('brand_name')}</span>
+              <span className="brand-tagline">{t('brand_tagline')}</span>
+            </div>
           </div>
         </div>
 
@@ -61,7 +68,7 @@ const Navbar = () => {
           <div className="lang-selector">
             <button className="lang-btn" onClick={() => setLangDropdownOpen(!langDropdownOpen)}>
               <Globe size={18} />
-              <span>{currentLanguage === 'en' ? 'English' : 'मराठी'}</span>
+              <span className="lang-text">{currentLanguage === 'en' ? 'English' : 'मराठी'}</span>
               <ChevronDown size={14} className={langDropdownOpen ? 'rotate' : ''} />
             </button>
             {langDropdownOpen && (
@@ -99,11 +106,11 @@ const Navbar = () => {
         .main-navbar {
           background: white;
           border-bottom: 1px solid #e2e8f0;
-          padding: 0.75rem 5%;
+          padding: 0.5rem 5%;
           position: sticky;
           top: 0;
           z-index: 1000;
-          height: 70px;
+          height: 60px;
           display: flex;
           align-items: center;
         }
@@ -117,6 +124,30 @@ const Navbar = () => {
           align-items: center;
         }
 
+        .nav-left {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+        }
+
+        .hamburger-btn {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: none;
+          border: none;
+          color: #64748b;
+          cursor: pointer;
+          padding: 0.5rem;
+          border-radius: 0.5rem;
+          transition: background 0.2s;
+        }
+
+        .hamburger-btn:hover {
+          background: #f1f5f9;
+          color: #0f172a;
+        }
+
         .nav-brand {
           display: flex;
           align-items: center;
@@ -125,8 +156,8 @@ const Navbar = () => {
 
         .brand-icon {
           color: #0ea5e9;
-          width: 32px;
-          height: 32px;
+          width: 28px;
+          height: 28px;
         }
 
         .brand-text {
@@ -135,14 +166,14 @@ const Navbar = () => {
         }
 
         .brand-name {
-          font-size: 1.25rem;
+          font-size: 1.1rem;
           font-weight: 800;
           color: #0f172a;
           line-height: 1.2;
         }
 
         .brand-tagline {
-          font-size: 0.7rem;
+          font-size: 0.65rem;
           color: #64748b;
           font-weight: 600;
           letter-spacing: 0.05em;
@@ -152,7 +183,7 @@ const Navbar = () => {
         .nav-actions {
           display: flex;
           align-items: center;
-          gap: 1.5rem;
+          gap: 1rem;
         }
 
         /* Language Selector */
@@ -164,12 +195,12 @@ const Navbar = () => {
           display: flex;
           align-items: center;
           gap: 0.5rem;
-          padding: 0.5rem 0.75rem;
+          padding: 0.4rem 0.6rem;
           background: #f1f5f9;
           border: 1px solid #e2e8f0;
           border-radius: 0.5rem;
           font-weight: 600;
-          font-size: 0.85rem;
+          font-size: 0.8rem;
           color: #475569;
           cursor: pointer;
           transition: all 0.2s;
@@ -223,13 +254,13 @@ const Navbar = () => {
           display: flex;
           align-items: center;
           gap: 0.5rem;
-          padding: 0.6rem 1.25rem;
+          padding: 0.5rem 1rem;
           background: #1e293b;
           color: white;
           border: none;
           border-radius: 9999px;
           font-weight: 600;
-          font-size: 0.9rem;
+          font-size: 0.85rem;
           cursor: pointer;
           transition: all 0.2s;
         }
@@ -242,10 +273,10 @@ const Navbar = () => {
         .user-nav-box {
           display: flex;
           align-items: center;
-          gap: 1rem;
+          gap: 0.75rem;
           background: #f8fafc;
-          padding: 0.4rem;
-          padding-left: 1rem;
+          padding: 0.3rem;
+          padding-left: 0.75rem;
           border-radius: 9999px;
           border: 1px solid #e2e8f0;
         }
@@ -253,7 +284,7 @@ const Navbar = () => {
         .user-profile-btn {
           display: flex;
           align-items: center;
-          gap: 0.75rem;
+          gap: 0.5rem;
           cursor: pointer;
         }
 
@@ -263,21 +294,21 @@ const Navbar = () => {
         }
 
         .user-name-nav {
-          font-size: 0.85rem;
+          font-size: 0.8rem;
           font-weight: 700;
           color: #1e293b;
           line-height: 1.2;
         }
 
         .user-role-nav {
-          font-size: 0.7rem;
+          font-size: 0.65rem;
           color: #0ea5e9;
           font-weight: 600;
         }
 
         .logout-nav-btn {
-          width: 36px;
-          height: 36px;
+          width: 32px;
+          height: 32px;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -296,9 +327,24 @@ const Navbar = () => {
 
         /* Dashboard variation */
         .main-navbar.dashboard-nav {
-          padding: 0.75rem 2rem;
+          padding: 0.5rem 1.5rem;
           background: #ffffff;
           border-bottom: 1px solid #e2e8f0;
+        }
+
+        @media (max-width: 768px) {
+          .lang-text {
+            display: none;
+          }
+          .user-details-nav {
+            display: none;
+          }
+          .brand-tagline {
+            display: none;
+          }
+          .user-nav-box {
+            padding-left: 0.3rem;
+          }
         }
       `}</style>
     </nav>

@@ -55,313 +55,611 @@ const AdminWorkMonitoring = () => {
   });
 
   return (
-    <div className="work-monitoring">
-      <div className="module-header">
-        <h1>{t('title_work_monitoring')}</h1>
-        <p>Comprehensive tracking of all ongoing and completed education projects</p>
-      </div>
-
-      <div className="monitor-stats-row">
-        <div className="mini-stat-card">
-          <span className="mini-stat-label">{t('dash_in_progress')}</span>
-          <span className="mini-stat-val">{works.filter(w => w.status === 'IN_PROGRESS' || w.status === 'ACTIVE').length}</span>
+    <div className="admin-page-container">
+      <div className="dashboard-header">
+        <div className="header-text">
+          <h1>{t('title_work_monitoring')}</h1>
+          <p>Comprehensive tracking of all ongoing and completed education projects</p>
         </div>
-        <div className="mini-stat-card">
-          <span className="mini-stat-label">{t('dash_completed')}</span>
-          <span className="mini-stat-val">{works.filter(w => w.status === 'COMPLETED').length}</span>
-        </div>
-      </div>
-
-      <div className="monitoring-filters">
-        <div className="search-box">
-          <Search size={20} />
-          <input 
-            type="text" 
-            placeholder={`${t('btn_search')} ${t('menu_active_works')}...`}
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
-        <div className="status-pills">
-          <button className={filterStatus === 'ALL' ? 'active' : ''} onClick={() => setStatusFilter('ALL')}>All</button>
-          <button className={filterStatus === 'ACTIVE' ? 'active' : ''} onClick={() => setStatusFilter('ACTIVE')}>Active</button>
-          <button className={filterStatus === 'IN_PROGRESS' ? 'active' : ''} onClick={() => setStatusFilter('IN_PROGRESS')}>In Progress</button>
-          <button className={filterStatus === 'COMPLETED' ? 'active' : ''} onClick={() => setStatusFilter('COMPLETED')}>Completed</button>
+        <div className="header-actions">
+          <div className="stats-mini-container">
+            <div className="stat-mini-item">
+              <span className="label">{t('dash_in_progress')}</span>
+              <span className="value">{works.filter(w => w.status === 'IN_PROGRESS' || w.status === 'ACTIVE').length}</span>
+            </div>
+            <div className="stat-mini-item">
+              <span className="label">{t('dash_completed')}</span>
+              <span className="value text-success">{works.filter(w => w.status === 'COMPLETED').length}</span>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div className="monitoring-table-container">
-        <table className="monitoring-table">
-          <thead>
-            <tr>
-              <th>{t('field_title')}</th>
-              <th>{t('field_school')}</th>
-              <th>{t('field_progress')}</th>
-              <th>{t('field_amount')}</th>
-              <th>{t('field_status')}</th>
-              <th>{t('field_actions')}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredWorks.map(work => (
-              <tr key={work.id}>
-                <td>
-                  <div className="work-id-tag">{work.workCode}</div>
-                  <div className="work-title-main">{work.title}</div>
-                </td>
-                <td>
-                  <div className="school-info-mini">
-                    <Building2 size={14} />
-                    <span>{work.schoolName}</span>
-                  </div>
-                </td>
-                <td>
-                  <div className="progress-cell">
-                    <div className="progress-text">{work.progressPercentage}%</div>
-                    <div className="progress-bar-mini">
-                      <div className="bar-fill" style={{ width: `${work.progressPercentage}%` }}></div>
-                    </div>
-                  </div>
-                </td>
-                <td>
-                  <div className="financial-cell">
-                    <div className="utilized-amt">₹{work.totalUtilized?.toLocaleString()}</div>
-                    <div className="total-amt">of ₹{work.sanctionedAmount?.toLocaleString()}</div>
-                  </div>
-                </td>
-                <td>
-                  <span className="status-dot-label" style={{ color: getStatusColor(work.status) }}>
-                    ● {work.status}
-                  </span>
-                </td>
-                <td>
-                  <button className="view-details-btn" onClick={() => handleViewDetails(work)}>{t('btn_view')}</button>
-                </td>
+      <div className="section-card filter-card">
+        <div className="filter-content">
+          <div className="search-box">
+            <Search size={18} />
+            <input 
+              type="text" 
+              placeholder={`${t('btn_search')} ${t('menu_active_works')}...`}
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+          <div className="status-tabs-wrapper">
+            <div className="status-tabs">
+              {['ALL', 'ACTIVE', 'IN_PROGRESS', 'COMPLETED'].map(status => (
+                <button 
+                  key={status}
+                  className={`tab-btn ${filterStatus === status ? 'active' : ''}`} 
+                  onClick={() => setStatusFilter(status)}
+                >
+                  {status.charAt(0) + status.slice(1).toLowerCase().replace('_', ' ')}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="section-card table-card">
+        <div className="table-responsive">
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th>{t('field_title')}</th>
+                <th>{t('field_school')}</th>
+                <th className="hide-tablet">{t('field_progress')}</th>
+                <th>{t('field_amount')}</th>
+                <th>{t('field_status')}</th>
+                <th>{t('field_actions')}</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {filteredWorks.map(work => (
+                <tr key={work.id}>
+                  <td>
+                    <div className="work-title-cell">
+                      <span className="work-code"># {work.workCode}</span>
+                      <span className="work-title">{work.title}</span>
+                    </div>
+                  </td>
+                  <td>
+                    <div className="school-info-cell">
+                      <Building2 size={16} className="text-slate-400" />
+                      <span>{work.schoolName}</span>
+                    </div>
+                  </td>
+                  <td className="hide-tablet">
+                    <div className="progress-cell">
+                      <div className="progress-label">
+                        <span className="pct">{work.progressPercentage}%</span>
+                      </div>
+                      <div className="progress-track">
+                        <div className="progress-fill" style={{ width: `${work.progressPercentage}%` }}></div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div className="financial-cell">
+                      <div className="utilized">₹{work.totalUtilized?.toLocaleString('en-IN')}</div>
+                      <div className="total hide-mobile">of ₹{work.sanctionedAmount?.toLocaleString('en-IN')}</div>
+                    </div>
+                  </td>
+                  <td>
+                    <span className="status-indicator" style={{ '--status-color': getStatusColor(work.status) }}>
+                      <span className="dot"></span>
+                      <span className="status-text">{work.status}</span>
+                    </span>
+                  </td>
+                  <td>
+                    <button className="btn-icon-only primary-ghost" onClick={() => handleViewDetails(work)} title={t('btn_view')}>
+                      <ChevronRight size={18} />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {filteredWorks.length === 0 && !loading && (
+            <div className="empty-state">
+              <BarChart3 size={48} />
+              <p>No works found matching your criteria</p>
+            </div>
+          )}
+        </div>
       </div>
 
       {isModalOpen && selectedWork && (
         <div className="modal-overlay">
-          <div className="modal modal-xl">
+          <div className="modal-container modal-xl">
             <div className="modal-header">
-              <div className="header-info">
-                <span className="req-id">{selectedWork.workCode}</span>
+              <div className="modal-title-area">
+                <span className="modal-tag"># {selectedWork.workCode}</span>
                 <h2>{selectedWork.title}</h2>
               </div>
-              <button className="close-x" onClick={() => setIsModalOpen(false)}><X size={24} /></button>
+              <button className="close-btn" onClick={() => setIsModalOpen(false)}><X size={24} /></button>
             </div>
-            <div className="modal-content" style={{ maxHeight: '80vh', overflowY: 'auto' }}>
-              <div className="work-details-layout">
-                <div className="details-info-main">
-                  <div className="info-grid-3">
-                    <div className="info-card-sm">
-                      <label><Building2 size={14} /> School</label>
-                      <span>{selectedWork.schoolName}</span>
+            <div className="modal-body custom-scrollbar">
+              <div className="modal-layout">
+                <div className="modal-main">
+                  <div className="info-grid">
+                    <div className="info-item">
+                      <div className="info-icon blue"><Building2 size={20} /></div>
+                      <div className="info-text">
+                        <label>School</label>
+                        <span>{selectedWork.schoolName}</span>
+                      </div>
                     </div>
-                    <div className="info-card-sm">
-                      <label><Calendar size={14} /> Created On</label>
-                      <span>{new Date(selectedWork.createdAt).toLocaleDateString()}</span>
+                    <div className="info-item">
+                      <div className="info-icon orange"><Calendar size={20} /></div>
+                      <div className="info-text">
+                        <label>Created On</label>
+                        <span>{new Date(selectedWork.createdAt).toLocaleDateString('en-IN')}</span>
+                      </div>
                     </div>
-                    <div className="info-card-sm">
-                      <label><IndianRupee size={14} /> Budget</label>
-                      <span>₹{selectedWork.sanctionedAmount?.toLocaleString()}</span>
-                    </div>
-                  </div>
-
-                  <div className="section-box">
-                    <h4>Description</h4>
-                    <p>{selectedWork.description}</p>
-                  </div>
-
-                  <div className="section-box">
-                    <h4>Initial Work Request Photos</h4>
-                    <div className="photo-gallery-horizontal">
-                      {selectedWork.photoUrls?.map((photo, i) => (
-                        <div key={i} className="gallery-photo-item">
-                          <img src={`http://localhost:8080${photo.url}`} alt="Site" />
-                          {(photo.latitude && photo.longitude) && (
-                            <div className="photo-geotag">
-                              <MapPin size={10} />
-                              <span>{photo.latitude.toFixed(4)}, {photo.longitude.toFixed(4)}</span>
-                            </div>
-                          )}
-                        </div>
-                      ))}
-                      {(!selectedWork.photoUrls || selectedWork.photoUrls.length === 0) && (
-                        <p className="no-data-msg">{t('no_initial_photos')}</p>
-                      )}
+                    <div className="info-item">
+                      <div className="info-icon green"><IndianRupee size={20} /></div>
+                      <div className="info-text">
+                        <label>Budget</label>
+                        <span>₹{selectedWork.sanctionedAmount?.toLocaleString('en-IN')}</span>
+                      </div>
                     </div>
                   </div>
 
-                  <div className="section-box">
-                    <h4>Execution Progress Photos</h4>
-                    <div className="updates-timeline">
-                      {selectedWork.progressUpdates?.map((update, i) => (
-                        <div key={update.id} className="update-item-card">
-                          <div className="update-header">
-                            <span className="update-pct">{update.progressPercentage}%</span>
-                            <span className="update-date">{new Date(update.updatedAt).toLocaleString()}</span>
-                            <span className="update-by">by {update.updatedBy}</span>
-                          </div>
-                          <p className="update-remarks">{update.remarks}</p>
-                          <div className="update-photos-grid">
-                            {update.photoUrls?.map((photo, pi) => (
-                              <div key={pi} className="progress-photo-wrapper">
-                                <img src={`http://localhost:8080${photo.url}`} alt="Progress" />
-                                {(photo.latitude && photo.longitude) && (
-                                  <div className="photo-geotag">
-                                    <MapPin size={10} />
-                                    <span>{photo.latitude.toFixed(4)}, {photo.longitude.toFixed(4)}</span>
-                                  </div>
-                                )}
-                                {photo.geoLocation && !photo.latitude && (
-                                  <div className="photo-geotag">
-                                    <MapPin size={10} />
-                                    <span>{photo.geoLocation}</span>
-                                  </div>
-                                )}
+                  <div className="content-section">
+                    <h4 className="section-title">Description</h4>
+                    <p className="description-text">{selectedWork.description}</p>
+                  </div>
+
+                  <div className="content-section">
+                    <h4 className="section-title">Initial Site Photos</h4>
+                    <div className="photo-scroll-container">
+                      <div className="photo-grid-horizontal">
+                        {selectedWork.photoUrls?.map((photo, i) => (
+                          <div key={i} className="photo-card-v2">
+                            <img src={`http://localhost:8080${photo.url}`} alt="Site" />
+                            {(photo.latitude && photo.longitude) && (
+                              <div className="geotag-overlay">
+                                <MapPin size={12} />
+                                <span>{photo.latitude.toFixed(4)}, {photo.longitude.toFixed(4)}</span>
                               </div>
-                            ))}
+                            )}
+                          </div>
+                        ))}
+                        {(!selectedWork.photoUrls || selectedWork.photoUrls.length === 0) && (
+                          <div className="no-photos-placeholder">
+                            <Camera size={32} />
+                            <p>{t('no_initial_photos')}</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="content-section">
+                    <h4 className="section-title">Execution Timeline</h4>
+                    <div className="timeline-v2">
+                      {selectedWork.progressUpdates?.map((update, i) => (
+                        <div key={update.id} className="timeline-item-v2">
+                          <div className="timeline-dot-v2"></div>
+                          <div className="timeline-content-v2">
+                            <div className="update-header-v2">
+                              <span className="update-badge-v2">{update.progressPercentage}%</span>
+                              <div className="update-meta-v2">
+                                <span className="author">by {update.updatedBy}</span>
+                                <span className="date">{new Date(update.updatedAt).toLocaleDateString('en-IN')}</span>
+                              </div>
+                            </div>
+                            <p className="update-remarks-v2">{update.remarks}</p>
+                            {update.photoUrls?.length > 0 && (
+                              <div className="update-photos-v2">
+                                {update.photoUrls.map((photo, pi) => (
+                                  <div key={pi} className="update-img-wrapper">
+                                    <img src={`http://localhost:8080${photo.url}`} alt="Progress" />
+                                  </div>
+                                ))}
+                              </div>
+                            )}
                           </div>
                         </div>
                       ))}
                       {(!selectedWork.progressUpdates || selectedWork.progressUpdates.length === 0) && (
-                        <p className="no-data-msg">No progress updates submitted yet.</p>
+                        <div className="empty-timeline">
+                          <Clock size={24} />
+                          <p>No progress updates submitted yet.</p>
+                        </div>
                       )}
                     </div>
                   </div>
                 </div>
 
-                <div className="details-sidebar">
-                  <div className="sidebar-sticky-top">
-                    <div className="progress-radial-box">
-                      <label>Overall Progress</label>
-                      <div className="progress-big-val">{selectedWork.progressPercentage}%</div>
-                      <div className="progress-bar-big">
-                        <div className="fill" style={{ width: `${selectedWork.progressPercentage}%` }}></div>
+                <div className="modal-sidebar">
+                  <div className="sticky-sidebar">
+                    <div className="progress-viz-card">
+                      <label className="viz-label">Project Completion</label>
+                      <div className="viz-container">
+                        <div className="circular-progress-net">
+                          <svg viewBox="0 0 36 36" className="circular-chart">
+                            <path className="circle-bg"
+                              d="M18 2.0845
+                                a 15.9155 15.9155 0 0 1 0 31.831
+                                a 15.9155 15.9155 0 0 1 0 -31.831"
+                            />
+                            <path className="circle"
+                              strokeDasharray={`${selectedWork.progressPercentage}, 100`}
+                              d="M18 2.0845
+                                a 15.9155 15.9155 0 0 1 0 31.831
+                                a 15.9155 15.9155 0 0 1 0 -31.831"
+                            />
+                            <text x="18" y="20.35" className="percentage">{selectedWork.progressPercentage}%</text>
+                          </svg>
+                        </div>
+                        <div className="viz-status">
+                          <span className="status-label">Current Status</span>
+                          <span className="status-value" style={{ color: getStatusColor(selectedWork.status) }}>{selectedWork.status}</span>
+                        </div>
                       </div>
                     </div>
 
-                    <div className="financial-breakdown">
-                      <h4>Financials</h4>
-                      <div className="fin-row">
-                        <span>Sanctioned</span>
-                        <strong>₹{selectedWork.sanctionedAmount?.toLocaleString()}</strong>
-                      </div>
-                      <div className="fin-row">
-                        <span>Utilized</span>
-                        <strong className="text-blue">₹{selectedWork.totalUtilized?.toLocaleString()}</strong>
-                      </div>
-                      <div className="fin-row total">
-                        <span>Balance</span>
-                        <strong>₹{(selectedWork.sanctionedAmount - selectedWork.totalUtilized)?.toLocaleString()}</strong>
+                    <div className="financial-breakdown-card">
+                      <h4 className="card-title">Financial Breakdown</h4>
+                      <div className="fin-list">
+                        <div className="fin-row-v2">
+                          <span className="label">Sanctioned</span>
+                          <span className="val font-bold">₹{selectedWork.sanctionedAmount?.toLocaleString('en-IN')}</span>
+                        </div>
+                        <div className="fin-row-v2 highlight-blue">
+                          <span className="label">Total Utilized</span>
+                          <span className="val font-bold">₹{selectedWork.totalUtilized?.toLocaleString('en-IN')}</span>
+                        </div>
+                        <div className="fin-row-v2 total-row">
+                          <span className="label">Balance</span>
+                          <span className="val font-extrabold">₹{(selectedWork.sanctionedAmount - selectedWork.totalUtilized)?.toLocaleString('en-IN')}</span>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
+            </div>
+            <div className="modal-footer">
+              <button className="btn-secondary-v2" onClick={() => setIsModalOpen(false)}>{t('btn_close')}</button>
             </div>
           </div>
         </div>
       )}
 
       <style>{`
-        .work-monitoring { padding: 0; }
-        .module-header { margin-bottom: 2rem; }
-        .module-header h1 { margin: 0; font-size: 1.75rem; color: #1e293b; }
-        .module-header p { margin: 0.25rem 0 0; color: #64748b; }
+        .admin-page-container {
+          display: flex;
+          flex-direction: column;
+          gap: 1.25rem;
+          color: #1e293b;
+          width: 100%;
+        }
 
-        .monitor-stats-row { display: flex; gap: 1.5rem; margin-bottom: 2rem; }
-        .mini-stat-card { background: white; padding: 1rem 1.5rem; border-radius: 0.75rem; border: 1px solid #e2e8f0; min-width: 150px; }
-        .mini-stat-label { display: block; font-size: 0.75rem; color: #64748b; text-transform: uppercase; font-weight: 700; margin-bottom: 0.25rem; }
-        .mini-stat-val { font-size: 1.5rem; font-weight: 800; color: #1e293b; }
+        .dashboard-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-end;
+          margin-bottom: 0.5rem;
+          flex-wrap: wrap;
+          gap: 1rem;
+        }
 
-        .monitoring-filters { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; gap: 2rem; }
-        .search-box { flex: 1; position: relative; display: flex; align-items: center; }
-        .search-box svg { position: absolute; left: 1rem; color: #94a3b8; }
-        .search-box input { width: 100%; padding: 0.7rem 1rem 0.75rem 3rem; border: 1px solid #e2e8f0; border-radius: 0.75rem; outline: none; background: white; }
+        .header-text h1 {
+          font-size: clamp(1.25rem, 5vw, 1.75rem);
+          font-weight: 800;
+          margin: 0;
+          letter-spacing: -0.02em;
+        }
 
-        .status-pills { display: flex; gap: 0.5rem; background: #f1f5f9; padding: 0.3rem; border-radius: 0.75rem; }
-        .status-pills button { padding: 0.5rem 1.25rem; border: none; background: none; border-radius: 0.5rem; font-size: 0.85rem; font-weight: 600; color: #64748b; cursor: pointer; transition: all 0.2s; }
-        .status-pills button.active { background: white; color: #0ea5e9; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .header-text p {
+          color: #64748b;
+          margin: 0.25rem 0 0;
+          font-size: 0.95rem;
+        }
 
-        .monitoring-table-container { background: white; border-radius: 1rem; border: 1px solid #e2e8f0; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        .monitoring-table { width: 100%; border-collapse: collapse; }
-        .monitoring-table th { background: #f8fafc; padding: 1rem; text-align: left; font-size: 0.8rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid #e2e8f0; }
-        .monitoring-table td { padding: 1rem; border-top: 1px solid #f1f5f9; }
+        .stats-mini-container {
+          display: flex;
+          gap: 0.75rem;
+        }
 
-        .work-id-tag { font-size: 0.7rem; font-family: monospace; font-weight: 700; color: #94a3b8; margin-bottom: 0.2rem; }
-        .work-title-main { font-weight: 700; color: #1e293b; font-size: 0.95rem; }
-        .school-info-mini { display: flex; align-items: center; gap: 0.5rem; color: #475569; font-size: 0.9rem; }
-        .progress-text { font-size: 0.85rem; font-weight: 700; color: #1e293b; margin-bottom: 0.4rem; }
-        .progress-bar-mini { height: 6px; background: #f1f5f9; border-radius: 3px; overflow: hidden; }
-        .bar-fill { height: 100%; background: #0ea5e9; border-radius: 3px; }
-        .utilized-amt { font-weight: 700; color: #1e293b; font-size: 0.95rem; }
-        .total-amt { font-size: 0.75rem; color: #94a3b8; }
-        .status-dot-label { font-size: 0.85rem; font-weight: 700; text-transform: uppercase; }
-        .view-details-btn { padding: 0.4rem 0.8rem; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 0.4rem; font-size: 0.8rem; font-weight: 600; color: #475569; cursor: pointer; transition: all 0.2s; }
-        .view-details-btn:hover { background: #1e293b; color: white; }
+        .stat-mini-item {
+          background: white;
+          padding: 0.5rem 1rem;
+          border-radius: 0.75rem;
+          border: 1px solid #e2e8f0;
+          display: flex;
+          flex-direction: column;
+          min-width: 100px;
+        }
 
-        /* Details Modal Styles */
-        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 2rem; }
-        .modal-xl { max-width: 1200px !important; width: 100%; }
-        .modal { background: white; border-radius: 1.5rem; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); }
-        .modal-header { padding: 1.5rem 2rem; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; background: #f8fafc; }
-        .header-info { display: flex; align-items: center; gap: 1rem; }
-        .req-id { font-family: monospace; font-weight: 800; color: #94a3b8; background: white; padding: 0.25rem 0.75rem; border-radius: 0.5rem; border: 1px solid #e2e8f0; }
-        .close-x { background: transparent; border: none; color: #64748b; cursor: pointer; padding: 0.5rem; border-radius: 0.5rem; }
-        .close-x:hover { background: #f1f5f9; color: #1e293b; }
+        .stat-mini-item .label {
+          font-size: 0.65rem;
+          text-transform: uppercase;
+          font-weight: 700;
+          color: #64748b;
+        }
 
-        .work-details-layout { display: grid; grid-template-columns: 1fr 320px; min-height: 500px; }
-        .details-info-main { padding: 2rem; border-right: 1px solid #e2e8f0; }
+        .stat-mini-item .value {
+          font-size: 1.1rem;
+          font-weight: 800;
+          color: #1e293b;
+        }
+
+        /* Filter Card */
+        .filter-card {
+          background: white;
+          border-radius: 1rem;
+          border: 1px solid #e2e8f0;
+          padding: 1.25rem;
+        }
+
+        .filter-content {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 1.5rem;
+          flex-wrap: wrap;
+        }
+
+        .search-box {
+          flex: 1;
+          min-width: 250px;
+          position: relative;
+          display: flex;
+          align-items: center;
+          background: #f8fafc;
+          border: 1px solid #e2e8f0;
+          border-radius: 0.75rem;
+          padding: 0 1rem;
+          transition: all 0.2s;
+        }
+
+        .search-box:focus-within {
+          border-color: #3b82f6;
+          background: white;
+          box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .search-box input {
+          border: none;
+          background: transparent;
+          padding: 0.7rem 0.75rem;
+          outline: none;
+          width: 100%;
+          font-size: 0.95rem;
+        }
+
+        .status-tabs-wrapper {
+          overflow-x: auto;
+          -webkit-overflow-scrolling: touch;
+          max-width: 100%;
+        }
+
+        .status-tabs {
+          display: flex;
+          background: #f1f5f9;
+          padding: 0.25rem;
+          border-radius: 0.75rem;
+          gap: 0.25rem;
+          width: max-content;
+        }
+
+        .tab-btn {
+          padding: 0.5rem 1rem;
+          border: none;
+          background: transparent;
+          border-radius: 0.5rem;
+          font-size: 0.85rem;
+          font-weight: 600;
+          color: #64748b;
+          cursor: pointer;
+          transition: all 0.2s;
+          white-space: nowrap;
+        }
+
+        .tab-btn.active {
+          background: white;
+          color: #3b82f6;
+          box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        /* Table */
+        .admin-table {
+          width: 100%;
+          border-collapse: collapse;
+          text-align: left;
+        }
+
+        .admin-table th {
+          background: #f8fafc;
+          padding: 1rem;
+          font-size: 0.75rem;
+          font-weight: 700;
+          text-transform: uppercase;
+          color: #64748b;
+          border-bottom: 1px solid #f1f5f9;
+        }
+
+        .admin-table td {
+          padding: 1rem;
+          border-bottom: 1px solid #f1f5f9;
+          vertical-align: middle;
+        }
+
+        .work-title-cell { display: flex; flex-direction: column; }
+        .work-code { font-family: monospace; font-size: 0.7rem; color: #94a3b8; font-weight: 700; }
+        .work-title { font-weight: 700; color: #1e293b; font-size: 0.9rem; }
+
+        .progress-cell { width: 100px; }
+        .progress-track { height: 6px; background: #f1f5f9; border-radius: 3px; overflow: hidden; }
+        .progress-fill { height: 100%; background: #3b82f6; }
+
+        .financial-cell .utilized { font-weight: 700; font-size: 0.9rem; }
+        .financial-cell .total { font-size: 0.75rem; color: #94a3b8; }
+
+        .status-indicator { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.75rem; font-weight: 700; color: var(--status-color); }
+        .status-indicator .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--status-color); }
+
+        .btn-icon-only {
+          padding: 0.5rem;
+          border-radius: 0.5rem;
+          background: #f8fafc;
+          border: 1px solid #e2e8f0;
+          color: #64748b;
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+
+        .btn-icon-only:hover { background: #1e293b; color: white; border-color: #1e293b; }
+
+        /* Modal Overlay */
+        .modal-overlay {
+          position: fixed;
+          top: 0; left: 0; right: 0; bottom: 0;
+          background: rgba(15, 23, 42, 0.75);
+          backdrop-filter: blur(4px);
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          z-index: 1000;
+          padding: 1rem;
+        }
+
+        .modal-container {
+          background: white;
+          border-radius: 1.25rem;
+          width: 100%;
+          max-width: 1100px;
+          max-height: 95vh;
+          display: flex;
+          flex-direction: column;
+          box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+          overflow: hidden;
+        }
+
+        .modal-header {
+          padding: 1.25rem 1.5rem;
+          background: #f8fafc;
+          border-bottom: 1px solid #f1f5f9;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          flex-shrink: 0;
+        }
+
+        .modal-title-area h2 { margin: 0; font-size: 1.25rem; font-weight: 800; color: #1e293b; }
+        .modal-tag { font-family: monospace; font-size: 0.75rem; color: #94a3b8; font-weight: 700; }
+
+        .close-btn { background: transparent; border: none; color: #94a3b8; cursor: pointer; padding: 4px; border-radius: 6px; }
+        .close-btn:hover { background: #fee2e2; color: #ef4444; }
+
+        .modal-body { padding: 0; overflow-y: auto; flex: 1; }
+        .modal-layout { display: grid; grid-template-columns: 1fr 340px; }
+
+        .modal-main { padding: 1.5rem; border-right: 1px solid #f1f5f9; }
+        .modal-sidebar { padding: 1.5rem; background: #fcfcfd; }
+
+        .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+        .info-item { display: flex; gap: 0.75rem; align-items: center; background: white; padding: 0.75rem; border-radius: 0.75rem; border: 1px solid #f1f5f9; }
+        .info-icon { width: 40px; height: 40px; border-radius: 0.6rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .info-icon.blue { background: #eff6ff; color: #3b82f6; }
+        .info-icon.orange { background: #fff7ed; color: #f97316; }
+        .info-icon.green { background: #f0fdf4; color: #10b981; }
+        .info-text label { display: block; font-size: 0.65rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; }
+        .info-text span { font-weight: 700; color: #334155; font-size: 0.9rem; }
+
+        .content-section { margin-bottom: 2rem; }
+        .section-title { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; color: #64748b; letter-spacing: 0.05em; margin-bottom: 1rem; }
+        .description-text { line-height: 1.6; color: #475569; background: #f8fafc; padding: 1rem; border-radius: 0.75rem; border: 1px solid #e2e8f0; margin: 0; font-size: 0.95rem; }
+
+        .photo-scroll-container { overflow-x: auto; padding-bottom: 0.5rem; }
+        .photo-grid-horizontal { display: flex; gap: 1rem; width: max-content; }
+        .photo-card-v2 { width: 220px; height: 150px; border-radius: 0.75rem; overflow: hidden; position: relative; border: 1px solid #e2e8f0; flex-shrink: 0; }
+        .photo-card-v2 img { width: 100%; height: 100%; object-fit: cover; }
+        .geotag-overlay { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(15, 23, 42, 0.7); color: white; padding: 0.35rem 0.5rem; font-size: 0.65rem; display: flex; align-items: center; gap: 4px; }
+
+        /* Timeline v2 */
+        .timeline-v2 { display: flex; flex-direction: column; gap: 1rem; }
+        .timeline-item-v2 { display: flex; gap: 1rem; position: relative; }
+        .timeline-dot-v2 { width: 10px; height: 10px; border-radius: 50%; background: #3b82f6; margin-top: 6px; flex-shrink: 0; position: relative; z-index: 1; border: 2px solid white; box-shadow: 0 0 0 2px #3b82f6; }
+        .timeline-item-v2:not(:last-child)::after { content: ''; position: absolute; left: 4px; top: 16px; bottom: -10px; width: 2px; background: #e2e8f0; }
+        .timeline-content-v2 { flex: 1; background: white; padding: 1rem; border-radius: 0.75rem; border: 1px solid #f1f5f9; }
+        .update-header-v2 { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
+        .update-badge-v2 { background: #3b82f6; color: white; font-weight: 800; font-size: 0.75rem; padding: 0.2rem 0.5rem; border-radius: 4px; }
+        .update-meta-v2 { display: flex; gap: 0.75rem; font-size: 0.75rem; color: #94a3b8; font-weight: 600; }
+        .update-remarks-v2 { font-size: 0.9rem; color: #475569; margin: 0 0 0.75rem 0; }
+        .update-photos-v2 { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 0.5rem; }
+        .update-img-wrapper { height: 80px; border-radius: 0.5rem; overflow: hidden; }
+        .update-img-wrapper img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* Circular Progress Net */
+        .progress-viz-card { background: white; padding: 1.5rem; border-radius: 1rem; border: 1px solid #e2e8f0; margin-bottom: 1rem; text-align: center; }
+        .viz-label { display: block; font-size: 0.75rem; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 1.5rem; }
+        .viz-container { display: flex; flex-direction: column; align-items: center; gap: 1.5rem; }
         
-        .info-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-bottom: 2rem; }
-        .info-card-sm { background: #f8fafc; padding: 1rem; border-radius: 0.75rem; border: 1px solid #e2e8f0; }
-        .info-card-sm label { display: flex; align-items: center; gap: 0.4rem; font-size: 0.7rem; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 0.4rem; }
-        .info-card-sm span { font-weight: 700; color: #1e293b; font-size: 1rem; }
+        .circular-progress-net { width: 140px; height: 140px; }
+        .circular-chart { display: block; margin: 0 auto; max-width: 100%; max-height: 250px; }
+        .circle-bg { fill: none; stroke: #f1f5f9; stroke-width: 2.8; }
+        .circle { fill: none; stroke-width: 2.8; stroke-linecap: round; stroke: #3b82f6; transition: stroke-dasharray 0.6s ease; }
+        .percentage { fill: #1e293b; font-family: sans-serif; font-size: 0.5rem; text-anchor: middle; font-weight: 800; }
 
-        .section-box { margin-bottom: 2.5rem; }
-        .section-box h4 { font-size: 0.9rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1rem; }
-        .section-box p { line-height: 1.6; color: #334155; }
+        .viz-status { display: flex; flex-direction: column; gap: 4px; }
+        .viz-status .status-label { font-size: 0.7rem; color: #94a3b8; font-weight: 600; }
+        .viz-status .status-value { font-weight: 800; font-size: 1rem; text-transform: uppercase; }
 
-        .photo-gallery-horizontal { display: flex; gap: 1rem; overflow-x: auto; padding-bottom: 1rem; }
-        .gallery-photo-item { flex: 0 0 200px; height: 140px; border-radius: 0.75rem; overflow: hidden; border: 1px solid #e2e8f0; }
-        .gallery-photo-item img { width: 100%; height: 100%; object-fit: cover; }
-        
-        .gallery-photo-item { position: relative; }
-        .photo-geotag { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.6); color: white; padding: 0.2rem 0.5rem; font-size: 0.65rem; display: flex; align-items: center; gap: 0.25rem; }
-        .progress-photo-wrapper { position: relative; border-radius: 0.5rem; overflow: hidden; height: 100px; }
-        .progress-photo-wrapper img { width: 100%; height: 100%; object-fit: cover; }
+        /* Financial Breakdown Card */
+        .financial-breakdown-card { background: white; padding: 1.25rem; border-radius: 1rem; border: 1px solid #e2e8f0; }
+        .fin-list { display: flex; flex-direction: column; gap: 0.75rem; }
+        .fin-row-v2 { display: flex; justify-content: space-between; font-size: 0.85rem; padding: 0.5rem 0; border-bottom: 1px dashed #f1f5f9; }
+        .highlight-blue { color: #3b82f6; }
+        .total-row { border-top: 1px solid #e2e8f0; border-bottom: none; margin-top: 0.25rem; padding-top: 0.75rem; color: #1e293b; }
 
-        .updates-timeline { display: flex; flex-direction: column; gap: 1.5rem; }
-        .update-item-card { border-left: 3px solid #0ea5e9; padding-left: 1.5rem; position: relative; }
-        .update-item-card::before { content: ''; position: absolute; left: -8px; top: 0; width: 13px; height: 13px; border-radius: 50%; background: #0ea5e9; border: 3px solid white; }
-        
-        .update-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem; }
-        .update-pct { font-weight: 800; color: #0ea5e9; background: #f0f9ff; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.85rem; }
-        .update-date { font-size: 0.8rem; color: #94a3b8; }
-        .update-by { font-size: 0.8rem; font-weight: 600; color: #64748b; }
-        .update-remarks { font-size: 0.95rem; color: #475569; margin-bottom: 1rem; }
-        
-        .update-photos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 0.75rem; }
-        .update-photos-grid img { width: 100%; height: 100px; object-fit: cover; border-radius: 0.5rem; border: 1px solid #f1f5f9; }
+        .modal-footer { padding: 1rem 1.5rem; border-top: 1px solid #f1f5f9; display: flex; justify-content: flex-end; flex-shrink: 0; }
+        .btn-secondary-v2 { background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; padding: 0.6rem 1.5rem; border-radius: 0.5rem; font-weight: 700; cursor: pointer; font-size: 0.9rem; }
 
-        .details-sidebar { padding: 2rem; background: #f8fafc; }
-        .sidebar-sticky-top { position: sticky; top: 0; }
-        
-        .progress-radial-box { text-align: center; margin-bottom: 2.5rem; padding: 1.5rem; background: white; border-radius: 1rem; border: 1px solid #e2e8f0; }
-        .progress-big-val { font-size: 3rem; font-weight: 800; color: #1e293b; line-height: 1; margin: 0.5rem 0; }
-        .progress-bar-big { height: 12px; background: #f1f5f9; border-radius: 6px; overflow: hidden; margin-top: 1rem; }
-        .progress-bar-big .fill { height: 100%; background: linear-gradient(90deg, #3b82f6, #0ea5e9); border-radius: 6px; }
+        /* Utility classes */
+        .font-extrabold { font-weight: 800; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
 
-        .financial-breakdown h4 { font-size: 0.8rem; color: #64748b; text-transform: uppercase; margin-bottom: 1rem; }
-        .fin-row { display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid #e2e8f0; font-size: 0.9rem; }
-        .fin-row.total { border-top: 2px solid #e2e8f0; border-bottom: none; margin-top: 0.5rem; padding-top: 1rem; }
-        .text-blue { color: #0ea5e9; }
-        .no-data-msg { font-style: italic; color: #94a3b8; font-size: 0.9rem; }
+        @media (max-width: 1024px) {
+          .modal-layout { grid-template-columns: 1fr; }
+          .modal-main { border-right: none; }
+          .modal-sidebar { border-top: 1px solid #f1f5f9; }
+          .sticky-sidebar { position: static; display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; align-items: start; }
+          .progress-viz-card { margin-bottom: 0; }
+        }
+
+        @media (max-width: 768px) {
+          .hide-tablet { display: none; }
+          .dashboard-header { flex-direction: column; align-items: flex-start; }
+          .stats-mini-container { width: 100%; }
+          .stat-mini-item { flex: 1; }
+          .filter-content { flex-direction: column; align-items: stretch; }
+          .search-box { min-width: 0; }
+          .status-tabs-wrapper { margin: 0 -1.25rem; padding: 0 1.25rem; }
+          
+          .sticky-sidebar { grid-template-columns: 1fr; }
+          .circular-progress-net { width: 120px; height: 120px; }
+        }
+
+        @media (max-width: 480px) {
+          .hide-mobile { display: none; }
+          .status-text { display: none; }
+          .status-indicator .dot { width: 10px; height: 10px; }
+          .admin-table th, .admin-table td { padding: 0.75rem; }
+          .modal-overlay { padding: 0; }
+          .modal-container { border-radius: 0; max-height: 100vh; height: 100vh; }
+          .modal-header { padding: 1rem; }
+          .modal-body { padding: 0; }
+          .modal-main, .modal-sidebar { padding: 1rem; }
+          .info-grid { grid-template-columns: 1fr; }
+        }
       `}</style>
     </div>
   );
