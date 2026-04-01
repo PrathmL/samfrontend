@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
-import { AlertTriangle, RefreshCw, CheckCircle, Package, X, Plus, Trash2 } from 'lucide-react';
+import { AlertTriangle, RefreshCw, CheckCircle, Package, X, Plus, Trash2, Calendar } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { showToast, showErrorAlert, showConfirmAlert } from '../../utils/sweetAlertUtils';
 
 const ClerkLowStockAlerts = () => {
   const { user } = useAuth();
   const [alerts, setAlerts] = useState([]);
-  const [materials, setMaterials] = useState([]);
+  const [movements, setMovements] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [materials, setMaterials] = useState([]);
 
   const [quotationItems, setQuotationItems] = useState([]);
   const [formData, setFormData] = useState({
@@ -25,6 +26,7 @@ const ClerkLowStockAlerts = () => {
     if (user?.schoolId) {
       fetchAlerts();
       fetchMaterials();
+      fetchMovements();
     }
   }, [user?.schoolId]);
 
@@ -37,6 +39,17 @@ const ClerkLowStockAlerts = () => {
       console.error('Error fetching alerts:', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchMovements = async () => {
+    try {
+      const res = await axios.get(`http://localhost:8080/api/inventory/stock/movements/${user.schoolId}`);
+      // Filter for OUT movements (item usage)
+      const usages = (res.data || []).filter(m => m.movementType === 'OUT');
+      setMovements(usages.slice(0, 5)); // Show only latest 5 usages
+    } catch (err) {
+      console.error('Error fetching movements:', err);
     }
   };
 
@@ -164,6 +177,37 @@ const ClerkLowStockAlerts = () => {
             <p>All materials are currently above their minimum stock levels.</p>
           </div>
         )}
+      </div>
+
+      <div className="recent-usage-section">
+        <div className="section-header">
+          <h2>Recent Item Usage</h2>
+          <p>Latest stock subtractions reported by Headmaster</p>
+        </div>
+        <div className="usage-list">
+          {movements.map(m => (
+            <div key={m.id} className="usage-card">
+              <div className="usage-date">
+                <Calendar size={14} />
+                {new Date(m.createdAt).toLocaleDateString()}
+              </div>
+              <div className="usage-details">
+                <div className="usage-material">
+                  <Package size={16} />
+                  <strong>{m.materialName}</strong>
+                </div>
+                <div className="usage-qty">
+                  <span className="qty-val">-{m.quantity}</span>
+                  <span className="qty-unit">{m.unit || 'units'}</span>
+                </div>
+              </div>
+              <div className="usage-purpose">{m.purpose}</div>
+            </div>
+          ))}
+          {movements.length === 0 && (
+            <div className="empty-usage">No recent item usage recorded.</div>
+          )}
+        </div>
       </div>
 
       {isModalOpen && (
@@ -295,6 +339,21 @@ const ClerkLowStockAlerts = () => {
         .submit-btn { padding: 0.6rem 1.5rem; background: #10b981; color: white; border: none; border-radius: 0.4rem; cursor: pointer; font-weight: 600; }
         .cancel-btn { padding: 0.6rem 1.5rem; background: #f1f5f9; color: #475569; border: none; border-radius: 0.4rem; cursor: pointer; font-weight: 600; }
         .overflow-y-auto { overflow-y: auto; }
+
+        .recent-usage-section { margin-top: 3rem; padding-top: 2rem; border-top: 1px solid #e2e8f0; }
+        .recent-usage-section h2 { font-size: 1.5rem; color: #1e293b; margin-bottom: 0.5rem; }
+        .recent-usage-section p { color: #64748b; margin-bottom: 1.5rem; }
+        
+        .usage-list { display: flex; flex-direction: column; gap: 1rem; }
+        .usage-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 0.75rem; padding: 1rem; display: grid; grid-template-columns: 120px 1fr 1fr; align-items: center; gap: 1rem; }
+        .usage-date { font-size: 0.85rem; color: #64748b; display: flex; align-items: center; gap: 0.4rem; }
+        .usage-details { display: flex; flex-direction: column; gap: 0.25rem; }
+        .usage-material { display: flex; align-items: center; gap: 0.5rem; color: #1e293b; }
+        .usage-qty { display: flex; align-items: baseline; gap: 0.25rem; }
+        .qty-val { font-weight: 700; color: #dc2626; font-size: 1.1rem; }
+        .qty-unit { font-size: 0.8rem; color: #64748b; }
+        .usage-purpose { font-size: 0.9rem; color: #475569; font-style: italic; }
+        .empty-usage { text-align: center; padding: 2rem; color: #94a3b8; background: #f8fafc; border-radius: 0.75rem; border: 1px dashed #e2e8f0; }
       `}</style>
     </div>
   );

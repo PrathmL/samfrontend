@@ -173,21 +173,360 @@ const SachivDashboard = () => {
       </div>
 
       <style>{`
-        .sachiv-dashboard { padding: 0; }
-        .welcome-section { margin-bottom: 2rem; }
-        .welcome-section h1 { margin: 0; font-size: 1.875rem; color: #1e293b; }
-        .welcome-section p { color: #64748b; margin: 0.5rem 0 0; }
-        
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2.5rem; }
-        .stat-card { background: white; padding: 1.5rem; border-radius: 1rem; display: flex; align-items: center; gap: 1.25rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-left: 4px solid; }
-        .stat-icon { width: 48px; height: 48px; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; }
-        .stat-info h3 { margin: 0; font-size: 1.5rem; font-weight: 700; color: #1e293b; }
-        .stat-info p { margin: 0; color: #64748b; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
-        .charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 2rem; }
-        .chart-card { background: white; padding: 1.5rem; border-radius: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; }
-        .chart-card h3 { margin: 0 0 1.5rem 0; font-size: 1.1rem; color: #1e293b; }
-        .chart-container { width: 100%; height: 300px; }
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+
+        @keyframes slideInUp {
+          from { opacity: 0; transform: translateY(30px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideInDown {
+          from { opacity: 0; transform: translateY(-20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+
+        * {
+          box-sizing: border-box;
+        }
+
+        .sachiv-dashboard {
+          padding: 1.5rem;
+          background: linear-gradient(135deg, #f0f9ff 0%, #f8fafc 100%);
+          min-height: 100vh;
+          animation: fadeIn 0.4s ease;
+        }
+
+        .welcome-section {
+          margin-bottom: 2.5rem;
+          animation: slideInDown 0.6s ease;
+        }
+
+        .welcome-section h1 {
+          margin: 0;
+          font-size: 2rem;
+          font-weight: 800;
+          color: #0f172a;
+          letter-spacing: -0.02em;
+        }
+
+        .welcome-section p {
+          color: #64748b;
+          margin: 0.5rem 0 0;
+          font-size: 1rem;
+          font-weight: 500;
+        }
+
+        .stats-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+          gap: 1.5rem;
+          margin-bottom: 2.5rem;
+        }
+
+        .stat-card {
+          background: white;
+          padding: 1.5rem;
+          border-radius: 1.25rem;
+          display: flex;
+          align-items: center;
+          gap: 1.5rem;
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+          border-left: 5px solid;
+          transition: all 0.3s ease;
+          animation: slideInUp 0.6s ease;
+          cursor: pointer;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .stat-card::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+          transition: left 0.5s ease;
+        }
+
+        .stat-card:hover::before {
+          left: 100%;
+        }
+
+        .stat-card:hover {
+          transform: translateY(-8px) scale(1.02);
+          box-shadow: 0 12px 24px -5px rgba(0, 0, 0, 0.12);
+        }
+
+        .stat-icon {
+          width: 64px;
+          height: 64px;
+          border-radius: 1rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+          transition: all 0.3s ease;
+        }
+
+        .stat-card:hover .stat-icon {
+          transform: scale(1.15) rotate(-10deg);
+        }
+
+        .stat-info h3 {
+          margin: 0;
+          font-size: 1.75rem;
+          font-weight: 800;
+          color: #0f172a;
+          letter-spacing: -0.02em;
+        }
+
+        .stat-info p {
+          margin: 0.25rem 0 0;
+          color: #64748b;
+          font-size: 0.875rem;
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+        }
+
+        .charts-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+          gap: 2rem;
+        }
+
+        .chart-card {
+          background: white;
+          padding: 2rem;
+          border-radius: 1.25rem;
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+          border: 1px solid #e2e8f0;
+          transition: all 0.3s ease;
+          animation: slideInUp 0.7s ease;
+        }
+
+        .chart-card:hover {
+          border-color: #cbd5e1;
+          box-shadow: 0 12px 24px -5px rgba(0, 0, 0, 0.12);
+          transform: translateY(-4px);
+        }
+
+        .chart-card h3 {
+          margin: 0 0 1.5rem 0;
+          font-size: 1.1rem;
+          font-weight: 700;
+          color: #0f172a;
+        }
+
+        .chart-container {
+          width: 100%;
+          height: 300px;
+        }
+
+        /* Tablet Responsiveness (768px - 1024px) */
+        @media (max-width: 1024px) {
+          .sachiv-dashboard {
+            padding: 1rem;
+          }
+
+          .welcome-section h1 {
+            font-size: 1.5rem;
+          }
+
+          .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+          }
+
+          .stat-card {
+            flex-direction: column;
+            text-align: center;
+            padding: 1.25rem;
+          }
+
+          .stat-info h3 {
+            font-size: 1.5rem;
+          }
+
+          .charts-grid {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+          }
+
+          .chart-container {
+            height: 250px;
+          }
+        }
+
+        /* Mobile Responsiveness (640px - 768px) */
+        @media (max-width: 768px) {
+          .sachiv-dashboard {
+            padding: 1rem;
+          }
+
+          .welcome-section h1 {
+            font-size: 1.35rem;
+          }
+
+          .welcome-section p {
+            font-size: 0.9rem;
+          }
+
+          .stats-grid {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+          }
+
+          .stat-card {
+            flex-direction: row;
+            text-align: left;
+            padding: 1rem;
+          }
+
+          .stat-icon {
+            width: 56px;
+            height: 56px;
+          }
+
+          .stat-info h3 {
+            font-size: 1.35rem;
+          }
+
+          .stat-info p {
+            font-size: 0.75rem;
+          }
+
+          .charts-grid {
+            gap: 1rem;
+          }
+
+          .chart-card {
+            padding: 1.5rem;
+          }
+
+          .chart-card h3 {
+            font-size: 1rem;
+            margin-bottom: 1rem;
+          }
+
+          .chart-container {
+            height: 250px;
+          }
+        }
+
+        /* Small Mobile (480px - 640px) */
+        @media (max-width: 640px) {
+          .sachiv-dashboard {
+            padding: 0.75rem;
+          }
+
+          .welcome-section {
+            margin-bottom: 1.75rem;
+          }
+
+          .welcome-section h1 {
+            font-size: 1.25rem;
+          }
+
+          .welcome-section p {
+            font-size: 0.85rem;
+          }
+
+          .stats-grid {
+            gap: 0.75rem;
+            margin-bottom: 1.75rem;
+          }
+
+          .stat-card {
+            padding: 0.875rem;
+            gap: 1rem;
+          }
+
+          .stat-icon {
+            width: 50px;
+            height: 50px;
+          }
+
+          .stat-info h3 {
+            font-size: 1.25rem;
+          }
+
+          .stat-info p {
+            font-size: 0.7rem;
+          }
+
+          .charts-grid {
+            gap: 0.75rem;
+          }
+
+          .chart-card {
+            padding: 1.25rem;
+          }
+
+          .chart-card h3 {
+            font-size: 0.95rem;
+          }
+
+          .chart-container {
+            height: 220px;
+          }
+        }
+
+        /* Extra Small Mobile (< 480px) */
+        @media (max-width: 480px) {
+          .sachiv-dashboard {
+            padding: 0.5rem;
+          }
+
+          .welcome-section {
+            margin-bottom: 1.5rem;
+          }
+
+          .welcome-section h1 {
+            font-size: 1.1rem;
+          }
+
+          .welcome-section p {
+            font-size: 0.8rem;
+          }
+
+          .stats-grid {
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+          }
+
+          .stat-card {
+            padding: 0.75rem;
+          }
+
+          .stat-icon {
+            width: 44px;
+            height: 44px;
+          }
+
+          .stat-info h3 {
+            font-size: 1.1rem;
+          }
+
+          .stat-info p {
+            font-size: 0.65rem;
+          }
+
+          .chart-card {
+            padding: 1rem;
+          }
+
+          .chart-container {
+            height: 200px;
+          }
+        }
       `}</style>
     </div>
   );

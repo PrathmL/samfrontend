@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider, useAuth } from './context/AuthContext';
 import LoginPage from './components/auth/LoginPage';
 import HomePage from './components/home/HomePage';
+import MainLayout from './components/common/MainLayout';
 import DashboardLayout from './components/dashboard/DashboardLayout';
 import AdminDashboardHome from './components/dashboard/AdminDashboardHome';
 import UserManagement from './components/dashboard/UserManagement';
@@ -152,7 +153,7 @@ function App() {
             } 
           />
 
-          <Route path="/" element={<HomePage />} />
+          <Route path="/" element={<MainLayout><HomePage /></MainLayout>} />
         </Routes>
       </Router>
     </AuthProvider>

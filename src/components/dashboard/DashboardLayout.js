@@ -9,12 +9,12 @@ import { useAuth } from '../../context/AuthContext';
 
 const DashboardLayout = ({ children }) => {
   const { user } = useAuth();
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(true);
 
   const renderSidebar = () => {
     switch (user?.role) {
       case 'ADMIN':
-        return <AdminSidebar />;
+        return <AdminSidebar collapsed={collapsed} setCollapsed={setCollapsed} />;
       case 'SACHIV':
         return <SachivSidebar collapsed={collapsed} setCollapsed={setCollapsed} />;
       case 'HEADMASTER':
@@ -27,8 +27,7 @@ const DashboardLayout = ({ children }) => {
   };
 
   const getMarginLeft = () => {
-    if (user?.role === 'ADMIN') return '260px';
-    return collapsed ? '70px' : '260px';
+    return collapsed ? '110px' : '280px';
   };
 
   return (

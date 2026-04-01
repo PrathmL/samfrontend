@@ -1,10 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { LogOut, Plus, ClipboardList, Clock, CheckCircle2, XCircle } from 'lucide-react';
 
 const BaseDashboard = ({ role, children }) => {
     const { user, logout } = useAuth();
+    const navigate = useNavigate();
+
+    const handleLogout = () => {
+        logout();
+        navigate('/');
+    };
 
     return (
         <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#f8fafc' }}>
@@ -16,7 +23,7 @@ const BaseDashboard = ({ role, children }) => {
                     {/* Placeholder for other menu items */}
                 </nav>
                 <button 
-                    onClick={logout}
+                    onClick={handleLogout}
                     style={{ position: 'absolute', bottom: '2rem', left: '1.5rem', right: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.75rem', background: 'none', border: '1px solid #334155', color: '#cbd5e1', cursor: 'pointer', borderRadius: '0.5rem' }}
                 >
                     <LogOut size={18} /> Logout
