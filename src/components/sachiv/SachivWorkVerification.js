@@ -9,7 +9,7 @@ import {
 import { useAuth } from '../../context/AuthContext';
 import { useTranslation } from 'react-i18next';
 import { showErrorAlert } from '../../utils/sweetAlertUtils';
-import WorkVerification from './WorkVerification';
+import WorkVerification from '../common/WorkVerification';
 
 const SachivWorkVerification = () => {
   const { user } = useAuth();

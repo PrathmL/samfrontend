@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import AdminSidebar from './AdminSidebar';
-import SachivSidebar from './SachivSidebar';
-import HeadmasterSidebar from './HeadmasterSidebar';
-import ClerkSidebar from './ClerkSidebar';
-import Navbar from '../common/Navbar';
-import Footer from '../common/Footer';
+import AdminSidebar from '../admin/AdminSidebar';
+import SachivSidebar from '../sachiv/SachivSidebar';
+import HeadmasterSidebar from '../headmaster/HeadmasterSidebar';
+import ClerkSidebar from '../clerk/ClerkSidebar';
+import Navbar from './Navbar';
+import Footer from './Footer';
 import { useAuth } from '../../context/AuthContext';
 
 const DashboardLayout = ({ children }) => {
